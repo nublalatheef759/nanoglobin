@@ -14,7 +14,10 @@ FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filte
 ## Status: mid-development
 
 Validation is simulation-based (Badread `nanopore2023`). See `simulation/README.md`.
-Not reproducible outside BlueBEAR — paths in `config.yml` are absolute and local.
+Not reproducible outside BlueBEAR: `clair3_path`, `sniffles_path` and
+`cutesv_path` in `config.yml` are absolute paths into a specific account, and the
+module/conda split (below) is BlueBEAR-specific. Reference and target paths are
+relative.
 
 ## Results so far
 
@@ -73,9 +76,10 @@ correctly resolved to type III (100% reciprocal) rather than type I (91%).
 ## Known issues
 
 **Thresholds**
-- `cutesv_min_support: 3` is known-wrong (38 false positives at ~1000×) and kept
-  only until the fraction-of-depth work lands.
-- Threshold should be a fraction of median depth; currently a fixed count.
+- `cutesv_min_support` is a fixed count (25, = 2.5% of ~1000×, calibrated on the
+  wild-type null control). Should be a fraction of median depth: 25 reads is 2.7%
+  of depth at 930× but 83% at 30×, and het variants sit at ~40%, so a fixed count
+  silently misses carriers below ~60×.
 
 **Callers**
 - CuteSV reports `./.` even with `--genotype` and the index present (DV counted,
@@ -102,8 +106,8 @@ correctly resolved to type III (100% reciprocal) rather than type I (91%).
 - β⁰/β⁺ classification lists are hardcoded in Python; should be a data file.
 
 **Pipeline**
-- WGS mode untested: `sniffles_sv`, `cutesv_sv` and `clair3_call` hardcode the
-  amplicon reference instead of using `REFERENCE`.
+- WGS mode is wired (`mode: wgs` in config switches the reference) but has never
+  been run. No WGS dataset tested.
 - `clinical_annotation` declares one output but the script writes several.
 - `comprehensive_report.py` and `patient_summary.py` take no arguments and glob
   the filesystem, so simulated samples appear in clinical reports.
