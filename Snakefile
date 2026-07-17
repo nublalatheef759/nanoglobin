@@ -64,7 +64,7 @@ rule sniffles_sv:
     input:
         bam="sorted_reads/{sample}.bam",
         bai="sorted_reads/{sample}.bam.bai",
-        ref="reference/hg38_globin.fa"
+        ref=REFERENCE
     output:
         "variants/{sample}/{sample}.sniffles.vcf"
     threads: 4
@@ -78,7 +78,7 @@ rule cutesv_sv:
     input:
         bam="sorted_reads/{sample}.bam",
         bai="sorted_reads/{sample}.bam.bai",
-        ref="reference/hg38_globin.fa"
+        ref=REFERENCE
     output:
         "variants/{sample}/{sample}.cutesv.vcf"
     threads: 4
@@ -96,7 +96,7 @@ rule clair3_call:
     input:
         bam="sorted_reads/{sample}.bam",
         bai="sorted_reads/{sample}.bam.bai",
-        ref="reference/hg38_globin.fa"
+        ref=REFERENCE
     output: "variants/{sample}/phased_merge_output.vcf.gz"
     threads: 4
     log:
