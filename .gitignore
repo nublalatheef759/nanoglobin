@@ -11,3 +11,5 @@ __pycache__/
 *.pyc
 models/
 *.xlsx
+variant_summary.txt.gz
+ithacnv.html
