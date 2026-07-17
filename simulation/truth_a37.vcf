@@ -1,0 +1,8 @@
+##fileformat=VCFv4.2
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Difference in length between REF and ALT">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant">
+##ALT=<ID=DEL,Description="Deletion">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	truth
+chr16	173707	a37	A	<DEL>	.	PASS	SVTYPE=DEL;END=177519;SVLEN=-3812	GT	1/1

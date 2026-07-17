@@ -1,0 +1,13 @@
+fastq/
+aligned/
+sorted_reads/
+variants/
+results/
+reference/
+logs/
+simulation/*.fa
+.snakemake/
+__pycache__/
+*.pyc
+models/
+*.xlsx
