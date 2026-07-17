@@ -47,12 +47,18 @@ rule copy_number:
         bam="sorted_reads/{sample}.bam",
         bai="sorted_reads/{sample}.bam.bai"
     output:
-        "variants/{sample}/{sample}.coverage.tsv"
+        summary="variants/{sample}/{sample}.coverage.tsv",
+        bins="variants/{sample}/{sample}.coverage_bins.tsv"
+    log:
+        "logs/coverage/{sample}.log"
+    params:
+        targets=lambda w: " ".join("--target %s=%s" % (k, v) for k, v in config["targets"].items()),
+        ref=lambda w: config["reference_region"],
+        binsize=lambda w: config["coverage_bin_size"]
     shell:
-        "samtools depth -r chr16:170000-178000 {input.bam} | "
-        "awk '{{sum+=$3; n++}} END {{print \"HBA_mean_depth\\t\"sum/n}}' > {output} && "
-        "samtools depth -r chr11:5225000-5228000 {input.bam} | "
-        "awk '{{sum+=$3; n++}} END {{print \"HBB_mean_depth\\t\"sum/n}}' >> {output}"
+        "python scripts/coverage_profile.py --bam {input.bam} {params.targets} "
+        "--reference {params.ref} --bin-size {params.binsize} "
+        "--summary {output.summary} --bins {output.bins} 2> {log}"
 
 rule sniffles_sv:
     input:

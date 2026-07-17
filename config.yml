@@ -9,6 +9,12 @@ clair3_models: "models/r1041_e82_400bps_sup_v430"
 sniffles_path: "/rds/homes/f/fnl759/.conda/envs/snakemake/bin/sniffles"
 cutesv_path: "/rds/homes/f/fnl759/.conda/envs/snakemake/bin/cuteSV"
 cutesv_min_support: 3
+targets:
+  HBA: "chr16:170000-178000"
+  HBB: "chr11:5225000-5228000"
+reference_region: "HBB"
+coverage_bin_size: 200
+
 
 
 
