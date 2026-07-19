@@ -1,7 +1,9 @@
 # NanoGlobin
 
-Variant calling for α/β-thalassaemia from Oxford Nanopore data. Targets HBA1/HBA2
-(chr16) and HBB (chr11).
+Variant calling for haemoglobinopathies from Oxford Nanopore long-read data —
+α/β-thalassaemias, structural haemoglobin variants (Hb S, Hb C, Hb E), and
+copy-number rearrangements. Targets HBA1/HBA2 (chr16) and HBB (chr11);
+developed for thalassaemia and generalised to the globin loci.
 
 ```
 FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filter → region filter → VEP → annotate
@@ -22,8 +24,8 @@ relative.
 ## Results so far
 
 All from simulated data with ground truth constructed by
-`scripts/simulate/make_haplotype.py`, which splices published breakpoints out of
-hg38 and emits a truth VCF.
+`scripts/simulate/make_haplotype.py` (deletions) and `scripts/simulate/make_snv.py`
+(point mutations), which apply a known variant to the reference and emit a truth VCF.
 
 **Specificity** (wild-type null control — reads simulated from the reference, so
 every call is by construction a false positive):
@@ -33,7 +35,7 @@ every call is by construction a false positive):
 | Sniffles (coverage-scaled default) | 0 |
 | CuteSV `min_support=3` | 38 |
 | CuteSV `min_support=25` | 0 |
-| Clair3 | 1 (1bp homopolymer, AF 12%, QUAL 6.38 — removed by `min_quality: 20`) |
+| Clair3 | 1 (1bp homopolymer, AF 12%) — removed by depth/AF filter |
 
 **Sensitivity and limit of detection** (het `-α3.7`, Sniffles):
 
@@ -55,23 +57,61 @@ fraction of median depth, not a count.
 | sample | truth | summary ratio | binned profile |
 |---|---|---|---|
 | WT_control | αα/αα | 1.008 | flat 1.0 |
-| HET_a37 | -α3.7/αα | 0.872 | 1.0 → **0.50** → 1.0 |
+| HET_a37 | -α3.7/αα | 0.872 | 1.0 → **0.50** → 1.0 (right side) |
 | HOM_a37 | -α3.7/-α3.7 | 0.849 | 1.0 → **0.00** → 1.0 |
+| HET_a42 | -α4.2/αα | 0.87 | **0.50** → 1.0 (left side) |
 | HET_fullalpha | --/αα | 0.503 | flat **0.50** |
 
 A single mean over the 8kb HBA window cannot distinguish het from hom `-α3.7`
 (0.872 vs 0.849). Binned depth gives 0.50 vs 0.00, and the step edges recover the
-breakpoints (chr16:173,384–177,187).
+breakpoints (chr16:173,384–177,187). The dip *position* discriminates `-α3.7`
+(right-sided) from `-α4.2` (left-sided) — the two commonest α-deletions.
 
 `--/αα` is flat: every bin at 0.50, no internal contrast. Within-sample
 normalisation compares bins against each other and therefore cannot detect it —
 this is the published failure mode where full α-cluster deletions are reported as
 αα/αα. Normalising against HBB (chr11, undeleted) gives 0.503.
 
-**SV naming** — `databases/cnvs.csv`, 258 entries parsed from IthaCNVs
-(GRCh38.p13), each carrying its `ithaID`. Matching requires reciprocal overlap
-≥50% in both directions plus size concordance ±10%. Simulated `-α3.7` type III is
-correctly resolved to type III (100% reciprocal) rather than type I (91%).
+**Phasing** — Clair3 `--enable_phasing`; het variants emitted as `0|1`.
+SRR37686273 carries six het variants across 1.3 kb of HBB, all in cis, read
+directly off single molecules.
+
+**Variant filtering** — a planted Hb S (`HBB:c.20A>T`, called correctly at DP 991,
+AF 0.465) was silently dropped by a `QUAL>20` filter (QUAL 19.88). ONT QUAL
+miscalibrates for SNVs: 28 false calls in the sample sat at DP=2 with AF=1.0 (they
+would pass an AF filter), while the real variant sat at DP 991. Populations
+separate cleanly on **depth**, not QUAL. Filter is now `FILTER=PASS` +
+`FORMAT/DP≥10` + `FORMAT/AF≥0.15`; QUAL dropped.
+
+## Naming and classification layer
+
+Variants are named and classified against a merged catalogue
+(`databases/variants.csv`, 2,839 entries) built from three sources, keyed on HGVS
+(`GENE:c.notation`):
+
+- **ClinVar** — pathogenicity for 2,814 globin variants (~705 pathogenic/likely
+  pathogenic). `scripts/build_clinvar.py`.
+- **HbVar** — common names (Hb S, IVS I-110, …) for 863 variants; 795 filled onto
+  ClinVar entries lacking a name. `scripts/merge_hbvar.py`.
+- **Curated catalogue** — 68 variants with cohort frequencies (n=1,066).
+
+Structural variants are named separately against **IthaCNVs**
+(`databases/cnvs.csv`, 258 CNVs, GRCh38.p13) with reciprocal-overlap matching and
+subtype resolution.
+
+Annotation is **catalogue-guided**: where VEP returns several transcripts for a
+variant, the transcript whose HGVS matches a catalogue entry is preferred. This
+resolves promoter/5′UTR variants (e.g. `c.-138C>A`) that canonical-only annotation
+leaves as `upstream_gene_variant`, confirmed on a planted `c.-138C>A` truth sample.
+
+## Co-inheritance flagging
+
+Patients co-inheriting **causative** HBA and HBB variants are flagged: co-inherited
+α-thalassaemia suppresses HbA2, the diagnostic marker for β-thal trait, so an HBB
+carrier can screen normal on HPLC. In this cohort, HBB heterozygotes below the
+3.5% HbA2 cutoff rose with α-globin dose — 25.5% (no HBA variant) → 36.5% (HBA het)
+→ 43.3% (HBA hom/comp het). The flag fires only when both loci carry causative
+variants; benign background variants do not trigger it.
 
 ## Known issues
 
@@ -88,21 +128,20 @@ correctly resolved to type III (100% reciprocal) rather than type I (91%).
   reads. Needs `--bed_fn`.
 
 **Annotation**
-- VEP REST returns `unknown` for every `upstream_gene_variant` — i.e. exactly
-  where the β-thal promoter variants sit (`c.-151C>T`, `c.-138C>A`). Indels
-  return `api_error`. VEP CLI or GeneBe is the likely fix.
+- Promoter/5′UTR HGVS is transcript-dependent: the legacy `c.-` numbering maps to
+  a non-canonical isoform, so catalogue-guided selection is required. Variants not
+  in the catalogue and >~340 bp upstream stay `upstream_gene_variant` (correct —
+  they are intergenic, not the named promoter variants).
 - `classify_mutation_type` matches HGVS with explicit bases (`c.25_26delAA`),
   which modern VEP output never produces (`c.25_26del`). β⁰ variants will
   silently classify as `Unclassified`.
 - Multi-nucleotide events (`c.126_129delCTTT`) are annotated per-variant rather
-  than per-haplotype; needs bcftools CSQ or VEP haplosaurus.
-- Common names available for 70 variants only (the study catalogue). IthaGenes
-  has ~3,549 but offers no bulk export.
+  than per-haplotype; needs bcftools CSQ or VEP haplosaurus (phasing is available).
 
 **Clinical logic**
-- Co-inheritance flag fires on any HBA+HBB variant pair, not only causative ones.
 - `annotate_structural` handles HBA only; HBB structural variants are never
-  annotated.
+  annotated. Its hardcoded `sv_lookup` dict predates `identify_sv.py`/`cnvs.csv`
+  and should be replaced by them.
 - β⁰/β⁺ classification lists are hardcoded in Python; should be a data file.
 
 **Pipeline**
@@ -111,7 +150,6 @@ correctly resolved to type III (100% reciprocal) rather than type I (91%).
 - `clinical_annotation` declares one output but the script writes several.
 - `comprehensive_report.py` and `patient_summary.py` take no arguments and glob
   the filesystem, so simulated samples appear in clinical reports.
-- `summary_table` is orphaned — nothing depends on it.
 
 **Environment**
 - Dependencies are split across conda and BlueBEAR modules. Clair3's `PYTHONPATH`
@@ -121,11 +159,14 @@ correctly resolved to type III (100% reciprocal) rather than type I (91%).
 
 ## Data sources
 
+- **ClinVar** — `variant_summary.txt.gz`, merged by `scripts/build_clinvar.py`.
+- **HbVar** (https://globin.bx.psu.edu/hbvar) — common names, tab-separated export,
+  merged by `scripts/merge_hbvar.py`.
 - **IthaCNVs** (https://www.ithanet.eu/db/ithacnv) — CNV breakpoints, GRCh38.p13.
   Parsed by `scripts/parse_ithacnv.py`. 258/311 entries have usable coordinates;
   51 are recorded as "Information unclear" and 2 have transposed digits
   (ithaID 298, 3964 — reported upstream).
-- `databases/variant_lookup.csv` — curated catalogue, 70 variants, with cohort
+- `databases/variant_lookup.csv` — curated catalogue, 68 variants, with cohort
   frequencies (n=1,066).
 
 ## Layout
@@ -136,15 +177,19 @@ config.yml                       paths, thresholds, target regions
 env_sv.sh / env_clair3.sh        module sets (mutually exclusive — see above)
 databases/
   variant_lookup.csv             curated SNV/indel catalogue + cohort frequencies
+  variants.csv                   merged catalogue (curated + ClinVar + HbVar)
   cnvs.csv                       IthaCNVs-derived CNV catalogue
 scripts/
   identify_sv.py                 CNV matching against cnvs.csv
   coverage_profile.py            binned depth, normalised to a reference region
-  vep_annotate.py                VEP REST annotation
+  vep_annotate.py                VEP annotation with catalogue-guided transcript choice
   comprehensive_report.py        merge caller outputs
   patient_summary.py             per-sample genotype summary
   annotation/annotate_variants.py  clinical annotation + report generation
   parse_ithacnv.py               IthaCNVs HTML → cnvs.csv
+  build_clinvar.py               ClinVar merge → variants.csv
+  merge_hbvar.py                 fill common names from HbVar export
   simulate/make_haplotype.py     apply a deletion to a reference, emit truth VCF
+  simulate/make_snv.py           apply a point mutation, emit truth VCF
 simulation/                      truth VCFs and validation results
 ```
