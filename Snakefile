@@ -114,7 +114,7 @@ rule filter_variants:
     output:
         "results/{sample}.filtered.vcf"
     shell:
-        "bcftools filter -i 'FORMAT/DP>={config[min_depth]} && FORMAT/AF>={config[min_af]}' {input} > {output}"
+        "bcftools filter -i 'FILTER=\"PASS\" && FORMAT/DP>={config[min_depth]} && FORMAT/AF>={config[min_af]}' {input} > {output}"
 
 rule summary_table:
     input:
