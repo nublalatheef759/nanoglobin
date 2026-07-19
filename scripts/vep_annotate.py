@@ -10,7 +10,7 @@ sample = input_vcf.split("/")[-1].split(".")[0]
 
 import os
 _cat_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                         "databases", "variant_lookup.csv")
+                         "databases", "variants.csv")
 CATALOGUE_HVGS = set()
 try:
     with open(_cat_path, encoding="utf-8-sig") as _f:

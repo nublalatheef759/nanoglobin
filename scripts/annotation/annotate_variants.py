@@ -313,7 +313,7 @@ if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     variants_path = os.path.join(base_dir, "results", "all_variants_annotated.csv")
     patient_path = os.path.join(base_dir, "results", "patient_summary.csv")
-    db_path = os.path.join(base_dir, "databases", "variant_lookup.csv")
+    db_path = os.path.join(base_dir, "databases", "variants.csv")
     output_dir = os.path.join(base_dir, "results", "clinical_reports")
     
     os.makedirs(output_dir, exist_ok=True)

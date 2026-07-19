@@ -13,3 +13,5 @@ models/
 *.xlsx
 variant_summary.txt.gz
 ithacnv.html
+variant_summary.txt.gz
+hbvar.tsv
