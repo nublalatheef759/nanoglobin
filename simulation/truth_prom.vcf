@@ -1,0 +1,4 @@
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	truth
+chr11	5227159	minus88_promoter	G	T	.	PASS	.	GT	0/1
