@@ -1,4 +1,4 @@
-# NanoThal
+# NanoGlobin
 
 Variant calling for α/β-thalassaemia from Oxford Nanopore data. Targets HBA1/HBA2
 (chr16) and HBB (chr11).
