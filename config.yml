@@ -1,5 +1,5 @@
-min_quality: 20
 min_depth: 10
+min_af: 0.15
 mode: "amplicon"
 samples: ["SRR37686269", "SRR37686273"]
 ref_amplicon: "reference/hg38_globin.fa"      
