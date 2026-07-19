@@ -131,30 +131,74 @@ def annotate_structural(patient_summary_df, db):
     
     return pd.DataFrame(results)
 
-def check_coinheritance(patient_summary_df):
-    """Flag patients with both HBA and HBB variants"""
-    flags = []
-    
-    for _, row in patient_summary_df.iterrows():
-        has_hba = pd.notna(row.get('HBA')) and row['HBA'] != ''
-        has_hbb = pd.notna(row.get('HBB')) and row['HBB'] != ''
-        
-        if has_hba and has_hbb:
-            flags.append({
-                'Sample': row['Sample'],
-                'HBA': row.get('HBA', ''),
-                'HBA_zygosity': row.get('HBA_zygosity', ''),
-                'HBB': row.get('HBB', ''),
-                'HBB_zygosity': row.get('HBB_zygosity', ''),
-                'Flag': 'CO-INHERITED: Both HBA and HBB variants detected. '
-                        'HbA2 may be reduced below diagnostic cutoff. '
-                        'Standard HPLC screening may miss carrier status.',
-                'Risk_level': 'HIGH' if 'homozygous' in str(row.get('HBA_zygosity', '')).lower() 
-                             else 'MODERATE'
-            })
-    
-    return pd.DataFrame(flags)
+# HbA2-suppression evidence from this cohort (n=191 HBB heterozygous carriers):
+#   no HBA variant      median 4.9, 25.5% below 3.5% cutoff
+#   HBA het             median 3.9, 36.5% below
+#   HBA hom/comp het    median 3.6, 43.3% below
+COHORT_BELOW_CUTOFF = {"none": 25.5, "het": 36.5, "hom": 43.3}
 
+
+def _is_causative(variant_name, gene, db):
+    """True if this variant is causative/pathogenic per the database."""
+    if not variant_name or str(variant_name).strip().lower() in ("", "wild-type", "nan"):
+        return False
+    base = re.split(r"\s*\(", str(variant_name).strip())[0].strip()
+    for _, r in db.iterrows():
+        if str(r.get("Gene", "")).upper() not in gene.upper():
+            continue
+        hvgs = str(r.get("HVGS", "")).strip()
+        common = str(r.get("Common name", "")).strip()
+        if base and (base == hvgs or base == common or base in hvgs):
+            func = str(r.get("Functionality", "")).strip().lower()
+            clin = str(r.get("ClinVar classification", "")).strip().lower()
+            if func.startswith("non") or "benign" in clin:
+                return False
+            return func == "causative" or "pathogenic" in clin
+    return False
+
+
+def _alpha_dose(zygosity):
+    z = str(zygosity).strip().lower()
+    if "hom" in z or "comp" in z:
+        return "hom"
+    if "het" in z:
+        return "het"
+    return "none"
+
+
+def check_coinheritance(patient_summary_df, db):
+    """Flag patients co-inheriting CAUSATIVE HBA and HBB variants.
+
+    Co-inherited alpha-thalassaemia suppresses HbA2, the diagnostic marker for
+    beta-thal trait, so an HBB carrier can screen normal on HPLC. Benign variants
+    do not do this, so both sides must be causative before flagging.
+    """
+    flags = []
+    for _, row in patient_summary_df.iterrows():
+        hba, hbb = row.get("HBA", ""), row.get("HBB", "")
+        if not _is_causative(hba, "HBA", db) or not _is_causative(hbb, "HBB", db):
+            continue
+        dose = _alpha_dose(row.get("HBA_zygosity", ""))
+        pct = COHORT_BELOW_CUTOFF[dose]
+        flags.append({
+            "Sample": row["Sample"],
+            "HBA": hba,
+            "HBA_zygosity": row.get("HBA_zygosity", ""),
+            "HBB": hbb,
+            "HBB_zygosity": row.get("HBB_zygosity", ""),
+            "Flag": (
+                "CO-INHERITED CAUSATIVE HBA + HBB VARIANTS. Co-inherited "
+                "alpha-thalassaemia suppresses HbA2, the marker for beta-thal "
+                "trait. In this cohort %.1f%% of HBB carriers with this HBA "
+                "status fell below the 3.5%% HbA2 cutoff (vs 25.5%% with no HBA "
+                "variant). HPLC may report normal; molecular confirmation indicated."
+                % pct
+            ),
+            "Cohort_pct_below_cutoff": pct,
+            "Risk_level": "HIGH" if dose == "hom" else "MODERATE",
+        })
+    return pd.DataFrame(flags)
+    
 def classify_mutation_type(hgvs, gene):
     """Classify HBB variants by mutation type"""
     if gene != 'HBB' and gene != 'HBB':
@@ -242,7 +286,10 @@ def generate_report(sample, snv_results, sv_results, coinheritance_flags):
             report.append("")
     
     # Co-inheritance flags
-    sample_flags = coinheritance_flags[coinheritance_flags['Sample'] == sample]
+    if not coinheritance_flags.empty:
+            sample_flags = coinheritance_flags[coinheritance_flags['Sample'] == sample]
+    else:
+        sample_flags = coinheritance_flags
     if not sample_flags.empty:
         report.append(f"\n{'!'*60}")
         report.append(f"⚠ CO-INHERITANCE ALERT")
@@ -292,7 +339,7 @@ if __name__ == "__main__":
     sv_annotated = annotate_structural(patients, db)
     
     print("Checking co-inheritance...")
-    coinheritance = check_coinheritance(patients)
+    coinheritance = check_coinheritance(patients, db)
     
     # Save annotated results
     snv_annotated.to_csv(os.path.join(output_dir, "snv_annotated.csv"), index=False)
