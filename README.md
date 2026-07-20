@@ -16,10 +16,40 @@ FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filte
 ## Status: mid-development
 
 Validation is simulation-based (Badread `nanopore2023`). See `simulation/README.md`.
-Not reproducible outside BlueBEAR: `clair3_path`, `sniffles_path` and
-`cutesv_path` in `config.yml` are absolute paths into a specific account, and the
-module/conda split (below) is BlueBEAR-specific. Reference and target paths are
-relative.
+The pipeline runs anywhere via `--use-conda` (see Reproducibility). The legacy
+BlueBEAR module path (`env_sv.sh` / `env_clair3.sh`, and the `*_path` keys in
+`config.yml`) still works but is no longer required.
+
+## Reproducibility
+
+Every rule runs in its own pinned conda environment (`envs/*.yaml`), created
+automatically by Snakemake. There is no module loading and no shell-switching —
+the whole pipeline runs from a single command.
+
+​```bash
+# one-time: snakemake (>=8) with conda >=24.7.1 in its environment
+
+# one-time: obtain the Clair3 ONT model (not bundled with the conda package).
+# NanoGlobin pins Clair3 1.0.4, which uses v1 (TensorFlow) models. Download
+# r1041_e82_400bps_sup_v430 — or the model matching your basecaller — from ONT
+# rerio (https://github.com/nanoporetech/rerio), place it under models/, and set
+# config.yml `clair3_models:` to that path (e.g. models/r1041_e82_400bps_sup_v430).
+
+# run everything
+snakemake --use-conda --cores 8
+​```
+
+`config.yml` `clair3_models:` must point at the extracted model directory. The
+`r1041_e82_400bps_sup_v430` model matches R10.4.1 E8.2 (5kHz) Dorado v4.3.0 SUP
+basecalling; data from a different chemistry/basecaller needs the corresponding
+model from rerio. rerio Clair3 models are v1-compatible — do not upgrade to
+Clair3 2.x without a matching v2 model.
+
+Pinned tool versions (`envs/`): minimap2 2.24, samtools 1.16.1, bcftools 1.15.1,
+sniffles 2.8.0, cuteSV 1.0.8, Clair3 1.0.4. The SV-caller environments list
+conda-forge before bioconda so pysam/libdeflate resolve under strict channel
+priority; the cuteSV rule sets `PYTHONNOUSERSITE=1` so a stray user-site cuteSV
+install cannot shadow the pinned one.
 
 ## Results so far
 
@@ -151,12 +181,6 @@ variants; benign background variants do not trigger it.
 - `comprehensive_report.py` and `patient_summary.py` take no arguments and glob
   the filesystem, so simulated samples appear in clinical reports.
 
-**Environment**
-- Dependencies are split across conda and BlueBEAR modules. Clair3's `PYTHONPATH`
-  shadows conda's pysam, so Clair3 and the SV callers cannot share a shell (hence
-  `env_sv.sh` / `env_clair3.sh`). `--use-conda` with per-rule environments is the
-  fix and is not yet done.
-
 ## Data sources
 
 - **ClinVar** — `variant_summary.txt.gz`, merged by `scripts/build_clinvar.py`.
@@ -174,7 +198,8 @@ variants; benign background variants do not trigger it.
 ```
 Snakefile                        pipeline definition
 config.yml                       paths, thresholds, target regions
-env_sv.sh / env_clair3.sh        module sets (mutually exclusive — see above)
+env_sv.sh / env_clair3.sh        legacy BlueBEAR module sets (superseded by --use-conda)
+envs/                            per-rule conda environments (pinned)
 databases/
   variant_lookup.csv             curated SNV/indel catalogue + cohort frequencies
   variants.csv                   merged catalogue (curated + ClinVar + HbVar)
