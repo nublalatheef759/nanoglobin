@@ -1,0 +1,15 @@
+# Python analysis rules: coverage_profile, identify_sv, comprehensive_report,
+# patient_summary, annotate_variants, vep_annotate. Pin the libraries the
+# scripts import so behaviour is identical on any machine.
+name: nanoglobin-python
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas=2.2
+  - numpy=1.26
+  - requests=2.31
+  - lxml=5.1
+  - pysam=0.22

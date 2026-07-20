@@ -23,6 +23,8 @@ rule minimap_align:
     log:
         "logs/minimap/{sample}.log"
     threads: 8
+    conda:
+        "envs/align.yaml"
     shell:
         "(minimap2 -a -x map-ont -t {threads} {input.ref} {input.fastq} | samtools view -Sb - > {output}) 2> {log}"
 
@@ -31,6 +33,8 @@ rule samtools_sort:
         "aligned/{sample}.bam"
     output:
         "sorted_reads/{sample}.bam"
+    conda:
+        "envs/align.yaml"
     shell:
         "samtools sort -T sorted_reads/{wildcards.sample} -O bam {input} > {output}"
 
@@ -39,6 +43,8 @@ rule samtools_index:
         "sorted_reads/{sample}.bam"
     output:
         "sorted_reads/{sample}.bam.bai"
+    conda:
+        "envs/align.yaml"
     shell:
         "samtools index {input}"
 
@@ -55,6 +61,8 @@ rule copy_number:
         targets=lambda w: " ".join("--target %s=%s" % (k, v) for k, v in config["targets"].items()),
         ref=lambda w: config["reference_region"],
         binsize=lambda w: config["coverage_bin_size"]
+    conda:
+        "envs/python.yaml"
     shell:
         "python scripts/coverage_profile.py --bam {input.bam} {params.targets} "
         "--reference {params.ref} --bin-size {params.binsize} "
@@ -70,8 +78,10 @@ rule sniffles_sv:
     threads: 4
     log:
         "logs/sniffles/{sample}.log"
+    conda:
+        "envs/sniffles.yaml"
     shell:
-        "{config[sniffles_path]} --input {input.bam} --reference {input.ref} "
+        "sniffles --input {input.bam} --reference {input.ref} "
         "--vcf {output} --threads {threads} 2> {log}"
 
 rule cutesv_sv:
@@ -84,26 +94,30 @@ rule cutesv_sv:
     threads: 4
     log:
         "logs/cutesv/{sample}.log"
+    conda:
+        "envs/cutesv.yaml"
     shell:
         "rm -rf variants/{wildcards.sample}/cutesv_tmp && "
         "mkdir -p variants/{wildcards.sample}/cutesv_tmp && "
-        "{config[cutesv_path]} {input.bam} {input.ref} {output} "
+        "PYTHONNOUSERSITE=1 cuteSV {input.bam} {input.ref} {output} "
         "variants/{wildcards.sample}/cutesv_tmp "
         "--threads {threads} --sample {wildcards.sample} "
         "--min_support {config[cutesv_min_support]} --min_size 50 --genotype 2> {log}"
-        
+
 rule clair3_call:
     input:
         bam="sorted_reads/{sample}.bam",
         bai="sorted_reads/{sample}.bam.bai",
         ref=REFERENCE
-    output: "variants/{sample}/phased_merge_output.vcf.gz"
+    output:
+        "variants/{sample}/phased_merge_output.vcf.gz"
     threads: 4
     log:
         "logs/clair3/{sample}.log"
-        
+    conda:
+        "envs/clair3.yaml"
     shell:
-        "{config[clair3_path]} "
+        "run_clair3.sh "
         "--bam_fn={input.bam} --ref_fn={input.ref} "
         "--output=variants/{wildcards.sample} --threads={threads} "
         "--platform=ont --model_path={config[clair3_models]} --enable_phasing 2> {log}"
@@ -113,6 +127,8 @@ rule filter_variants:
         "variants/{sample}/phased_merge_output.vcf.gz"
     output:
         "results/{sample}.filtered.vcf"
+    conda:
+        "envs/bcftools.yaml"
     shell:
         "bcftools filter -i 'FILTER=\"PASS\" && FORMAT/DP>={config[min_depth]} && FORMAT/AF>={config[min_af]}' {input} > {output}"
 
@@ -132,6 +148,7 @@ rule summary_table:
             }}' >> {output}
         done
         """
+
 rule region_filter:
     input:
         "results/{sample}.filtered.vcf"
@@ -143,7 +160,7 @@ rule region_filter:
              ($1=="chr11" && $2>=5225000 && $2<=5228000) || \
              ($1=="chr16" && $2>=170000 && $2<=178000)' {input} > {output}
         """
-        
+
 rule annotate_variants:
     input:
         "results/{sample}.globin_only.vcf"
@@ -151,6 +168,8 @@ rule annotate_variants:
         "results/{sample}.annotated.csv"
     log:
         "logs/annotate/{sample}.log"
+    conda:
+        "envs/python.yaml"
     shell:
         "python scripts/vep_annotate.py {input} {output} 2> {log}"
 
@@ -166,14 +185,14 @@ rule merge_annotations:
             tail -n +2 $f >> {output}
         done
         """
+
 rule comprehensive_summary:
     input:
-        annotated="results/all_variants_annotated.csv",
-        sniffles=expand("variants/{sample}/{sample}.sniffles.vcf", sample=SAMPLES),
-        cutesv=expand("variants/{sample}/{sample}.cutesv.vcf", sample=SAMPLES),
-        coverage=expand("variants/{sample}/{sample}.coverage.tsv", sample=SAMPLES)
+        "results/all_variants_annotated.csv"
     output:
         "results/comprehensive_report.csv"
+    conda:
+        "envs/python.yaml"
     shell:
         "python scripts/comprehensive_report.py {output}"
 
@@ -182,18 +201,18 @@ rule patient_summary:
         "results/comprehensive_report.csv"
     output:
         "results/patient_summary.csv"
+    conda:
+        "envs/python.yaml"
     shell:
         "python scripts/patient_summary.py {input} {output}"
-        
+
 rule clinical_annotation:
-    input: 
+    input:
         annotated="results/all_variants_annotated.csv",
-        patients="results/patient_summary.csv", 
+        patients="results/patient_summary.csv"
     output:
         "results/clinical_reports/sv_annotated.csv"
+    conda:
+        "envs/python.yaml"
     shell:
         "python scripts/annotation/annotate_variants.py"
-        
-    
-
-    

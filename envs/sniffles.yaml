@@ -1,0 +1,12 @@
+# Sniffles2 SV calling. conda-forge first: under strict channel priority the
+# pysam/libdeflate dependencies resolve from conda-forge, and sniffles from bioconda.
+name: nanoglobin-sniffles
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - sniffles=2.8.0
+  - pysam=0.22.0
+ 
+  

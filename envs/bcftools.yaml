@@ -1,0 +1,9 @@
+# bcftools: filter_variants, region_filter, any VCF manipulation
+name: nanoglobin-bcftools
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - bcftools=1.15.1
+  - samtools=1.16.1

@@ -1,0 +1,9 @@
+# Alignment + BAM handling: minimap_align, samtools_sort, samtools_index
+name: nanoglobin-align
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - minimap2=2.24
+  - samtools=1.16.1
