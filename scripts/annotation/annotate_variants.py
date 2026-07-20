@@ -200,29 +200,34 @@ def check_coinheritance(patient_summary_df, db):
     return pd.DataFrame(flags)
     
 def classify_mutation_type(hgvs, gene):
-    """Classify HBB variants by mutation type"""
-    if gene != 'HBB' and gene != 'HBB':
+    """Classify HBB variants by mutation type."""
+    if gene != 'HBB':
         return 'N/A'
-    
+    if pd.isna(hgvs):
+        return 'Unknown'
+
     beta0 = ['c.93-22_95del', 'c.92+1G>A', 'c.92+1G>T', 'c.118C>T',
-             'c.25_26delAA', 'c.17_18delCT', 'c.315+1G>A', 
+             'c.25_26delAA', 'c.17_18delCT', 'c.315+1G>A',
              'c.27dupG', 'c.126_129delCTTT', 'c.112delT']
     severe_beta_plus = ['c.92+5G>C', 'c.93-21G>A']
     mild_beta_plus = ['c.-151C>T', 'c.-138C>A', 'c.-50A>C', 'c.-137C>G']
     structural = ['c.20A>T', 'c.364G>C', 'c.79G>A', 'c.364G>A']
-    
-    if pd.isna(hgvs):
-        return 'Unknown'
-    
+
+    def norm(c):
+        # VEP omits trailing bases (c.25_26delAA -> c.25_26del); normalise both
+        # sides so old-style list entries still match modern VEP output.
+        return re.sub(r'(del|dup|ins)[ACGT]+$', r'\1', c) if c else c
+
     c_part = hgvs.split(':')[1] if ':' in str(hgvs) else str(hgvs)
-    
-    if c_part in beta0:
+    c_part = norm(c_part)
+
+    if c_part in {norm(x) for x in beta0}:
         return 'β⁰ (null)'
-    elif c_part in severe_beta_plus:
+    elif c_part in {norm(x) for x in severe_beta_plus}:
         return 'Severe β⁺'
-    elif c_part in mild_beta_plus:
+    elif c_part in {norm(x) for x in mild_beta_plus}:
         return 'Mild β⁺'
-    elif c_part in structural:
+    elif c_part in {norm(x) for x in structural}:
         return 'Structural'
     else:
         return 'Unclassified'
