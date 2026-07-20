@@ -30,7 +30,7 @@ with open(output_file, 'w') as out:
                 parts = line.strip().split("\t")
                 chrom, pos = parts[0], int(parts[1])
                 in_hbb = chrom == "chr11" and 5225000 <= pos <= 5228000
-                in_hba = chrom == "chr16" and 170000 <= pos <= 178000
+                in_hba = chrom == "chr16" and 165000 <= pos <= 180000
                 if not (in_hbb or in_hba):
                     continue
                 svtype = ""

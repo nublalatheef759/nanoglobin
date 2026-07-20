@@ -1,0 +1,8 @@
+sample	truth_vcf	class
+HET_a37	simulation/truth_a37.vcf	SV
+HET_a42	simulation/truth_a42.vcf	SV
+HET_fullalpha	simulation/truth_fullalpha.vcf	SV
+HOM_a37	simulation/truth_a37.vcf	SV
+HET_hbs	simulation/truth_hbs.vcf	SNV
+HET_prom	simulation/truth_prom.vcf	SNV
+WT_control	-	SV
