@@ -36,3 +36,32 @@ Size exact at every depth. Fraction invariant; count falls 40-fold.
 CuteSV min_support:  3 -> 38 FP | 10 -> 1 | 25 -> 0 | 50 -> 0 | 100 -> 0
 Sniffles: 0 FP throughout.
 Clair3: 1 call (1bp homopolymer del, AF 12%, QUAL 6.38), removed by min_quality 20.
+
+## Simulating copy-number gains (triplications)
+
+A deletion is simulated by removing a segment (make_haplotype.py). A gain is the
+inverse, but must NOT be simulated by running Badread on a tandem-duplicated
+reference at fixed Nx -- Badread spreads coverage across the longer template, so
+the duplicated span only reaches ~1.3x instead of 2x.
+
+Correct approach: baseline reads from the normal reference, PLUS an extra copy's
+worth of reads from just the duplicated segment, so the segment gets genuine 2x:
+
+    # baseline (normal 2-copy depth)
+    badread simulate --reference reference/sim_target.fa --quantity 1000x \
+        --seed 10 --error_model nanopore2023 | sed 's/^@/@base_/' > base.fq
+    # extra copy over the duplicated segment only
+    samtools faidx reference/sim_target.fa chr16:173384-177187 > dupseg.fa
+    badread simulate --reference dupseg.fa --quantity 1000x \
+        --seed 11 --error_model nanopore2023 | sed 's/^@/@extra_/' > extra.fq
+    cat base.fq extra.fq > fastq/HOM_triple.fastq
+
+Validated: the binned profile shows ~2x (1.80 vs 0.91 flanking) over the
+duplicated span, with sharp boundaries. make_triplication.py emits the DUP truth
+VCF for benchmarking.
+
+## Simulating copy-number gains (triplications)
+Do NOT run Badread on a tandem-duplicated reference at fixed Nx (coverage spreads
+across the longer template; the dup span only reaches ~1.3x). Instead: baseline
+reads from the normal reference PLUS an extra copy's worth from just the
+duplicated segment, giving a genuine 2x. See make_triplication.py for the truth VCF.
