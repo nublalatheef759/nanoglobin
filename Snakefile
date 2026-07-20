@@ -12,7 +12,8 @@ SAMPLES = config["samples"]
 
 rule all:
     input:
-        "results/clinical_reports/sv_annotated.csv"
+        "results/clinical_reports/sv_annotated.csv",
+        "results/comprehensive_report_concordance.csv"
 
 rule minimap_align:
     input:
@@ -195,6 +196,17 @@ rule comprehensive_summary:
         "envs/python.yaml"
     shell:
         "python scripts/comprehensive_report.py {output}"
+        
+rule concordance:
+    input:
+        "results/comprehensive_report.csv"
+    output:
+        "results/comprehensive_report_concordance.csv"
+    conda:
+        "envs/python.yaml"
+    shell:
+        "python scripts/concordance.py {input} {output}"
+
 
 rule patient_summary:
     input:
