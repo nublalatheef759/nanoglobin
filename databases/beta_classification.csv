@@ -1,0 +1,21 @@
+hgvs,class,label
+c.93-22_95del,beta0,β⁰ (null)
+c.92+1G>A,beta0,β⁰ (null)
+c.92+1G>T,beta0,β⁰ (null)
+c.118C>T,beta0,β⁰ (null)
+c.25_26delAA,beta0,β⁰ (null)
+c.17_18delCT,beta0,β⁰ (null)
+c.315+1G>A,beta0,β⁰ (null)
+c.27dupG,beta0,β⁰ (null)
+c.126_129delCTTT,beta0,β⁰ (null)
+c.112delT,beta0,β⁰ (null)
+c.92+5G>C,severe_beta_plus,Severe β⁺
+c.93-21G>A,severe_beta_plus,Severe β⁺
+c.-151C>T,mild_beta_plus,Mild β⁺
+c.-138C>A,mild_beta_plus,Mild β⁺
+c.-50A>C,mild_beta_plus,Mild β⁺
+c.-137C>G,mild_beta_plus,Mild β⁺
+c.20A>T,structural,Structural
+c.364G>C,structural,Structural
+c.79G>A,structural,Structural
+c.364G>A,structural,Structural
