@@ -109,7 +109,8 @@ rule clair3_call:
     input:
         bam="sorted_reads/{sample}.bam",
         bai="sorted_reads/{sample}.bam.bai",
-        ref=REFERENCE
+        ref=REFERENCE,
+        bed="targets.bed"
     output:
         "variants/{sample}/phased_merge_output.vcf.gz"
     threads: 4
@@ -121,7 +122,8 @@ rule clair3_call:
         "run_clair3.sh "
         "--bam_fn={input.bam} --ref_fn={input.ref} "
         "--output=variants/{wildcards.sample} --threads={threads} "
-        "--platform=ont --model_path={config[clair3_models]} --enable_phasing 2> {log}"
+        "--platform=ont --model_path={config[clair3_models]} "
+        "--bed_fn={input.bed} --enable_phasing 2> {log}"
 
 rule filter_variants:
     input:
