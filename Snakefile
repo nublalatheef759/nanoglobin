@@ -225,7 +225,9 @@ rule clinical_annotation:
         annotated="results/all_variants_annotated.csv",
         patients="results/patient_summary.csv"
     output:
-        "results/clinical_reports/sv_annotated.csv"
+        sv="results/clinical_reports/sv_annotated.csv",
+        snv="results/clinical_reports/snv_annotated.csv",
+        coinh="results/clinical_reports/coinheritance_flags.csv"
     conda:
         "envs/python.yaml"
     shell:
