@@ -162,11 +162,12 @@ variants; benign background variants do not trigger it.
   a non-canonical isoform, so catalogue-guided selection is required. Variants not
   in the catalogue and >~340 bp upstream stay `upstream_gene_variant` (correct —
   they are intergenic, not the named promoter variants).
-- `classify_mutation_type` matches HGVS with explicit bases (`c.25_26delAA`),
-  which modern VEP output never produces (`c.25_26del`). β⁰ variants will
-  silently classify as `Unclassified`.
 - Multi-nucleotide events (`c.126_129delCTTT`) are annotated per-variant rather
   than per-haplotype; needs bcftools CSQ or VEP haplosaurus (phasing is available).
+- `vep_annotate.py` annotates insertions via the Ensembl VEP region endpoint,
+  which can return an API error for some indel formats (unnormalised ref/alt or
+  coordinate convention). Not triggered by any variant in the current test set;
+  validating a fix would require indel test cases with known VEP output.
 
 **Clinical logic**
 - `annotate_structural` handles HBA only; HBB structural variants are never
