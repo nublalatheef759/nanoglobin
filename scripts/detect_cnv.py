@@ -72,6 +72,41 @@ def call_file(path):
     return find_runs(rows, BASELINE), BASELINE
 
 
+def write_cnv_calls(out_path):
+    """Write one row per CNV call to a CSV the sample report can consume.
+
+    Gains are matched against the IthaCNVs catalogue by reciprocal overlap
+    (reusing identify_sv) so a detected bump can be named, e.g. ααα(anti-3.7).
+    Copy number for gains is noisy (a duplication maps ambiguously), so we report
+    the measured fold-change, not an inferred copy count."""
+    import glob, os, csv as _csv, sys as _sys
+    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    try:
+        from identify_sv import identify_sv
+    except Exception:
+        identify_sv = None
+    paths = sorted(glob.glob("variants/*/*.coverage_bins.tsv"))
+    with open(out_path, "w", newline="", encoding="utf-8-sig") as fh:
+        w = _csv.writer(fh)
+        w.writerow(["Sample", "Type", "Region", "Fold", "Name", "Confidence"])
+        for p in paths:
+            sample = os.path.basename(os.path.dirname(p))
+            res = call_file(p)
+            if not res:
+                continue
+            calls, base = res
+            for kind, start, end, fold, copies in calls:
+                region = "chr16:%d-%d" % (start, end)
+                name = ""
+                if kind == "gain" and identify_sv is not None:
+                    # match the bump against catalogued DUP entries
+                    hit = identify_sv("chr16", start, "DUP", end - start)
+                    if hit and not hit.startswith("unknown"):
+                        name = hit
+                conf = "high" if kind == "loss" else "moderate"
+                w.writerow([sample, kind, region, "%.2f" % fold, name, conf])
+
+
 if __name__ == "__main__":
     import glob, os
     # test across all samples: gains should fire only on triple, losses on deletions
@@ -89,5 +124,11 @@ if __name__ == "__main__":
             desc = "; ".join("%s chr16:%d-%d (%.2fx, ~%s copies)" % (k, s, e, f, c)
                              for k, s, e, f, c in calls)
             print("%-16s %.2f   %s" % (sample, base, desc))
-            
+
+    import sys as _sys
+    if len(_sys.argv) > 1:
+        write_cnv_calls(_sys.argv[1])
+        print("\nwrote CNV calls -> %s" % _sys.argv[1])
+        
+        
             

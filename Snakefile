@@ -13,7 +13,8 @@ SAMPLES = config["samples"]
 rule all:
     input:
         "results/clinical_reports/sv_annotated.csv",
-        "results/comprehensive_report_concordance.csv"
+        "results/comprehensive_report_concordance.csv",
+        "results/sample_report.csv"
 
 rule minimap_align:
     input:
@@ -198,6 +199,27 @@ rule comprehensive_summary:
         "envs/python.yaml"
     shell:
         "python scripts/comprehensive_report.py {output}"
+        
+rule cnv_calls:
+    input:
+        expand("variants/{s}/{s}.coverage_bins.tsv", s=SAMPLES)
+    output:
+        "results/cnv_calls.csv"
+    conda:
+        "envs/python.yaml"
+    shell:
+        "python scripts/detect_cnv.py {output}"
+
+rule sample_report:
+    input:
+        report="results/comprehensive_report.csv",
+        cnv="results/cnv_calls.csv"
+    output:
+        "results/sample_report.csv"
+    conda:
+        "envs/python.yaml"
+    shell:
+        "python scripts/sample_report.py {input.report} databases/variants.csv {output} {input.cnv}"
         
 rule concordance:
     input:
