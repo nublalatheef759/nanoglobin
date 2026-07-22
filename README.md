@@ -117,7 +117,9 @@ separate cleanly on **depth**, not QUAL. Filter is now `FILTER=PASS` +
 
 Variants are named and classified against a merged catalogue
 (`databases/variants.csv`, 2,839 entries) built from three sources, keyed on HGVS
-(`GENE:c.notation`):
+(`GENE:c.notation`). Coverage spans all eight human globin genes — HBB, HBA1,
+HBA2, HBD, HBG1, HBG2, HBE1, HBZ — i.e. the α- and β-thalassaemias, structural
+haemoglobin variants (Hb S/C/D/E), and δ-/γ-globin variants:
 
 - **ClinVar** — pathogenicity for 2,814 globin variants (~705 pathogenic/likely
   pathogenic). `scripts/build_clinvar.py`.
@@ -127,7 +129,10 @@ Variants are named and classified against a merged catalogue
 
 Structural variants are named separately against **IthaCNVs**
 (`databases/cnvs.csv`, 258 CNVs, GRCh38.p13) with reciprocal-overlap matching and
-subtype resolution.
+subtype resolution. This applies to copy-number **gains** as well as deletions:
+a coverage-derived duplication (e.g. a bump over chr16:173,384–177,187) is matched
+against catalogued DUP entries and named — e.g. ααα(anti-3.7) — by the same
+overlap logic.
 
 Annotation is **catalogue-guided**: where VEP returns several transcripts for a
 variant, the transcript whose HGVS matches a catalogue entry is preferred. This
@@ -142,6 +147,18 @@ carrier can screen normal on HPLC. In this cohort, HBB heterozygotes below the
 3.5% HbA2 cutoff rose with α-globin dose — 25.5% (no HBA variant) → 36.5% (HBA het)
 → 43.3% (HBA hom/comp het). The flag fires only when both loci carry causative
 variants; benign background variants do not trigger it.
+
+## Per-sample clinical report
+
+`results/sample_report.csv` gives one row per sample for high-volume review:
+a descriptive Result flag (causative / conflicting / VUS-only / none — a
+description of what was found, not a diagnosis), the primary finding's common
+name, HGVS, and zygosity, variant counts by significance tier, and a full ranked
+variant list. SNVs and structural variants (deletions and catalogue-matched
+gains) are unified into one view. Nothing is hidden: benign and VUS variants sort
+below causative ones but remain visible, since a classification benign for one
+population or submitter may matter for another — ClinVar "Conflicting" variants
+are surfaced explicitly.
 
 ## Known issues
 
@@ -211,6 +228,8 @@ scripts/
   vep_annotate.py                VEP annotation with catalogue-guided transcript choice
   comprehensive_report.py        merge caller outputs
   patient_summary.py             per-sample genotype summary
+  detect_cnv.py                  copy-number gain/loss calling from coverage bins
+  sample_report.py               ranked per-sample clinical report
   annotation/annotate_variants.py  clinical annotation + report generation
   parse_ithacnv.py               IthaCNVs HTML → cnvs.csv
   build_clinvar.py               ClinVar merge → variants.csv
