@@ -83,79 +83,95 @@ def annotate_snv_indels(variants_df, db):
     
     return annotated
 
-def annotate_structural(patient_summary_df, db):
-    """Match structural variants (deletions, duplications) against the database"""
+def _smart_split(cell):
+    """Split a patient_summary cell into individual variants on '; ', but NOT on
+    the '; ' that appears inside an identify_sv annotation like
+    '(100% reciprocal; ithaID=2231)'. Paren-depth aware."""
+    parts, depth, buf, i, s = [], 0, "", 0, str(cell)
+    while i < len(s):
+        c = s[i]
+        if c == '(':
+            depth += 1; buf += c
+        elif c == ')':
+            depth -= 1; buf += c
+        elif s[i:i+2] == '; ' and depth == 0:
+            parts.append(buf); buf = ""; i += 2; continue
+        else:
+            buf += c
+        i += 1
+    if buf:
+        parts.append(buf)
+    return parts
+
+
+def annotate_structural(patient_summary_df, cnv_db):
+    """Match structural variants against the IthaCNVs catalogue (cnvs.csv).
+
+    Handles BOTH HBA and HBB structural variants. Each variant name in
+    patient_summary is already the identify_sv match, e.g.
+    '-α3.7 (type III) (100% reciprocal; ithaID=2231)'. We look each up by its
+    ithaID (parsed from that name) against cnvs.csv, which is coordinate-derived,
+    gene-agnostic, and includes HBB entries (Corfu, Lepore, IVS deletions).
+
+    Replaces the former hardcoded sv_lookup dict (HBA-only, 8 entries) with the
+    258-CNV catalogue. The HBB path is exercised by cnvs.csv but untested in the
+    current dataset (no HBB SVs in the test samples).
+    """
+    import re
     results = []
-    
-    sv_lookup = {
-        '-a3.7': '-α3.7',
-        '-a4.2': '-α4.2',
-        'anti-3.7': 'ααα(anti-3.7)',
-        'anti-4.2': 'ααα(anti-4.2)',
-        '--SEA': '--SEA',
-        '--FIL': '--FIL',
-        '--MED': '--MED',
-        'Hb Lepore': 'Hb Lepore'
-    }
-    
+
+    def lookup(var):
+        m = re.search(r'ithaID=(\w+)', str(var))
+        if m is not None:
+            hit = cnv_db[cnv_db['ithaID'].astype(str) == m.group(1)]
+            if not hit.empty:
+                return hit.iloc[0]
+        base = re.split(r'\s*\(', str(var).strip())[0].strip()
+        hit = cnv_db[cnv_db['name'].astype(str).str.strip() == base]
+        if not hit.empty:
+            return hit.iloc[0]
+        return None
+
+    def emit(sample, gene, var, zyg):
+        match = lookup(var)
+        if match is not None:
+            results.append({
+                'Sample': sample, 'Variant_pipeline': var,
+                'Variant_db': match.get('name', var),
+                'Common_name': match.get('name', ''),
+                'Gene': gene, 'Zygosity': zyg, 'Type': 'Structural',
+                'Functionality': match.get('functionality', ''),
+                'Locus': match.get('locus', ''),
+                'HGVS': match.get('hgvs', ''),
+                'IthaID': match.get('ithaID', ''),
+                'Source': match.get('source', ''),
+            })
+        else:
+            results.append({
+                'Sample': sample, 'Variant_pipeline': var, 'Variant_db': var,
+                'Common_name': 'NOT IN CATALOGUE', 'Gene': gene, 'Zygosity': zyg,
+                'Type': 'Structural', 'Functionality': 'Unknown',
+                'Locus': '', 'HGVS': '', 'IthaID': '', 'Source': '',
+            })
+
     for _, row in patient_summary_df.iterrows():
         sample = row['Sample']
-        
-        # Check HBA
-        if pd.notna(row.get('HBA')):
-            hba_variants = str(row['HBA']).split('; ')
-            hba_zygosities = str(row.get('HBA_zygosity', '')).split('; ')
-            
-            for i, var in enumerate(hba_variants):
+        for gene in ('HBA', 'HBB'):
+            cell = row.get(gene)
+            if not pd.notna(cell) or str(cell).strip() in ('', 'wild-type'):
+                continue
+            variants = _smart_split(cell)
+            zygs = _smart_split(row.get(gene + '_zygosity', '') or '')
+            for i, var in enumerate(variants):
                 var = var.strip()
-                zyg = hba_zygosities[i].strip() if i < len(hba_zygosities) else 'unknown'
-                
-                # Look up in database
-                db_name = sv_lookup.get(var, var)
-                db_match = db[db['HVGS'] == db_name]
-                
-                if not db_match.empty:
-                    match = db_match.iloc[0]
-                    results.append({
-                        'Sample': sample,
-                        'Variant_pipeline': var,
-                        'Variant_db': db_name,
-                        'Common_name': match.get('Common name', ''),
-                        'Gene': 'HBA',
-                        'Zygosity': zyg,
-                        'Type': 'Structural',
-                        'Functionality': match.get('Functionality', ''),
-                        'In_IthaGenes': match.get('In Ithagenes? (Yes/No)', ''),
-                        'In_gnomAD': match.get('In gnomAD? (Yes/No)', ''),
-                        'gnomAD_AF': match.get('gnomAD total AF (%)', ''),
-                        'gnomAD_ME_AF': match.get('gnomAD ME AF (%)', ''),
-                        'Cohort_frequency': match.get('Cohort frequency (%)', '')
-                    })
-                else:
-                    results.append({
-                        'Sample': sample,
-                        'Variant_pipeline': var,
-                        'Variant_db': db_name,
-                        'Common_name': 'NOT IN DATABASE',
-                        'Gene': 'HBA',
-                        'Zygosity': zyg,
-                        'Type': 'Structural',
-                        'Functionality': 'Unknown',
-                        'In_IthaGenes': 'No',
-                        'In_gnomAD': 'No',
-                        'gnomAD_AF': '',
-                        'gnomAD_ME_AF': '',
-                        'Cohort_frequency': ''
-                    })
-    
+                if not var or var == 'wild-type':
+                    continue
+                if var.startswith('ENST') or ':c.' in var:
+                    continue
+                zyg = zygs[i].strip() if i < len(zygs) else 'unknown'
+                emit(sample, gene, var, zyg)
+
     return pd.DataFrame(results)
-
-# HbA2-suppression evidence from this cohort (n=191 HBB heterozygous carriers):
-#   no HBA variant      median 4.9, 25.5% below 3.5% cutoff
-#   HBA het             median 3.9, 36.5% below
-#   HBA hom/comp het    median 3.6, 43.3% below
-COHORT_BELOW_CUTOFF = {"none": 25.5, "het": 36.5, "hom": 43.3}
-
 
 def _is_causative(variant_name, gene, db):
     """True if this variant is causative/pathogenic per the database."""
@@ -248,13 +264,12 @@ def generate_report(sample, snv_results, sv_results, coinheritance_flags):
             report.append(f"  Gene: {row['Gene']}")
             report.append(f"  Zygosity: {row['Zygosity']}")
             report.append(f"  Functionality: {row['Functionality']}")
-            report.append(f"  In IthaGenes: {row['In_IthaGenes']}")
-            report.append(f"  In gnomAD: {row['In_gnomAD']}")
-            if pd.notna(row['gnomAD_AF']) and str(row['gnomAD_AF']).strip() not in ('', 'nan'):
-                report.append(f"  gnomAD AF (total): {row['gnomAD_AF']}%")
-                report.append(f"  gnomAD AF (ME): {row['gnomAD_ME_AF']}%")
-            if pd.notna(row['Cohort_frequency']) and str(row['Cohort_frequency']).strip() not in ('', 'nan'):
-                report.append(f"  UAE cohort frequency: {row['Cohort_frequency']}%")
+            if str(row.get('Locus','')).strip():
+                report.append(f"  Locus: {row['Locus']}")
+            if str(row.get('HGVS','')).strip():
+                report.append(f"  HGVS: {row['HGVS']}")
+            if str(row.get('IthaID','')).strip():
+                report.append(f"  IthaID: {row['IthaID']}")
             report.append("")
     
     # SNV/Indel variants
@@ -326,6 +341,7 @@ if __name__ == "__main__":
     variants = pd.read_csv(variants_path)
     patients = pd.read_csv(patient_path)
     db = load_database(db_path)
+    cnv_db = load_database(os.path.join(base_dir, "databases", "cnvs.csv"))
     
     print(f"  Samples: {len(patients)}")
     print(f"  SNV/Indel variants: {len(variants)}")
@@ -336,7 +352,7 @@ if __name__ == "__main__":
     snv_annotated = annotate_snv_indels(variants, db)
     
     print("Annotating structural variants...")
-    sv_annotated = annotate_structural(patients, db)
+    sv_annotated = annotate_structural(patients, cnv_db)
     
     print("Checking co-inheritance...")
     coinheritance = check_coinheritance(patients, db)
@@ -365,7 +381,7 @@ if __name__ == "__main__":
     print(f"Reports generated: {len(all_samples)}")
     print(f"Co-inheritance alerts: {len(coinheritance)}")
     print(f"Database matches (SNV): {snv_annotated['HVGS'].notna().sum()}")
-    print(f"Database matches (SV): {len(sv_annotated[sv_annotated['Common_name'] != 'NOT IN DATABASE'])}")
+    print(f"Database matches (SV): {len(sv_annotated[sv_annotated['Common_name'] != 'NOT IN CATALOGUE'])}")
     print(f"\nOutput directory: {output_dir}")
     
 
