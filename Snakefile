@@ -14,7 +14,9 @@ rule all:
     input:
         "results/clinical_reports/sv_annotated.csv",
         "results/comprehensive_report_concordance.csv",
-        "results/sample_report.csv"
+        "results/sample_report.csv",
+        expand("variants/{sample}/{sample}.csq.vcf.gz", sample=SAMPLES),
+        expand("variants/{sample}/{sample}.cigar_deletions.tsv", sample=SAMPLES)
 
 rule minimap_align:
     input:
@@ -70,6 +72,24 @@ rule copy_number:
         "--reference {params.ref} --bin-size {params.binsize} "
         "--summary {output.summary} --bins {output.bins} 2> {log}"
 
+rule cigar_deletions:
+    input:
+        bam="sorted_reads/{sample}.bam",
+        bai="sorted_reads/{sample}.bam.bai",
+        cnvs="databases/cnvs.csv"
+    output:
+        "variants/{sample}/{sample}.cigar_deletions.tsv"
+    log:
+        "logs/cigar_del/{sample}.log"
+    conda:
+        "envs/python.yaml"
+    shell:
+        "SAMTOOLS=$(find .snakemake/conda -name samtools -type f 2>/dev/null | head -1); "
+        "python scripts/detect_deletions_cigar.py "
+        "--bam {input.bam} --name {wildcards.sample} "
+        "--cnvs {input.cnvs} --samtools $SAMTOOLS "
+        "--out {output} 2> {log}"
+        
 rule sniffles_sv:
     input:
         bam="sorted_reads/{sample}.bam",
@@ -125,6 +145,23 @@ rule clair3_call:
         "--output=variants/{wildcards.sample} --threads={threads} "
         "--platform=ont --model_path={config[clair3_models]} "
         "--bed_fn={input.bed} --enable_phasing 2> {log}"
+
+rule csq_annotate:
+    input:
+        vcf="variants/{sample}/phased_merge_output.vcf.gz",
+        ref=config["ref_wgs"],
+        gff=config["csq_gff"]
+    output:
+        "variants/{sample}/{sample}.csq.vcf.gz"
+    log:
+        "logs/csq/{sample}.log"
+    conda:
+        "envs/bcftools.yaml"
+    shell:
+        "bcftools csq -f {input.ref} -g {input.gff} --phase a "
+        "-r chr11:5225000-5229000,chr16:172000-178000 "
+        "{input.vcf} -Oz -o {output} 2> {log} && "
+        "bcftools index -t {output} 2>> {log}"
 
 rule filter_variants:
     input:
@@ -254,3 +291,4 @@ rule clinical_annotation:
         "envs/python.yaml"
     shell:
         "python scripts/annotation/annotate_variants.py"
+
