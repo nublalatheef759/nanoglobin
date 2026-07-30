@@ -159,7 +159,7 @@ rule csq_annotate:
         "envs/bcftools.yaml"
     shell:
         "bcftools csq -f {input.ref} -g {input.gff} --phase a "
-        "-r chr11:5225000-5229000,chr16:172000-178000 "
+        "-r chr11:5225000-5310000,chr16:172000-178000 "
         "{input.vcf} -Oz -o {output} 2> {log} && "
         "bcftools index -t {output} 2>> {log}"
 
@@ -198,7 +198,7 @@ rule region_filter:
     shell:
         """
         awk '/^#/ {{print; next}} \
-             ($1=="chr11" && $2>=5225000 && $2<=5228000) || \
+             ($1=="chr11" && $2>=5225000 && $2<=5310000) || \
              ($1=="chr16" && $2>=170000 && $2<=178000)' {input} > {output}
         """
 

@@ -3684,3 +3684,345 @@ HBB:c.9_10delinsCT,,,,,,Likely benign,No,No,,,"criteria provided, single submitt
 HBB:c.9_83del,,,,,,Likely pathogenic,No,No,,,"criteria provided, single submitter",4818706,11,5226938,GGCCTCACCACCAACTTCATCCACGTTCACCTTGCCCCACAGGGCAGTAACGGCAGACTTCTCCTCAGGAGTCAGA,G,ClinVar
 HBB:c.9dup,,,,,,no classification for the single variant,No,No,,,no classification for the single variant,869417,11,5227012,G,GA,ClinVar
 HBB:g.71609_72227del619,,,4,1.04,,Pathogenic,No,No,NA,NA,,,11,5225389,,,ClinVar
+HBD:c.-130G>A,'-80 (G>A),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-127T>C,'-77 T>C,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-126A>T,'-76 (A>T),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-118C>T,'-68 (C>T),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-115A>G,'-65 (A>G),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-105T>C,'-55 (T>C),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-86C>A,'-36 (C>A),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-81A>G,'-31 (A>G),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-80T>C,'-30 T>C,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.3G>A,Init CD ATG>ATA [Met>Ile],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.14C>T,CD 4 ACT>ATT [Thr>Ile] (HbA2-Mitsero),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.82G>T,CD 27 GCC>TCC [Ala>Ser],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.92G>C,CD 30 (AGG>ACG),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.92+2T>C,IVS I-2 (T>C),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.93-1G>C,IVS I-128 G>C (IVS I 3' AG>AC),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.113G>A,CD 37 (TGG>TAG),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.275dupT,CD 91 (+T),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.295G>A,CD 98 (GTG>ATG),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.315+1G>A,IVS II-1 G>A,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.315+6T>A,IVS II-6 (T>A),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.316-5C>T,IVS II-894 C>T,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.316-2A>C,IVS II-897 A>C,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.*199G>A,Poly A +69 (G>A),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.5T>C,CD 1 GTG>GCG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.8A>T,CD 2 CAT>CTT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.8A>G,CD 2 CAT>CGT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.14C>G,CD 4 ACT>AGT [Thr>Ser],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.23A>C,CD 7 GAG>GCG [Glu>Ala],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.25A>G,CD 8 AAG>GAG [Lys>Glu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.35T>G,CD 11 GTC>GGC,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.39T>A,CD 12 AAT>AAA [Asn>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.41C>A,CD 13 GCC>GAC [Ala>Asp] (Hb A2-Corleone),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.49G>C,CD 16 GGC>CGC,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.62T>A,CD 20 GTG>GAG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.68C>A,CD 22 GCA>GAA [Ala>Glu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.74G>A,CD 24 GGT>GAT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.77G>A,CD 25 GGT>GAT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.81G>C,CD 26 GAG>GAC,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.110C>A,CD 36 CCT>CAT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.130G>A,CD 43 GAG>AAG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.131A>G,CD 43 GAG>GGG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.143A>T,CD 47 GAT>GTT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.155C>G,CD 51 CCT>CGT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.174C>A,CD 57 AAC>AAA,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.179A>T,CD 59 AAG>ATG [Lys>Met],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.180G>C,CD 59 AAG>AAC,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.193G>A,CD 64 GGC>AGC (Gly>Ser) (Hb A2-Venlo),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.208G>C,CD 69 GGT>CGT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.212C>G,"CD 70 GCC>GGC [Ala>Gly] (Cubstitution of Ala with Gly at helical position E14, which is in contact with heme.)",δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.226C>G,CD 75 CTG>GTG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.251G>A,CD 83 GGC>GAC [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.257T>C,CD 85 TTT>TCT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.262C>A,CD 87 CAG>AAG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.265C>G,CD 88 CTG>GTG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.272A>T,CD 90 GAG>GTG [Glu>Val],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.280T>G,CD 93 TGT>GGT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.298G>A,CD 99 GAT>AAT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.315G>T,CD 104 AGG>AGT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.349C>T,CD 116 CGC>TGC [Arg>Cys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.350G>A,CD 116 CGC>CAC [Arg>His],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.352A>G,CD 117 AAC>GAC,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.365A>T,CD 121 GAA>GTA,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.376C>G,CD 125 CAA>GAA,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.401T>C,CD 133 GTG>GCG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.410G>A,CD 136 GGT>GAT [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.422C>T,CD 140 GCC>GTC,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.425T>C,CD 141 CTG>CCG,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.428C>A,CD 142 GCT>GAT [Ala>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.440A>G,CD 146 CAT>CGT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.4G>T,CD 1 GGT>TGT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.17A>G,CD 5 GAG>GGG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.19G>A | HBG2:c.19G>A,CD 6 GAG>AAG,Aγ or Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.22G>A,CD 7 GAC>AAC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.25A>C | HBG2:c.25A>G,CD 8 AAG>CAG or GAG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.38C>A | HBG2:c.38C>A,CD 12 ACA>AAA [Thr>Lys],Aγ or Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.38C>G,CD 12 ACA>AGA [Thr>Arg],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.46T>C,CD 15 TGG>CGG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.49G>C,CD 16 GGC>CGC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.54G>C | HBG2:c.54G>T,CD 17 AAG>AAC or AAT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.60T>A | HBG2:c.60T>G,CD 19 AAT>AAA or AAG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.62T>C,CD 20 GTG>GCG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.64G>A,CD 21 GAA>AAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.64G>C,CD 21 GAA>CAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.68A>T,CD 22 GAT>GTT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.68A>G,CD 22 GAT>GGT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.77G>A,CD 25 GGA>GAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.79G>A,CD 26 GAA>AAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.103G>A,CD 34 GTC>ATC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.115A>C,CD 38 ACC>CCC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.121A>G,CD 40 AGG>GGG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.122G>A,CD 40 AGG>AAG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.125T>C,CD 41 TTC>TCC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.133A>C,CD 44 AGC>CGC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.167T>G,CD 55 ATG>AGG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.178A>C,CD 59 AAA>CAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.178A>G,CD 59 AAA>GAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.190C>T,CD 63 CAT>TAT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.198G>C | HBG2:c.198G>T,CD 65 AAG>AAT or AAC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.199A>C,CD 66 AAG>CAG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.200A>G,CD 66 AAG>AGG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.217G>C,CD 72 GGA>CGA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.221A>C,CD 73 GAT>GCT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.226A>G,CD 75 ATA>GTA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.227T>C,CD 75 ATA>ACA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.233A>G,CD 77 CAC>CGC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.238G>C,CD 79 GAT>CAT [Asp>His],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.241G>A,CD 80 GAT>AAT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.241G>T,CD 80 GAT>TAT [Asp>Tyr],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.277C>T,CD  92 CAC>TAC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.283G>A,CD 94 GAC>AAC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.293A>G,CD 97 CAT>CGT [His>Arg],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.304G>C,CD 101 GAG>CAG [Glu>Gln],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.304G>A,CD 101 GAG>AAG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.308A>C,CD 102 AAC>ACC [Asn>Thr],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.315G>C,CD 104 AAG>AAC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.327T>A | HBG2:c.327T>A,CD 108  AAT>AAA [Asn>Lys],Aγ or Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.353A>G,CD 117 CAT>CGT,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.355T>C,CD 118 TTC>CTC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.361A>C,CD 120 AAA>CAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.364G>A,CD 121 GAA>AAA,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.377A>C,CD 125 GAG>GCG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.391T>G,CD 130 TGG>GGG,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.439C>T,CD 146 CAC>TAC,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.9T>G,CD 2 CAT>CAG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.16G>A,CD 5 GAG>AAG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.19G>C,CD 6 GAG>CAG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.20A>G,CD 6 GAG>GGG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.38C>G,CD 12 ACA>AGA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.67G>A,CD 22 GAT>AAT [Asp>Asn],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.68A>G,CD 22 GAT>GGT,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.70_72del,CD 23 (-GCT),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.76G>C,CD 25 GGA>CGA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.110C>G,CD 36 CCA>CGA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.112T>G,CD 37 TGG>GGG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.119A>G,CD 39 CAG>CGG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.122G>A,CD 40 AGG>AAG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.130G>A,CD 43 GAC>AAC,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.161C>A,CD 53 GCC>GAC,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.184A>G,CD 61 AAG>GAG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.217G>C,CD 72 GGA>CGA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.220G>C,CD 73 GAT>CAT,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.220G>A,CD 73 GAT>AAT,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.227T>C,CD 75 ATA>ACA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.238G>A,CD 79 GAT>AAT,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.241G>A,CD 80 GAT>AAT,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.241G>T,CD 80 GAT>TAT [Asp>Tyr],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.293A>G,CD 97 CAT>CGT,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.358G>A,CD 119 GGC>AGC [Gly>Ser],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.364G>A,CD 121 GAA>AAA [Glu>Lys] (Hb F-Siena),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.364G>C,CD 121 GAA>CAA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.385G>A,CD 128 GCT>ACT,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.396G>T,CD 131 CAG>CAT [Gln>His],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.403G>A,CD 134 GTG>ATG,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.409G>T,CD 136 GCA>TCA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.410C>G,CD 136 GCA>GGA,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-620T>G,'-567 T>G (Iranian non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-255C>G,'-202 C>G (Black non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-253dup,'-200 +C (Tunisian non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-249C>T,'-196 C>T (Greek non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-228T>C,'-175 T>C (Black/Sardinian/British non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-167C>G,'-114 C>G (Australian non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-167C>A,'-114 C>A (Algerian non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-167C>T,'-114 C>T (Japanese non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-163A>C,'-110 A>C (Czech non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-162G>T,'-109 G>T (Greek non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-90A>T,'-37  A>T (Belgian non-deletional HPFH),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-264C>T,'-211 C>T (Venezuelan non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-255C>T,'-202 C>T (Black non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-254C>T,'-201 C>T (Greek non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-251T>C,'-198 T>C (British non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-249C>T,'-196 C>T (Italian/Chinese non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-248C>G,'-195 C>G (Brazilian non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-228T>C,'-175 T>C (Black non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-211C>T,'-158 C>T (Cretan non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-170G>A,'-117 G>A (Greek/Italian/Black non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-167_-155delCAATAGCCTTGAC,"'-114 to -102 (13 bp deletion , Black non-deletional HPFH)",Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-167C>T,'-114 C>T (Georgian non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.92+5G>T,IVS I-5 G>T,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.323G>A,CD 107 G>A [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-1G>A,CAP +53 (G>A),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.60C>A,CD 19 AAC>AAA [Asn>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.38A>C,CD 12 AAT>ACT (Asn>Thr),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-250c>T,'-197 C>T,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-250C>T,'-197 C>T,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-166A>G,'-113 A>G,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.244C>T,CD 81 CTC>TTC [Leu>Phe] (Hb A2-Saint-Denis),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.120G>C,CD 39 CAG>CAC [Gln>His],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.224G>A,CD 74 GGC>GAC [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.24G>C,CD 7 GAG>GAC [Glu>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.7C>A,CD 2 CAT>AAT [His>Asn],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.157G>C,CD 52 GAT>CAT [Asp>His],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.434A>C,CD 144 AAG>ACG [Lys>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.272A>G,CD 90 GAG>GGG [Glu>Gly],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.359G>A,CD 119 GGC>GAC [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.19G>C,CD 6 GAG>CAG [Glu>Gln],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.430C>T,CD 143 CAC>TAC [His>Tyr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.440A>G,CD 146 CAC>CGC [His>Arg],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.280T>C,CD 93 TGT>CGT [Cys>Arg],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.365A>T,CD 121 GAA>GTA [Glu>Val],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.275T>G,CD 91 CTG>CGG [Leu>Arg],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.430C>G,CD 143 CAC>GAC [His>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.140G>A,CD 46 GGG>GAG [Gly>Glu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.151T>A,CD 50 TCT>ACT [Ser>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.124T>C,CD 41 TTC>CTC [Phe>Leu],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.112T>G,CD 37 TGG>GGG [Trp>Gly],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.202G>A,CD 67 GTG>ATG [Val>Met] (Hb F-Heuried),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.89G>A,CD 29 GGC>GAC [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.[67G>A; 68C>A],CD 22 GCA>ACA>AAA [Ala>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.44T>C,CD 14 CTG>CCG [Leu>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.4G>A,CD 1 GGT>AGT [Gly>Ser],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.410G>A,CD 136 GGA>GAA [Gly>Glu],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.377A>C,CD 125 GAG>GCG [Glu>Ala],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.317T>A,CD 105 CTC>CAC [Leu>His],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.194G>A,CD 64 GGC>GAC [Gly>Asp],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.316-2A>G,IVS II-897 A>G,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.271G>A,CD 90 GAG>AAG [Glu>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.239A>G,CD 79 GAC>GGC [Asp>Gly],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.412_414delGTG,CD 137 -GTG [-Val] (Hb Anti-Lepore Lincoln Park),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.443G>T,CD 147 TGA>TTA,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.333_334insGT,CD 110-111 +GT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.427C>A,CD 142 GCT>CCT [Ala>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.179A>G,CD 59 AAA>AGA [Lys>Arg],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.340G>A,CD 113 GTT>ATT [Val>Ile],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.428C>T,CD 142 GCT>GTT [Ala>Val],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.92+56_92+82dup,IVS I-82_83 (+GTAGACAGAGAAGACTCTTGGGTTTCT),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.202G>A,CD 67 GTG>ATG [Val>Met],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.353A>C,CD 117 AAC>ACC [Asn>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.176_177insC,CD 58 +C,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.431A>G,CD 143 CAC>CGC [His>Arg] (Hb A2-Abruzzo),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.314G>A,CD 104 AGG>AAG [Arg>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.301C>T,CD 100 CCT>TCT [Pro>Ser],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-167C>G,'-114 C>G (African-American/Hispanic non-deletional HPFH),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.364G>A,CD 121 GAA>AAA [Glu>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.293A>G,CD 97 CAC>CGC [His>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-6A>T,CAP +48 (A>T),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.349C>G,CD 116 CGC>GGC [Arg>Gly],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.347C>T,CD 115 GCC>GTC [Ala>Val],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.22_24delGAG,CD 7 (-3bp): (-GAG),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.31delG,CD 10 GCT>-CT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.93-2delA,IVS I 3' AG>-C,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.341_342dupTG,CD 113 (+TG),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.325A>G,CD 108 AAT>GAT [Asn>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.263delA,CD 87 CAG>C-G,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.180_181dup,CD 59/60 (+GG),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.134C>G,CD 44 TCC>TGC [Ser>Cys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.127T>C,CD 42 TTT>CTT [Phe>Leu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.86T>C,CD 28 CTG>CCG [Leu>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.65A>G,CD 21 GAT>GGT [Asp>Gly],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.53A>C,CD 17 AAA>ACA [Lys>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.31G>C,CD 10 GCT>CCT [Ala>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.233A>G,CD 77 CAC>CGC [His>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.442T>C,CD 147 TGA>CGA  [Stop>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-533_-529delATAAG,'-533 (-ATAAG),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.350G>C,CD 116 CGC>CCC [Arg>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.170G>A,CD 56 GGC>GAC [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.160G>C,CD 53 GCT>CCT [Ala>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.142G>A,CD 47 GAT>AAT [Asp>Asn],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.350G>T,CD 116 CGC>CTC [Arg>Leu] (Hb A2-India),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.5G>A,CD 1 GGT>GAT [Gly>Asp],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.50G>A,CD 16 GGC>GAC [Gly>Asp],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.89G>A,CD 29 GGA>GAA [Gly>Glu],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.85C>A,CD 28 CTG>ATG [Leu>Met],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.221A>T,CD 73 GAT>GTT [Asp>Val],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.22G>T,CD 7 GAG>TAG [Glu>STOP],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.11T>C,CD 3 CTG>CCG [Leu>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.191A>T,CD 63 CAT>CTT [His>Leu],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.47G>T,CD 15 TGG>TTG [Trp>Leu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.433A>G,CD 144 AAG>GAG [Lys>Glu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.275T>C,CD 91 CTG>CCG [Leu>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.110C>G,CD 36 CCT>CGT [Pro>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.269G>A,CD 89 AGT>AAT [Ser>Asn],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.209G>A,CD 69 GGT>GAT [Gly>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.179delA,CD 59 AAG>A-G (δ0 59 (-A)),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.394C>G,CD 131 CAG>GAG [Gln>Glu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.198G>T,CD 65 AAG>AAT [Lys>Asn],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.32C>T,CD 10 GCT>GTT [Ala>Val],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.391delT,CD 130 TAT>-AT,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.269G>A,CD 89 AGT>AAT [Ser>Asn],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.74G>A,CD 24 GGA>GAA [Gly>Glu],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.282_283delTG,CD 93/94 (-TG) [Cys>STOP],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-180A>G,'-130 A>G,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-94G>A,'-44 G>A,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.[152C>G;227T>C],CD 50 (TCT>TGT);CD 75(ATA>ACA),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.16C>A,CD 5 CCT>ACT [Pro>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.46T>C,CD 15 TGG>CGG [Trp>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.294C>T,CD 97 CAC>CAT [His>His],δ,,,Neutral,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-178C>T,'-125 C>T,Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.239A>G,CD 79 GAT>GGT [Asp>Gly],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.42C>A,CD 13 AGC>AGA [Ser>Arg],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.135_145del,CD 44-48 (-CTTTGGGGATC) (p.Phe46Valfs*4),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.404T>A,CD134 GTG>GAG [Val>Glu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.362A>C,CD 120 AAG>ACG [Lys>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.262C>T,CD 87 CAG>TAG [Gln>STOP],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-272_-275dup,'-219 (+AGCA),Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.187G>C,CD 62 GCT>CCT [Ala>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.92+1G>C,IVS I-1 G>C,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-417G>C,'-365 G>C,Aγ,,,Neutral,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.358G>C,CD 119 GGC>CGC [Gly>Arg],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.420T>G,CD 139 AGT>AGG [Ser>Arg],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.202G>A,CD 67 GTG>ATG [Val>Met],Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-420C>A,'-368 C>A,Aγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.-253_-254dup,'-200 (+CC),Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.422C>A,CD 140 GCC>GAC [Ala>Asp],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.90C>T,CD 29 GGC>GGT [Gly>Gly],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.295_297delGTGinsA,"CD 98 (-GTG, +A)",δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.[249G>T;400G>A],CD 82 AAG>AAT [Lys>Asn]; CD133 GTG>ATG [Val>Met],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.370A>G,CD 123 ACC>GCC [Thr>Ala],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.282T>G,CD 93 TGT>TGG [Cys>Trp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.263A>G,CD 87 CAG>CGG [Gln>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.[139G>C;316-443A>G],"CD 46 GGG>CGG [Gly>Arg], IVS II-456 A>G",δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.118C>A,CD 39 CAG>AAG [Gln>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.27G>C,CD 8 AAG>AAC [Lys>Asn],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:C.290T>G,CD 96 CTG>CGG [Leu>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.243C>A,CD 80 AAC>AAA [Asn>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.*199G>T,Poly A +69 (G>T),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.377A>G,CD 125 CAA>CGA [Gln>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.22G>A,CD 7 GAG>AAG [Glu>Lys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.197A>G,CD 65 AAG>ATG [Lys>Met],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.123G>T,CD 40 AGG>AGT [Arg>Ser],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.299A>G,CD 99 GAT>GGT [Asp>Gly],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.56T>G,CD 18 GTG>GGG [Val>Gly],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.139G>A,CD 46 GGG>AGG [Gly>Arg],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG1:c.-404A>G,'-352 A>G,Aγ,,,Neutral,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.238G>A,CD 79 GAC>AAC [Asp>Asn],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.230C>A,CD 76 GCT>GAT [Ala>Asp],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.52A>C,CD 17 AAA>CAA [Lys>Gln],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.67G>C,CD 22 GAT>CAT   [Asp>His],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.398A>C,CD 132 AAG>ACG [Lys>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.*200G>A,Poly A +70 (G>A),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.369_370insA,CD 122/123 (+A),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.2T>C,Init CD ATG>ACG [Met>Thr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-326A>G,'-276 A>G,δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.277C>T,CD 92 CAC>TAC [His>Tyr],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.149C>G,CD49 TCC>TGC [Ser>Cys],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.186G>T | HBD:c.186G>C,CD 61 AAG>AAT or AAC [Lys>Asn] (Hb A2-Jilin),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.349C>A,CD 116 CGC>AGC [Arg>Ser],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.201G>C,CD 66 AAG>AAC [Lys>Asn],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.17C>T,CD 5 CCT>CTT [Pro>Leu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.290T>C,CD 96 CTG>CCG [Leu>Pro],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.374C>T,CD 124 CCA>CTA [Pro>Leu],δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBD:c.-134C>T,'-84 (C>T),δ,,,Causative,,Yes,No,,,,,,,,,IthaGenes
+HBG2:c.308A>G,CD 102 AAC>AGC [Asn>Ser],Gγ,,,Causative,,Yes,No,,,,,,,,,IthaGenes

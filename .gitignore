@@ -40,3 +40,18 @@ databases/*.checkpoint_*
 databases/naming_layer.csv.checkpoint_*
 databases/variants.csv.pre_swap_bak
 config_HG*.yml
+*.sif
+happy_out/
+wide_val/
+*.pre_*_bak
+*.pre_extend_bak
+# large containers and generated validation outputs
+*.sif
+happy_out/
+wide_val/
+# backups from catalogue/subtype edits
+*.pre_extend_bak
+*.pre_subtype_fix_bak
+*.pre_*_bak
+# scratch diagnostic files
+simulation/truth_triple.vcf

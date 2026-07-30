@@ -1,0 +1,21 @@
+hap.py validation (GA4GH standard, jmcdani20/hap.py v0.3.12), CORRECTED FP column
+Pooled across HG002 + 5 HPRC genomes.
+
+CORE (HBA/HBB):
+  SNV:   96.6% recall, 99.3% precision (140 TP, 5 FN, 1 FP)
+  INDEL: 63.6% recall, 73.7% precision (14 TP, 8 FN, 5 FP)
+
+EXTENDED beta-cluster, GENE BODIES (HBB,HBD,HBG1/2,HBE1 - clinically relevant):
+  SNV:   96.9% recall, 99.4% precision (156 TP, 5 FN, 1 FP)
+  INDEL: 63.3% recall, 91.2% precision (31 TP, 18 FN, 3 FP)
+
+EXTENDED beta-cluster, FULL interval (incl. intergenic + LCR):
+  SNV:      90.4% recall, 94.1% precision (788 TP, 84 FN, 49 FP)
+  INDEL:    69.6% recall, 83.8% precision
+  COMBINED: 87.0% recall, 92.6% precision
+
+KEY FINDING: gene-body SNV calling is accurate across the whole extended cluster
+(~97%/99%, matching HBA/HBB). Extended-interval precision loss (94.1%) is driven
+by false positives in intergenic + LCR regulatory sequence (60 of 67 chr11 FPs),
+NOT in the globin genes and NOT in the HBG1/HBG2 paralogs. Indels remain the
+primary limitation (~63% recall, ONT error mode).
