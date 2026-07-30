@@ -64,22 +64,25 @@ install cannot shadow the pinned one.
 Validated on real Oxford Nanopore data against three independent truth sources —
 no single truth set carries the whole claim.
 
-**1. SNV/indel — HPRC assembly truth (5 genomes, 2 populations).**
-Pipeline calls compared against HPRC diploid assemblies (`.dip.vcf.gz`), region-
-extracted and normalised, via `bcftools isec`:
+**1. SNV/indel — HPRC assembly truth (5 genomes), GA4GH-standard hap.py.**
+Pipeline calls benchmarked against HPRC diploid assemblies using hap.py
+(jmcdani20/hap.py v0.3.12, the GA4GH-standard benchmarking tool), pooled across
+5 genomes (HG02071, HG02083, HG02514, HG02074, HG02622):
 
-| sample | population | sensitivity | precision |
+| region | type | recall | precision |
 |---|---|---|---|
-| HG02071 | KHV | 88.9 | 100 |
-| HG02083 | KHV | 88.4 | 92.0 |
-| HG02514 | KHV | 91.6 | 91.6 |
-| HG02074 | KHV | 93.1 | 100 |
-| HG02622 | GWD | 89.4 | 89.4 |
+| HBA/HBB core | SNV | 96.6% | 99.3% |
+| HBA/HBB core | INDEL | 63.6% | 73.7% |
+| β-cluster gene bodies | SNV | 96.9% | 99.4% |
+| β-cluster gene bodies | INDEL | 63.3% | 91.2% |
 
-Mean ~90.3% sensitivity, ~94.6% precision. False negatives cluster at a recurring
-low-complexity tandem-repeat region (chr16:171,206–171,221) across all five
-genomes — a systematic ONT indel error mode where the conservative caller
-correctly declines, preserving precision.
+SNV calling is strong across both the core loci and the extended β-cluster gene
+bodies. Indels are the primary limitation (~63% recall), reflecting known ONT
+indel error modes, with false negatives clustering at a recurring low-complexity
+tandem-repeat region (chr16:171,206–171,221). Across the full extended interval
+(including intergenic and locus-control-region sequence) SNV precision falls to
+94.1%, driven by false positives in repetitive/regulatory intergenic and LCR
+sequence rather than in the globin genes themselves.
 
 **2. SNV/indel — GIAB gold standard (HG002).**
 Against NIST v4.2.1 benchmark, restricted to globin high-confidence regions:
@@ -93,8 +96,8 @@ checked against DRAGEN calls — 0 false positives:
 | sample | truth | detected | zygosity |
 |---|---|---|---|
 | NA21106 | -α4.2/αα | 4257 bp = -α4.2 | het (0.58) |
-| HG00642 | -α3.7/αα | 3804 bp = -α3.7 I | het |
-| HG03136 | -α3.7/-α3.7 | 3804 bp = -α3.7 I | hom (1.00) |
+| HG00642 | -α3.7/αα | 3804 bp = -α3.7 | het |
+| HG03136 | -α3.7/-α3.7 | 3804 bp = -α3.7 | hom (1.00) |
 | HG00735 | ααα3.7/αα | (triplication) | correctly excluded |
 | HG03862 | --/αα | 10553 bp | deferred to coverage (below read span) |
 | normals ×4 | αα/αα | none | — |
@@ -110,8 +113,12 @@ development scaffolding, not a validation pillar.
 method:
 
 - **detects** the deletion from the CIGAR of spanning reads (0 false positives);
-- **types** it by breakpoint size against `cnvs.csv` size columns, resolving the
-  `-α3.7` type I/II/III subtypes and distinguishing `-α3.7` from `-α4.2`;
+- **types** it by breakpoint size against `cnvs.csv` size columns, distinguishing
+  the `-α3.7` and `-α4.2` deletion classes (the ~450 bp size difference is robust to
+  CIGAR-size variance and is corroborated by independent assembly-derived breakpoint
+  sizes). The `-α3.7` subtypes (type I/II/III) differ by ~8 bp and are not resolved
+  by breakpoint size; class-level reporting is used, as these subtypes are clinically
+  equivalent (single-gene α+-deletion);
 - **calls zygosity** from the deletion-read fraction *at the breakpoint*
   (het ~0.5–0.7, hom 1.0);
 - **excludes triplications** — an extra near-identical α-copy maps to the same
@@ -119,7 +126,7 @@ method:
   as a deletion (confirmed on HG00735).
 
 This is the long-read advantage short reads cannot structurally achieve: precise
-size, subtype and zygosity within read length. Deletions exceeding read length
+class (-α3.7 vs -α4.2) and zygosity within read length. Deletions exceeding read length
 (`--`, ~10.5 kb, spanned by too few reads) defer to the coverage method.
 
 **Coverage method** (`scripts/coverage_profile.py`, `panel_normalise.py`,
@@ -175,7 +182,7 @@ during this work were reported to and corrected by ITHANET, which also added CSV
 export to IthaGenes and IthaCNVs in response.
 
 Structural variants are named against **IthaCNVs** (`databases/cnvs.csv`, 311 CNVs,
-GRCh38.p13) with reciprocal-overlap matching and subtype resolution, for gains as
+GRCh38.p13) with reciprocal-overlap matching at the deletion-class level (-α3.7 vs -α4.2; subtypes not resolved by overlap), for gains as
 well as deletions.
 
 Annotation is **catalogue-guided**: where VEP returns several transcripts, the one
