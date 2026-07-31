@@ -1,4 +1,3 @@
-import glob
 import os
 
 configfile: "config.yml"
@@ -9,6 +8,11 @@ else:
     REFERENCE = config["ref_wgs"]
 
 SAMPLES = config["samples"]
+SAMPLE_ARGS = " ".join("--sample %s" % sample for sample in SAMPLES)
+BIN_ARGS = " ".join(
+    "--bin %s=variants/%s/%s.coverage_bins.tsv" % (sample, sample, sample)
+    for sample in SAMPLES
+)
 
 rule all:
     input:
@@ -89,7 +93,7 @@ rule cigar_deletions:
         "--bam {input.bam} --name {wildcards.sample} "
         "--cnvs {input.cnvs} --samtools $SAMTOOLS "
         "--out {output} 2> {log}"
-        
+
 rule sniffles_sv:
     input:
         bam="sorted_reads/{sample}.bam",
@@ -229,23 +233,30 @@ rule merge_annotations:
 
 rule comprehensive_summary:
     input:
-        "results/all_variants_annotated.csv"
+        annotated=expand("results/{sample}.annotated.csv", sample=SAMPLES),
+        sniffles=expand("variants/{sample}/{sample}.sniffles.vcf", sample=SAMPLES),
+        cutesv=expand("variants/{sample}/{sample}.cutesv.vcf", sample=SAMPLES),
+        coverage=expand("variants/{sample}/{sample}.coverage.tsv", sample=SAMPLES)
     output:
         "results/comprehensive_report.csv"
+    params:
+        samples=SAMPLE_ARGS
     conda:
         "envs/python.yaml"
     shell:
-        "python scripts/comprehensive_report.py {output}"
-        
+        "python scripts/comprehensive_report.py --output {output} {params.samples}"
+
 rule cnv_calls:
     input:
-        expand("variants/{s}/{s}.coverage_bins.tsv", s=SAMPLES)
+        expand("variants/{sample}/{sample}.coverage_bins.tsv", sample=SAMPLES)
     output:
         "results/cnv_calls.csv"
+    params:
+        bins=BIN_ARGS
     conda:
         "envs/python.yaml"
     shell:
-        "python scripts/detect_cnv.py {output}"
+        "python scripts/detect_cnv.py --output {output} {params.bins}"
 
 rule sample_report:
     input:
@@ -257,7 +268,7 @@ rule sample_report:
         "envs/python.yaml"
     shell:
         "python scripts/sample_report.py {input.report} databases/variants.csv {output} {input.cnv}"
-        
+
 rule concordance:
     input:
         "results/comprehensive_report.csv"
@@ -267,7 +278,6 @@ rule concordance:
         "envs/python.yaml"
     shell:
         "python scripts/concordance.py {input} {output}"
-
 
 rule patient_summary:
     input:
@@ -292,3 +302,43 @@ rule clinical_annotation:
     shell:
         "python scripts/annotation/annotate_variants.py"
 
+
+# Optional cohort-to-caller foundations. These rules are defined only when the
+# corresponding contracts are declared in config.yml; they are explicit targets
+# rather than hidden prerequisites of the legacy caller pipeline.
+if config.get("assay_profile") and config.get("haplotype_catalogue"):
+    rule compile_assay:
+        input:
+            profile=config["assay_profile"],
+            haplotypes=config["haplotype_catalogue"]
+        output:
+            compiled="results/assay/compiled_products.json",
+            coverage="results/assay/coverage.tsv",
+            ambiguity="results/assay/indistinguishability.tsv",
+            summary="results/assay/summary.json"
+        conda:
+            "envs/python.yaml"
+        shell:
+            "python scripts/compile_assay.py "
+            "--profile {input.profile} --haplotypes {input.haplotypes} "
+            "--compiled-json {output.compiled} --coverage-tsv {output.coverage} "
+            "--indistinguishability-tsv {output.ambiguity} "
+            "--summary-json {output.summary}"
+
+if config.get("cohort_input") and config.get("cohort_contract"):
+    rule normalise_cohort_reports:
+        input:
+            cohort=config["cohort_input"],
+            contract=config["cohort_contract"]
+        output:
+            episodes="results/cohort/episodes.csv",
+            findings="results/cohort/findings.csv",
+            phenotypes="results/cohort/phenotypes.csv",
+            summary="results/cohort/summary.json"
+        conda:
+            "envs/python.yaml"
+        shell:
+            "python scripts/normalise_cohort_reports.py "
+            "--input {input.cohort} --contract {input.contract} "
+            "--episodes {output.episodes} --findings {output.findings} "
+            "--phenotypes {output.phenotypes} --summary-json {output.summary}"

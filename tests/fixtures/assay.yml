@@ -1,0 +1,19 @@
+assay_id: synthetic_globin_panel
+version: "1"
+platform: ont
+primers:
+  HBA_F:
+    sequence: ACGTTGCAACGT
+    max_mismatches: 0
+  HBA_R:
+    sequence: TTAACCGGTACC
+    max_mismatches: 0
+products:
+  - id: HBA_product
+    forward_primer: HBA_F
+    reverse_primer: HBA_R
+    min_length: 30
+    max_length: 100
+    pool: alpha
+    roles: [whole_gene, copy_markers]
+    required: true

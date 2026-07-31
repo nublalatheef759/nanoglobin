@@ -1,134 +1,190 @@
 #!/usr/bin/env python3
+"""Detect local coverage departures without over-naming HBA copy gains.
+
+Coverage is an evidence producer.  A gain-shaped interval can be compared with
+IthaCNVs as a *candidate class*, but reciprocal overlap cannot establish copy
+order, junction sequence, or a clinical allele such as alpha-alpha-alpha
+anti-3.7.  The output therefore keeps candidate naming separate from the call.
+
+The command accepts explicit ``SAMPLE=PATH`` inputs.  It never scans the
+filesystem, which prevents stale or simulated samples from entering reports.
 """
-detect_cnv.py -- call copy-number GAINS and LOSSES from the binned coverage
-profile (the *_coverage_bins.tsv produced by coverage_profile.py).
 
-The whole-window mean masks localised events through flanking dilution (a 3.8kb
-gain in an 8kb window barely moves the mean). This works on the binned profile
-instead: it finds a run of consecutive bins that departs from the local flanking
-baseline, which recovers both the event and its boundaries.
+from __future__ import annotations
 
-  loss  : run of bins <= 0.5 * flanking baseline   (deletion)
-  gain  : run of bins >= 1.5 * flanking baseline   (duplication/triplication)
+import argparse
+import csv
+import statistics
+import sys
+from pathlib import Path
+from typing import Iterable, Sequence
 
-Baseline = median of the bins OUTSIDE the called run (the flanking normal depth),
-so it is robust to the HBA/HBB ratio not being exactly 1.0.
-"""
-import csv, sys, statistics
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-MIN_RUN = 3          # consecutive bins required
-GAIN_FACTOR = 1.5    # >= 1.5x baseline -> gain
-LOSS_FACTOR = 0.5    # <= 0.5x baseline -> loss
+from scripts.identify_sv import identify_sv  # noqa: E402
 
 
-def load_bins(path, region="HBA"):
-    rows = []
-    with open(path) as fh:
-        for r in csv.DictReader(fh, delimiter="\t"):
-            if r["region"] == region:
-                rows.append((int(r["bin_start"]), float(r["ratio_to_HBB"])))
+MIN_RUN = 3
+GAIN_FACTOR = 1.5
+LOSS_FACTOR = 0.5
+BASELINE = 1.0
+
+
+def load_bins(path: str | Path, region: str = "HBA") -> list[tuple[int, int, float]]:
+    rows: list[tuple[int, int, float]] = []
+    with Path(path).open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        required = {"region", "bin_start", "bin_end", "ratio_to_HBB"}
+        missing = required - set(reader.fieldnames or [])
+        if missing:
+            raise ValueError(f"{path} is missing columns: {', '.join(sorted(missing))}")
+        for row in reader:
+            if row["region"] != region:
+                continue
+            rows.append((int(row["bin_start"]), int(row["bin_end"]), float(row["ratio_to_HBB"])))
     rows.sort()
     return rows
 
 
-# The ratio is already HBB-normalised, so 1.0 IS the diploid baseline. Do NOT
-# use the sample's own median: a whole-region event (e.g. flat 0.5 for full-alpha)
-# moves the median and would hide itself. Fixed baseline of 1.0 avoids that.
-BASELINE = 1.0
+def find_runs(
+    rows: Sequence[tuple[int, int, float]], baseline: float = BASELINE
+) -> list[tuple[str, int, int, float, int | None]]:
+    calls: list[tuple[str, int, int, float, int | None]] = []
 
-
-def find_runs(rows, baseline=BASELINE):
-    calls = []
-    def classify(ratio):
+    def classify(ratio: float) -> str | None:
         if baseline <= 0 or ratio != ratio:
             return None
-        f = ratio / baseline
-        if f >= GAIN_FACTOR: return "gain"
-        if f <= LOSS_FACTOR: return "loss"
+        fold = ratio / baseline
+        if fold >= GAIN_FACTOR:
+            return "gain"
+        if fold <= LOSS_FACTOR:
+            return "loss"
         return None
-    i, n = 0, len(rows)
-    while i < n:
-        kind = classify(rows[i][1])
+
+    i = 0
+    while i < len(rows):
+        kind = classify(rows[i][2])
         if kind is None:
-            i += 1; continue
+            i += 1
+            continue
         j = i
-        while j < n and classify(rows[j][1]) == kind:
+        while j < len(rows) and classify(rows[j][2]) == kind:
             j += 1
         if j - i >= MIN_RUN:
-            seg = rows[i:j]
-            start = seg[0][0]
-            end = seg[-1][0]
-            med = statistics.median([r for _, r in seg])
-            copies = round(2 * med / baseline) if baseline else None
-            calls.append((kind, start, end, med / baseline, copies))
+            segment = rows[i:j]
+            start = segment[0][0]
+            end = segment[-1][1]
+            median_ratio = statistics.median(ratio for _, _, ratio in segment)
+            copies = round(2 * median_ratio / baseline) if baseline else None
+            calls.append((kind, start, end, median_ratio / baseline, copies))
         i = j
     return calls
 
 
-def call_file(path):
+def call_file(path: str | Path) -> tuple[list[tuple[str, int, int, float, int | None]], float] | None:
     rows = load_bins(path)
     if not rows:
-        return []
+        return None
     return find_runs(rows, BASELINE), BASELINE
 
 
-def write_cnv_calls(out_path):
-    """Write one row per CNV call to a CSV the sample report can consume.
+def _parse_bin_spec(value: str) -> tuple[str, Path]:
+    if "=" not in value:
+        raise argparse.ArgumentTypeError("--bin must be SAMPLE=PATH")
+    sample, path = value.split("=", 1)
+    sample = sample.strip()
+    if not sample or not path.strip():
+        raise argparse.ArgumentTypeError("--bin must contain a non-empty sample and path")
+    return sample, Path(path)
 
-    Gains are matched against the IthaCNVs catalogue by reciprocal overlap
-    (reusing identify_sv) so a detected bump can be named, e.g. ααα(anti-3.7).
-    Copy number for gains is noisy (a duplication maps ambiguously), so we report
-    the measured fold-change, not an inferred copy count."""
-    import glob, os, csv as _csv, sys as _sys
-    _sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    try:
-        from identify_sv import identify_sv
-    except Exception:
-        identify_sv = None
-    paths = sorted(glob.glob("variants/*/*.coverage_bins.tsv"))
-    with open(out_path, "w", newline="", encoding="utf-8-sig") as fh:
-        w = _csv.writer(fh)
-        w.writerow(["Sample", "Type", "Region", "Fold", "Name", "Confidence"])
-        for p in paths:
-            sample = os.path.basename(os.path.dirname(p))
-            res = call_file(p)
-            if not res:
+
+def write_cnv_calls(
+    out_path: str | Path,
+    bin_specs: Iterable[tuple[str, Path]],
+) -> None:
+    specs = list(bin_specs)
+    if not specs:
+        raise ValueError("at least one explicit coverage-bin input is required")
+    sample_names = [sample for sample, _ in specs]
+    if len(set(sample_names)) != len(sample_names):
+        raise ValueError("duplicate sample in --bin inputs")
+
+    output = Path(out_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open("w", newline="", encoding="utf-8-sig") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(
+            [
+                "Sample",
+                "Type",
+                "Region",
+                "Fold",
+                "Estimated_copies",
+                "Name",
+                "Naming_status",
+                "Confidence",
+            ]
+        )
+        for sample, path in specs:
+            if not path.is_file():
+                raise FileNotFoundError(f"missing coverage bins for {sample}: {path}")
+            result = call_file(path)
+            if result is None:
                 continue
-            calls, base = res
+            calls, _baseline = result
             for kind, start, end, fold, copies in calls:
-                region = "chr16:%d-%d" % (start, end)
+                region = f"chr16:{start}-{end}"
                 name = ""
-                if kind == "gain" and identify_sv is not None:
-                    # match the bump against catalogued DUP entries
+                naming_status = "not_applicable"
+                if kind == "gain":
                     hit = identify_sv("chr16", start, "DUP", end - start)
                     if hit and not hit.startswith("unknown"):
                         name = hit
-                conf = "high" if kind == "loss" else "moderate"
-                w.writerow([sample, kind, region, "%.2f" % fold, name, conf])
+                        naming_status = "catalogue_candidate_only"
+                    else:
+                        naming_status = "uncatalogued_gain_candidate"
+                elif kind == "loss":
+                    naming_status = "coverage_loss_not_typed"
+                confidence = "moderate" if kind == "gain" else "screening"
+                writer.writerow(
+                    [
+                        sample,
+                        kind,
+                        region,
+                        f"{fold:.2f}",
+                        "" if copies is None else copies,
+                        name,
+                        naming_status,
+                        confidence,
+                    ]
+                )
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--output", required=True)
+    parser.add_argument(
+        "--bin",
+        action="append",
+        required=True,
+        type=_parse_bin_spec,
+        metavar="SAMPLE=PATH",
+        help="explicit per-sample coverage-bin TSV; repeat for each sample",
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    try:
+        write_cnv_calls(args.output, args.bin)
+    except (OSError, ValueError) as exc:
+        print(f"detect_cnv: {exc}", file=sys.stderr)
+        return 2
+    return 0
 
 
 if __name__ == "__main__":
-    import glob, os
-    # test across all samples: gains should fire only on triple, losses on deletions
-    paths = sorted(glob.glob("variants/*/*.coverage_bins.tsv"))
-    print("%-16s %-6s %s" % ("sample", "base", "calls"))
-    for p in paths:
-        sample = os.path.basename(os.path.dirname(p))
-        res = call_file(p)
-        if not res:
-            print("%-16s   --   (no HBA bins)" % sample); continue
-        calls, base = res
-        if not calls:
-            print("%-16s %.2f   normal (no CNV)" % (sample, base))
-        else:
-            desc = "; ".join("%s chr16:%d-%d (%.2fx, ~%s copies)" % (k, s, e, f, c)
-                             for k, s, e, f, c in calls)
-            print("%-16s %.2f   %s" % (sample, base, desc))
-
-    import sys as _sys
-    if len(_sys.argv) > 1:
-        write_cnv_calls(_sys.argv[1])
-        print("\nwrote CNV calls -> %s" % _sys.argv[1])
-        
-        
-            
+    raise SystemExit(main())
