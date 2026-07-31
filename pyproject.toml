@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = ["PyYAML>=6"]
 
 [tool.setuptools]
-packages = ["nanoglobin"]
+packages = ["nanoglobin", "scripts"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
