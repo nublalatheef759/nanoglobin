@@ -89,9 +89,11 @@ The assignment state is one of:
 - `unique_sequence`;
 - `equivalent_haplotypes` when multiple chromosome haplotypes yield the same
   amplicon sequence;
-- `low_margin` when distinct compiled products fit similarly;
-- `poor_sequence_fit` when the catalogue does not explain the read; or
-- `no_compiled_sequence`.
+- `low_margin` when distinct compiled sequences fit similarly;
+- `poor_sequence_fit` when the catalogue does not explain the read;
+- `no_compiled_sequence`; or
+- `ambiguous_product_definition` when terminal evidence cannot separate two
+  declared product definitions.
 
 This deliberately preserves assay-induced ambiguity. The emitted
 `sequence_log_likelihood` is not yet a calibrated ONT pair-HMM, and read counts
@@ -109,11 +111,13 @@ indistinguishable, which is the physically correct result.
 
 `*.molecules.tsv` retains one inspectable row per read, including primer evidence,
 orientation, molecule state, product candidates, sequence compatibility and the
-reason for ambiguity or failure.
+reason for ambiguity or failure. For reverse-oriented reads, trim coordinates are
+reported in the oriented molecule coordinate system used for sequence comparison.
 
 `*.product_counts.tsv` summarizes endpoint candidates, assigned reads, sequence
-ambiguity, poor fits and observed product lengths. Counts are assay-product
-abundances, not genomic allele counts.
+ambiguity, poor fits and observed product lengths. Exact length medians are computed
+from bounded integer histograms rather than retaining all read observations in
+memory. Counts are assay-product abundances, not genomic allele counts.
 
 `*.summary.json` reports assignment, off-target, one-ended, dimer and chimera
 fractions. These quantities are directly usable for exploratory assay QC on
