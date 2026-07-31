@@ -15,9 +15,11 @@ from nanoglobin.assay import (
     write_compiled_json,
 )
 from nanoglobin.molecules import (
+    AdmissionAccumulator,
     AdmissionConfig,
     FastqRecord,
     MoleculeAdmissionError,
+    MoleculeObservation,
     admit_molecule,
     load_compiled_assay,
     read_fastq,
@@ -235,6 +237,27 @@ class MoleculeAdmissionTests(unittest.TestCase):
         )
         self.assertEqual(observation.status, "complete")
         self.assertEqual(observation.assigned_product_id, "true")
+
+    def test_accumulator_uses_exact_length_histogram(self):
+        accumulator = AdmissionAccumulator()
+        for index, length in enumerate((40, 40, 50, 60)):
+            accumulator.add(
+                MoleculeObservation(
+                    sample="S1",
+                    read_id=f"r{index}",
+                    read_length_bp=length,
+                    status="complete",
+                    orientation="forward",
+                    assigned_product_id="HBA_product",
+                    assignment_state="unique_sequence",
+                    observed_product_length_bp=length,
+                )
+            )
+        row = next(accumulator.product_rows())
+        self.assertEqual(row["median_observed_length_bp"], "45.0")
+        self.assertEqual(row["min_observed_length_bp"], 40)
+        self.assertEqual(row["max_observed_length_bp"], 60)
+        self.assertEqual(accumulator.product_lengths["HBA_product"][40], 2)
 
     def test_fastq_gzip_and_cli_outputs(self):
         from scripts.admit_amplicon_reads import main
