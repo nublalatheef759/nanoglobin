@@ -6,7 +6,6 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Sequence
 import csv
-import statistics
 
 from .assay import AssayProfile
 from .molecule_types import MoleculeObservation, OBSERVATION_FIELDS
@@ -33,8 +32,31 @@ def write_observation_tsv_header(handle) -> csv.DictWriter:
     return writer
 
 
+def _weighted_median(counts: Counter[int]) -> float | None:
+    """Return the exact median represented by an integer histogram."""
+
+    total = sum(counts.values())
+    if total == 0:
+        return None
+    lower_rank = (total - 1) // 2
+    upper_rank = total // 2
+    seen = 0
+    lower_value: int | None = None
+    upper_value: int | None = None
+    for value, count in sorted(counts.items()):
+        next_seen = seen + count
+        if lower_value is None and lower_rank < next_seen:
+            lower_value = value
+        if upper_rank < next_seen:
+            upper_value = value
+            break
+        seen = next_seen
+    assert lower_value is not None and upper_value is not None
+    return (lower_value + upper_value) / 2.0
+
+
 class AdmissionAccumulator:
-    """Streaming summary state; retains lengths, not full read observations."""
+    """Streaming summary state with bounded integer length histograms."""
 
     def __init__(self) -> None:
         self.total = 0
@@ -44,7 +66,7 @@ class AdmissionAccumulator:
         self.product_counts: Counter[str] = Counter()
         self.product_candidate_counts: Counter[str] = Counter()
         self.product_state_counts: dict[str, Counter[str]] = defaultdict(Counter)
-        self.product_lengths: dict[str, list[int]] = defaultdict(list)
+        self.product_lengths: dict[str, Counter[int]] = defaultdict(Counter)
 
     def add(self, observation: MoleculeObservation) -> None:
         self.total += 1
@@ -60,9 +82,9 @@ class AdmissionAccumulator:
                 observation.assignment_state or "none"
             ] += 1
             if observation.observed_product_length_bp is not None:
-                self.product_lengths[product_id].append(
+                self.product_lengths[product_id][
                     int(observation.observed_product_length_bp)
-                )
+                ] += 1
 
     @property
     def complete_total(self) -> int:
@@ -73,7 +95,8 @@ class AdmissionAccumulator:
             set(self.product_candidate_counts) | set(self.product_counts)
         )
         for product_id in product_ids:
-            lengths = self.product_lengths.get(product_id, [])
+            length_counts = self.product_lengths.get(product_id, Counter())
+            median_length = _weighted_median(length_counts)
             states = self.product_state_counts.get(product_id, Counter())
             assigned = self.product_counts[product_id]
             yield {
@@ -86,10 +109,14 @@ class AdmissionAccumulator:
                 ),
                 "poor_fit_reads": states["poor_sequence_fit"],
                 "median_observed_length_bp": (
-                    f"{statistics.median(lengths):.1f}" if lengths else ""
+                    f"{median_length:.1f}" if median_length is not None else ""
                 ),
-                "min_observed_length_bp": min(lengths) if lengths else "",
-                "max_observed_length_bp": max(lengths) if lengths else "",
+                "min_observed_length_bp": (
+                    min(length_counts) if length_counts else ""
+                ),
+                "max_observed_length_bp": (
+                    max(length_counts) if length_counts else ""
+                ),
                 "fraction_of_all_reads": (
                     f"{assigned / self.total:.6f}"
                     if self.total
