@@ -139,7 +139,7 @@ def write_cnv_calls(
                 name = ""
                 naming_status = "not_applicable"
                 if kind == "gain":
-                    hit = identify_sv("chr16", start, "DUP", end - start)
+                    hit = identify_sv("chr16", start, "DUP", end - start + 1)
                     if hit and not hit.startswith("unknown"):
                         name = hit
                         naming_status = "catalogue_candidate_only"
