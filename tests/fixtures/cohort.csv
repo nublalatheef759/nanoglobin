@@ -1,0 +1,3 @@
+Person_ID,Episode_ID,Nationality,Gender,Age,Clinical_in,Result,Date_received,HBA,HBA_zygosity,HBA_additional_details,HBB,HBB_zygosity,HBB_additional_details,Hb,MCV
+P1,E1,UAE,M,21y,Sickle Cell,positive,26/05/2002,not_tested,,,HBB:c.20A>T,homozygous,CD 6 GAG>GTG,9.1,68
+P2,E2,UAE,F,6m,Beta-Thal,negative,01/05/2024,,,,,,,11.4,

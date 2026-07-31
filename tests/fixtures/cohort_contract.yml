@@ -1,0 +1,29 @@
+contract_id: historical_v1
+identifiers:
+  person_id: Person_ID
+  episode_id: Episode_ID
+shared_columns:
+  nationality: Nationality
+  sex: Gender
+  age: Age
+  clinical_indication: Clinical_in
+  report_result: Result
+  date_received: Date_received
+loci:
+  HBA:
+    result: HBA
+    zygosity: HBA_zygosity
+    details: HBA_additional_details
+  HBB:
+    result: HBB
+    zygosity: HBB_zygosity
+    details: HBB_additional_details
+phenotypes:
+  haemoglobin:
+    column: Hb
+    unit: g/dL
+  MCV:
+    column: MCV
+    unit: fL
+not_tested_values: [not_tested, not tested]
+missing_values: ["", NA, N/A, null]

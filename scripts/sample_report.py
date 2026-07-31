@@ -1,218 +1,250 @@
 #!/usr/bin/env python3
+"""Create one evidence-ranked row per sample.
+
+The report is descriptive, not diagnostic.  Small variants retain their
+IthaGenes/ClinVar evidence.  Coverage-defined HBA gains are deliberately kept as
+*structural candidates*: interval overlap cannot establish copy order, junction
+sequence, or a named triplication allele.
 """
-sample_report.py -- one row per sample, unifying SNVs and structural variants
-(deletions AND copy-number gains), ranked by clinical significance and flagged
-with classification, source, and zygosity. Designed for high-volume scanning:
-the left columns give a triage flag and the primary finding; the full ranked
-variant list is pushed right, consulted only on demand.
 
-Nothing is hidden: benign variants sort to the bottom but stay visible, because a
-classification benign in one population/submitter may matter in another (and
-ClinVar 'Conflicting' variants are surfaced explicitly).
+from __future__ import annotations
 
-The Result column is DESCRIPTIVE, not diagnostic: it reports what the pipeline
-found (causative variant detected / conflicting / VUS only / none), leaving the
-clinical conclusion to the clinician.
-
-Inputs:
-  comprehensive_report.csv   per-variant calls (SNVs + SV deletions)
-  variants.csv               SNV/indel catalogue (ClinVar/HbVar classification)
-  [cnv_calls.csv]            optional copy-number calls from detect_cnv.py (gains)
-
-Output columns:
-  Sample, Result, Common_name, Primary_HGVS, Primary_zygosity,
-  N_pathogenic, N_conflicting, N_vus, N_benign, All_variants_ranked
-"""
-import csv, re, sys, os
+import csv
+import os
+import re
+import sys
+from pathlib import Path
 
 
-def zygosity_from_gt(gt):
-    g = (gt or "").strip().replace("|", "/")
-    a = g.split("/")
-    if a == ["1", "1"]:
+def zygosity_from_gt(gt: str) -> str:
+    alleles = (gt or "").strip().replace("|", "/").split("/")
+    if alleles == ["1", "1"]:
         return "hom"
-    if a in (["0", "1"], ["1", "0"]):
+    if alleles in (["0", "1"], ["1", "0"]):
         return "het"
-    if a == ["0", "0"]:
+    if alleles == ["0", "0"]:
         return "ref"
     return ""
 
 
-def tier(clinvar, functionality):
-    c = (clinvar or "").strip().lower()
-    f = (functionality or "").strip().lower()
-    if f == "causative" or "pathogenic" in c:
-        if c.startswith("conflicting"):
+def tier(clinvar: str, functionality: str) -> int:
+    classification = (clinvar or "").strip().lower()
+    function = (functionality or "").strip().lower()
+    if function == "causative" or "pathogenic" in classification:
+        if classification.startswith("conflicting"):
             return 2
         return 1
-    if c.startswith("conflicting"):
+    if classification.startswith("conflicting"):
         return 2
-    if "uncertain" in c or c in ("", "other", "?",
-                                 "no classification for the single variant"):
+    if "uncertain" in classification or classification in (
+        "",
+        "other",
+        "?",
+        "no classification for the single variant",
+    ):
         return 3
-    if "benign" in c:
+    if "benign" in classification:
         return 4
     return 3
 
 
 TRANSCRIPT_TO_GENE = {
-    "ENST00000335295": "HBB", "ENST00000251595": "HBA2", "ENST00000252242": "HBA1",
-    "ENST00000380315": "HBB", "ENST00000866237": "HBA2", "ENST00000320868": "HBD",
-    "ENST00001097508": "HBA1", "ENST00000485743": "HBB",
+    "ENST00000335295": "HBB",
+    "ENST00000251595": "HBA2",
+    "ENST00000252242": "HBA1",
+    "ENST00000380315": "HBB",
+    "ENST00000866237": "HBA2",
+    "ENST00000320868": "HBD",
+    "ENST00001097508": "HBA1",
+    "ENST00000485743": "HBB",
 }
 
 
-def to_hgvs(hgvs):
-    """ENST00000335295.4:c.20A>T -> HBB:c.20A>T (gene-prefixed HGVS)."""
-    s = str(hgvs)
-    m = re.match(r"(ENST\d+)\.\d+:(c\..+)", s)
-    if m:
-        gene = TRANSCRIPT_TO_GENE.get(m.group(1), m.group(1))
-        return "%s:%s" % (gene, m.group(2))
-    return s
+def to_hgvs(hgvs: str) -> str:
+    """Convert transcript-prefixed c.HGVS to a gene-prefixed catalogue key."""
+
+    value = str(hgvs)
+    match = re.match(r"(ENST\d+)\.\d+:(c\..+)", value)
+    if not match:
+        return value
+    gene = TRANSCRIPT_TO_GENE.get(match.group(1), match.group(1))
+    return f"{gene}:{match.group(2)}"
 
 
-def load_catalogue(path):
-    """gene:c. HGVS -> (clinvar_class, common_name, functionality). Skips junk rows."""
-    cat = {}
-    with open(path, encoding="utf-8-sig") as fh:
-        for r in csv.DictReader(fh):
-            hvgs = (r.get("HVGS") or "").strip()
-            if not re.match(r"^[A-Z0-9]+:c\.", hvgs):
+def load_catalogue(path: str | Path) -> dict[str, tuple[str, str, str, str]]:
+    """Return HGVS -> (classification, common name, functionality, source)."""
+
+    catalogue: dict[str, tuple[str, str, str, str]] = {}
+    with Path(path).open(newline="", encoding="utf-8-sig") as handle:
+        for row in csv.DictReader(handle):
+            hgvs = (row.get("HVGS") or "").strip()
+            if not re.match(r"^[A-Z0-9]+:c\.", hgvs):
                 continue
-            cat[hvgs] = (
-                (r.get("ClinVar classification") or "").strip(),
-                (r.get("Common name") or "").strip(),
-                (r.get("Functionality") or "").strip(),
+            source = (row.get("Source") or row.get("source") or "IthaGenes/ClinVar/HbVar").strip()
+            catalogue[hgvs] = (
+                (row.get("ClinVar classification") or "").strip(),
+                (row.get("Common name") or "").strip(),
+                (row.get("Functionality") or "").strip(),
+                source,
             )
-    return cat
+    return catalogue
 
 
-
-def _excel_safe(v):
-    """Excel reads a leading -, =, + or @ as a formula (e.g. -α3.7 -> #NAME?).
-    Prefix a leading apostrophe so Excel renders the literal text. Only applied
-    to standalone name cells, not the combined detail column."""
-    v = "" if v is None else str(v)
-    return "'" + v if v[:1] in ("-", "=", "+", "@") else v
+def _excel_safe(value: object) -> str:
+    text = "" if value is None else str(value)
+    return "'" + text if text[:1] in ("-", "=", "+", "@") else text
 
 
-def main():
-    report_csv = sys.argv[1]
-    variants_csv = sys.argv[2]
-    out_csv = sys.argv[3]
-    cnv_csv = sys.argv[4] if len(sys.argv) > 4 else None
+def _display(common: str, hgvs: str) -> str:
+    if common and hgvs:
+        return f"{common} ({hgvs})"
+    return common or hgvs
 
-    cat = load_catalogue(variants_csv)
 
-    cnv_by_sample = {}
+def main(argv: list[str] | None = None) -> int:
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    if len(arguments) not in (3, 4):
+        print(
+            "usage: sample_report.py comprehensive_report.csv variants.csv "
+            "output.csv [cnv_calls.csv]",
+            file=sys.stderr,
+        )
+        return 2
+    report_csv, variants_csv, out_csv = arguments[:3]
+    cnv_csv = arguments[3] if len(arguments) == 4 else None
+
+    catalogue = load_catalogue(variants_csv)
+    cnv_by_sample: dict[str, list[dict[str, str]]] = {}
     if cnv_csv and os.path.exists(cnv_csv):
-        with open(cnv_csv, encoding="utf-8-sig") as fh:
-            for r in csv.DictReader(fh):
-                cnv_by_sample.setdefault(r["Sample"], []).append(r)
+        with open(cnv_csv, newline="", encoding="utf-8-sig") as handle:
+            for row in csv.DictReader(handle):
+                cnv_by_sample.setdefault(row["Sample"], []).append(row)
 
-    # each entry: (tier, common_name, hgvs, zyg, klass, source)
-    samples = {}
-    with open(report_csv, encoding="utf-8-sig") as fh:
-        for row in csv.DictReader(fh):
-            s = row["Sample"]
-            samples.setdefault(s, [])
+    # Entries: tier, common_name, hgvs/evidence, zygosity, class, source.
+    samples: dict[str, list[tuple[int, str, str, str, str, str]]] = {}
+    with open(report_csv, newline="", encoding="utf-8-sig") as handle:
+        for row in csv.DictReader(handle):
+            sample = row["Sample"]
+            samples.setdefault(sample, [])
             tool = row["Tool"]
             if tool == "Coverage":
                 continue
             hgvs_raw = row.get("HGVS", "")
-            cons = row.get("Consequence", "")
-            zyg = zygosity_from_gt(row.get("Genotype", ""))
+            consequence = row.get("Consequence", "")
+            zygosity = zygosity_from_gt(row.get("Genotype", ""))
 
-            if "SV_" in cons or tool in ("Sniffles", "CuteSV"):
-                # structural deletion: name already the identify_sv result
-                name = re.split(r"\s*\(", str(hgvs_raw).strip())[0] if hgvs_raw else cons
+            if "SV_" in consequence or tool in ("Sniffles", "CuteSV"):
+                name = re.split(r"\s*\(", str(hgvs_raw).strip())[0] if hgvs_raw else consequence
                 if name.startswith("unknown"):
-                    common, hgvs_disp, klass, src, t = name, "", "Unclassified SV", "-", 3
+                    entry = (3, name, "", zygosity, "Unclassified SV", "caller evidence")
                 else:
-                    common, hgvs_disp, klass, src, t = name, "", "Causative", "IthaCNVs", 1
-                # dedup: Sniffles + CuteSV report the same deletion
-                if any(e[1] == common for e in samples[s]):
-                    continue
-                samples[s].append((t, common, hgvs_disp, zyg, klass, src))
+                    entry = (1, name, "", zygosity, "Causative", "IthaCNVs + read junction")
+                if not any(existing[1] == entry[1] for existing in samples[sample]):
+                    samples[sample].append(entry)
+                continue
+
+            hgvs = to_hgvs(hgvs_raw)
+            clinvar, common, functionality, source = catalogue.get(
+                hgvs, ("", "", "", "unmatched")
+            )
+            rank = tier(clinvar, functionality)
+            classification = (clinvar or "").strip()
+            if classification and classification not in (
+                "?",
+                "other",
+                "not provided",
+                "no classification for the single variant",
+            ):
+                klass = classification
+            elif functionality.strip().lower() == "causative":
+                klass = "Causative"
             else:
-                hgvs = to_hgvs(hgvs_raw)
-                clinvar, common, func = cat.get(hgvs, ("", "", ""))
-                t = tier(clinvar, func)
-                cv = (clinvar or "").strip()
-                if cv and cv not in ("?", "other", "not provided",
-                                     "no classification for the single variant"):
-                    klass = cv
-                elif func.strip().lower() == "causative":
-                    klass = "Causative"
-                else:
-                    klass = "unclassified"
-                samples[s].append((t, common, hgvs, zyg, klass, "ClinVar/HbVar"))
+                klass = "unclassified"
+            samples[sample].append((rank, common, hgvs, zygosity, klass, source))
 
-    # copy-number GAINS from detect_cnv (losses already come via SV callers)
-    for s_name, rows in cnv_by_sample.items():
-        samples.setdefault(s_name, [])
-        for r in rows:
-            if r["Type"] == "gain":
-                named = (r.get("Name") or "").strip()
-                if named:
-                    # e.g. "ααα(anti-3.7) (98% reciprocal; ithaID=2561)"
-                    common = re.split(r"\s*\(\d+%", named)[0].strip()
-                    klass = "Causative (gain)"
-                else:
-                    common = "triplication/gain"
-                    klass = "gain, unclassified"
-                hgvs_disp = "%s, ~%s× depth" % (r["Region"], r.get("Fold", "?"))
-                if not any(e[1] == common for e in samples[s_name]):
-                    samples[s_name].append((1, common, hgvs_disp, "", klass, "coverage"))
+    # Coverage-defined gains are candidates, not named causal alleles.
+    for sample, rows in cnv_by_sample.items():
+        samples.setdefault(sample, [])
+        for row in rows:
+            if row.get("Type") != "gain":
+                continue
+            candidate_name = (row.get("Name") or "").strip()
+            naming_status = (row.get("Naming_status") or "").strip()
+            details = f"{row.get('Region', '')}, ~{row.get('Fold', '?')}x depth"
+            if candidate_name:
+                details += f"; catalogue candidate {candidate_name}"
+            common = "HBA copy-number gain candidate"
+            klass = "Unresolved structural gain"
+            source = "coverage"
+            if naming_status:
+                source += f"; {naming_status}"
+            entry = (3, common, details, "", klass, source)
+            if not any(existing[1] == common and existing[2] == details for existing in samples[sample]):
+                samples[sample].append(entry)
 
-    def display(common, hgvs):
-        """Combined 'Name (HGVS)' for the detail column."""
-        if common and hgvs:
-            return "%s (%s)" % (common, hgvs)
-        return common or hgvs
+    with open(out_csv, "w", newline="", encoding="utf-8-sig") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(
+            [
+                "Sample",
+                "Result",
+                "Common_name",
+                "Primary_HGVS",
+                "Primary_zygosity",
+                "N_pathogenic",
+                "N_conflicting",
+                "N_vus",
+                "N_benign",
+                "All_variants_ranked",
+            ]
+        )
+        for sample in sorted(samples):
+            variants = sorted(samples[sample], key=lambda item: (item[0], item[1], item[2]))
+            counts = {1: 0, 2: 0, 3: 0, 4: 0}
+            for rank, *_ in variants:
+                counts[rank] += 1
 
-    with open(out_csv, "w", newline="", encoding="utf-8-sig") as out:
-        w = csv.writer(out)
-        w.writerow(["Sample", "Result", "Common_name", "Primary_HGVS",
-                    "Primary_zygosity", "N_pathogenic", "N_conflicting",
-                    "N_vus", "N_benign", "All_variants_ranked"])
-        for s in sorted(samples):
-            variants = sorted(samples[s], key=lambda x: x[0])
-            n = {1: 0, 2: 0, 3: 0, 4: 0}
-            for t, *_ in variants:
-                n[t] += 1
+            primaries = [variant for variant in variants if variant[0] <= 2]
+            primary_names = "; ".join(variant[1] for variant in primaries) if primaries else ""
+            primary_hgvs = "; ".join(variant[2] for variant in primaries if variant[2])
+            primary_zygosity = "; ".join(variant[3] for variant in primaries if variant[3])
 
-            # primary = tier 1/2 findings
-            primaries = [v for v in variants if v[0] <= 2]
-            prim_names = "; ".join(v[1] for v in primaries) if primaries else ""
-            prim_hgvs = "; ".join(v[2] for v in primaries if v[2]) if primaries else ""
-            prim_zyg = "; ".join(v[3] for v in primaries if v[3]) if primaries else ""
-
-            # descriptive Result flag (NOT a diagnosis)
-            if n[1]:
+            if counts[1]:
                 result = "Causative variant detected"
-            elif n[2]:
+            elif counts[2]:
                 result = "Conflicting classification — review"
-            elif n[3]:
-                result = "VUS only — review"
-            elif n[4]:
+            elif counts[3]:
+                result = "Unresolved/VUS finding — review"
+            elif counts[4]:
                 result = "Benign only"
             else:
-                result = "No variant detected"
+                result = "No filtered variant detected"
 
-            all_v = "; ".join(
-                "%s [%s%s]" % (display(v[1], v[2]), v[4], (", " + v[3]) if v[3] else "")
-                for v in variants
-            ) if variants else "none"
-
-            w.writerow([s, result, _excel_safe(prim_names) or "none", _excel_safe(prim_hgvs), prim_zyg,
-                        n[1], n[2], n[3], n[4], all_v])
+            details = (
+                "; ".join(
+                    f"{_display(variant[1], variant[2])} "
+                    f"[{variant[4]}{', ' + variant[3] if variant[3] else ''}; {variant[5]}]"
+                    for variant in variants
+                )
+                if variants
+                else "none"
+            )
+            writer.writerow(
+                [
+                    sample,
+                    result,
+                    _excel_safe(primary_names) or "none",
+                    _excel_safe(primary_hgvs),
+                    primary_zygosity,
+                    counts[1],
+                    counts[2],
+                    counts[3],
+                    counts[4],
+                    _excel_safe(details),
+                ]
+            )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
-    
-    
-
-    
+    raise SystemExit(main())

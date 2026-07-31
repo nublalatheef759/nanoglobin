@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nanoglobin.local/schemas/assay-profile.schema.json",
+  "title": "NanoGlobin amplicon assay profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["assay_id", "version", "platform", "primers", "products"],
+  "properties": {
+    "assay_id": {"type": "string", "minLength": 1},
+    "version": {"type": ["string", "number"]},
+    "platform": {"type": "string", "minLength": 1},
+    "max_products_per_haplotype": {"type": "integer", "minimum": 1},
+    "primers": {
+      "type": "object",
+      "minProperties": 2,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sequence"],
+        "properties": {
+          "sequence": {
+            "type": "string",
+            "pattern": "^[ACGTRYSWKMBDHVNacgtryswkmbdhvn\\s]+$"
+          },
+          "max_mismatches": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "products": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "forward_primer", "reverse_primer", "min_length", "max_length"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "forward_primer": {"type": "string", "minLength": 1},
+          "reverse_primer": {"type": "string", "minLength": 1},
+          "min_length": {"type": "integer", "minimum": 1},
+          "max_length": {"type": "integer", "minimum": 1},
+          "pool": {"type": "string"},
+          "roles": {
+            "oneOf": [
+              {"type": "string"},
+              {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+            ]
+          },
+          "required": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

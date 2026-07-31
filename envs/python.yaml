@@ -1,6 +1,4 @@
-# Python analysis rules: coverage_profile, identify_sv, comprehensive_report,
-# patient_summary, annotate_variants, vep_annotate. Pin the libraries the
-# scripts import so behaviour is identical on any machine.
+# Python analysis rules and reusable NanoGlobin kernels.
 name: nanoglobin-python
 channels:
   - conda-forge
@@ -13,3 +11,5 @@ dependencies:
   - requests=2.31
   - lxml=5.1
   - pysam=0.22
+  - pyyaml=6
+  - pytest=8
