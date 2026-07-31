@@ -414,7 +414,20 @@ def compile_product_for_haplotype(
             length = r_hit.end - f_hit.start
             if not product.min_length <= length <= product.max_length:
                 continue
-            product_sequence = sequence[f_hit.start : r_hit.end]
+            template_sequence = sequence[f_hit.start : r_hit.end]
+            # PCR primers become part of the amplified molecule.  Template bases
+            # at tolerated primer-site mismatches are therefore overwritten by
+            # the declared oligonucleotide sequence after amplification.  Keeping
+            # the raw template slice here would expose a base that the sequenced
+            # amplicon does not physically contain and could falsely distinguish
+            # haplotypes that differ only under a primer.
+            interior_start = len(forward.sequence)
+            interior_end = len(template_sequence) - len(reverse_binding)
+            product_sequence = (
+                forward.sequence
+                + template_sequence[interior_start:interior_end]
+                + reverse_binding
+            )
             compiled.append(
                 CompiledProduct(
                     assay_id=profile.assay_id,

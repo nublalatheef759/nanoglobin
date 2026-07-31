@@ -77,6 +77,37 @@ class AssayCompilerTests(unittest.TestCase):
         }
         self.assertTrue(any(expected <= pairs for pairs in pair_sets))
 
+
+    def test_tolerated_primer_site_variant_is_overwritten_in_product_molecule(self):
+        profile = assay_profile_from_mapping(
+            {
+                "assay_id": "primer_incorporation",
+                "version": "1",
+                "platform": "ont",
+                "primers": {
+                    "F": {"sequence": "AACCGGTT", "max_mismatches": 1},
+                    "R": {"sequence": "TTGGCCAA", "max_mismatches": 0},
+                },
+                "products": [
+                    {
+                        "id": "p",
+                        "forward_primer": "F",
+                        "reverse_primer": "R",
+                        "min_length": 20,
+                        "max_length": 100,
+                    }
+                ],
+            }
+        )
+        # The template differs under the forward primer, but the amplified
+        # molecule begins with the declared primer oligonucleotide.
+        from nanoglobin.assay import Haplotype
+        sequence = "TACCGGTT" + "A" * 12 + reverse_complement("TTGGCCAA")
+        compiled = compile_catalogue(profile, [Haplotype("h", sequence)])
+        self.assertEqual(len(compiled), 1)
+        self.assertTrue(compiled[0].sequence.startswith("AACCGGTT"))
+        self.assertEqual(compiled[0].forward_mismatches, 1)
+
     def test_cli_writes_reproducible_outputs(self):
         from scripts.compile_assay import main
 

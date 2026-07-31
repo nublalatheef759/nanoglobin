@@ -41,3 +41,29 @@ __all__ += [
     "load_cohort_contract",
     "normalise_rows",
 ]
+
+from .molecules import (
+    AdmissionAccumulator,
+    AdmissionConfig,
+    AdmissionEngine,
+    CompiledAssay,
+    FastqRecord,
+    MoleculeAdmissionError,
+    MoleculeObservation,
+    admit_molecule,
+    load_compiled_assay,
+    read_fastq,
+)
+
+__all__ += [
+    "AdmissionAccumulator",
+    "AdmissionConfig",
+    "AdmissionEngine",
+    "CompiledAssay",
+    "FastqRecord",
+    "MoleculeAdmissionError",
+    "MoleculeObservation",
+    "admit_molecule",
+    "load_compiled_assay",
+    "read_fastq",
+]

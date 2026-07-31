@@ -13,6 +13,7 @@ BIN_ARGS = " ".join(
     "--bin %s=variants/%s/%s.coverage_bins.tsv" % (sample, sample, sample)
     for sample in SAMPLES
 )
+MOLECULE_CONFIG = config.get("molecule_admission", {})
 
 rule all:
     input:
@@ -324,6 +325,46 @@ if config.get("assay_profile") and config.get("haplotype_catalogue"):
             "--compiled-json {output.compiled} --coverage-tsv {output.coverage} "
             "--indistinguishability-tsv {output.ambiguity} "
             "--summary-json {output.summary}"
+
+    rule admit_amplicon_reads:
+        input:
+            fastq="fastq/{sample}.fastq",
+            profile=config["assay_profile"],
+            compiled="results/assay/compiled_products.json"
+        output:
+            molecules="results/assay/molecules/{sample}.molecules.tsv",
+            products="results/assay/molecules/{sample}.product_counts.tsv",
+            summary="results/assay/molecules/{sample}.summary.json"
+        params:
+            end_search=MOLECULE_CONFIG.get("end_search_bp", 100),
+            seed_length=MOLECULE_CONFIG.get("primer_seed_length", 7),
+            min_overlap=MOLECULE_CONFIG.get("min_primer_overlap", 10),
+            max_mismatches=MOLECULE_CONFIG.get("max_primer_mismatches", 4),
+            max_error_rate=MOLECULE_CONFIG.get("max_primer_error_rate", 0.25),
+            length_tolerance=MOLECULE_CONFIG.get("length_tolerance_fraction", 0.10),
+            max_edit_rate=MOLECULE_CONFIG.get("max_sequence_edit_rate", 0.25),
+            assignment_margin=MOLECULE_CONFIG.get("sequence_assignment_margin", 0.02),
+            assumed_error=MOLECULE_CONFIG.get("assumed_sequence_error_rate", 0.10),
+            max_reads=MOLECULE_CONFIG.get("max_reads", 0)
+        conda:
+            "envs/python.yaml"
+        shell:
+            "python scripts/admit_amplicon_reads.py "
+            "--sample {wildcards.sample} --fastq {input.fastq} "
+            "--profile {input.profile} --compiled-json {input.compiled} "
+            "--molecules-tsv {output.molecules} "
+            "--product-counts-tsv {output.products} "
+            "--summary-json {output.summary} "
+            "--end-search-bp {params.end_search} "
+            "--primer-seed-length {params.seed_length} "
+            "--min-primer-overlap {params.min_overlap} "
+            "--max-primer-mismatches {params.max_mismatches} "
+            "--max-primer-error-rate {params.max_error_rate} "
+            "--length-tolerance-fraction {params.length_tolerance} "
+            "--max-sequence-edit-rate {params.max_edit_rate} "
+            "--sequence-assignment-margin {params.assignment_margin} "
+            "--assumed-sequence-error-rate {params.assumed_error} "
+            "--max-reads {params.max_reads}"
 
 if config.get("cohort_input") and config.get("cohort_contract"):
     rule normalise_cohort_reports:
