@@ -240,7 +240,7 @@ def main(argv: list[str] | None = None) -> int:
                     counts[2],
                     counts[3],
                     counts[4],
-                    details,
+                    _excel_safe(details),
                 ]
             )
     return 0
