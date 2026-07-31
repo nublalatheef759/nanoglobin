@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nanoglobin.local/schemas/cohort-contract.schema.json",
+  "title": "NanoGlobin report-derived cohort contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_id", "loci"],
+  "properties": {
+    "contract_id": {"type": "string", "minLength": 1},
+    "identifiers": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "person_id": {"type": "string"},
+        "episode_id": {"type": "string"}
+      }
+    },
+    "shared_columns": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "loci": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["result"],
+        "properties": {
+          "result": {"type": "string", "minLength": 1},
+          "zygosity": {"type": "string"},
+          "details": {"type": "string"}
+        }
+      }
+    },
+    "phenotypes": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "string", "minLength": 1},
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["column"],
+            "properties": {
+              "column": {"type": "string", "minLength": 1},
+              "unit": {"type": "string"},
+              "date_column": {"type": "string"}
+            }
+          }
+        ]
+      }
+    },
+    "missing_values": {"type": "array", "items": {"type": "string"}},
+    "not_tested_values": {"type": "array", "items": {"type": "string"}}
+  }
+}
