@@ -9,6 +9,7 @@ simulation/*.fa
 .snakemake/
 __pycache__/
 *.pyc
+*.egg-info/
 models/
 *.xlsx
 variant_summary.txt.gz
