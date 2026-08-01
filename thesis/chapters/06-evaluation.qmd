@@ -1,0 +1,37 @@
+# Evaluation
+
+```{r}
+source("R/figures.R")
+posterior <- read_tsv_or_example(
+  "../results/assay/genotypes/example.posteriors.tsv",
+  "data/example/genotype_posteriors.tsv"
+)
+```
+
+## Evaluation layers
+
+Keep the following evaluations separate:
+
+1. compiler correctness against known primer sites and expected products;
+2. sealed synthetic genotype recovery and deliberate ambiguity fixtures;
+3. real unlabelled amplicon mechanics, including endpoint, length and artifact
+   distributions;
+4. WGS small-variant benchmarking within declared truth/confident regions;
+5. structural evidence compared with DRAGEN or graph calls as comparators; and
+6. analytical sensitivity/specificity on certified or orthogonally characterised
+   assay-matched material.
+
+## Posterior example
+
+```{r}
+#| label: fig-genotype-posterior
+#| fig-cap: "Ranked conditional posterior over assay-observable genotype classes."
+#| fig-alt: "Horizontal bar chart of the leading candidate genotype classes and their posterior probabilities."
+plot_genotype_posterior(posterior)
+```
+
+## Reporting
+
+For each accuracy number, report the exact sample set, truth provenance, confidence
+regions, variant class, TP/FP/FN denominators and comparison configuration. Do not
+refer to DRAGEN-concordant deletion carriers as independent truth.
