@@ -1,0 +1,4 @@
+rank	class_id	posterior	genotype_pair_count	genotype_pairs	product_signature	log_read_likelihood	log_count_likelihood	log_dropout_likelihood	log_prior	log_score
+1	OGC_example1	0.82	1	alpha_alpha/minus_alpha_3p7	HBA_whole:hash1:1;DEL_3p7:hash2:1	-18.2	-4.1	-0.1	-1.4	-23.8
+2	OGC_example2	0.12	2	alpha_alpha/alpha_alpha;alpha_alpha/alpha_alias	HBA_whole:hash1:2	-21.4	-5.0	-3.0	-1.4	-30.8
+3	OGC_example3	0.06	1	minus_alpha_3p7/minus_alpha_3p7	DEL_3p7:hash2:2	-24.0	-5.6	-0.1	-1.4	-31.1
