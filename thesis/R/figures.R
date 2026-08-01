@@ -1,3 +1,5 @@
+source("R/setup.R")
+
 plot_reported_spectrum <- function(data) {
   data |>
     mutate(category = reorder(category, count)) |>
