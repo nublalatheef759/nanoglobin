@@ -116,20 +116,43 @@ class GenotypeConfig:
             raise GenotypeModelError("resolved_odds must be >= 1")
         if not 0 <= self.max_unresolved_fraction <= 1:
             raise GenotypeModelError("max_unresolved_fraction must be in [0, 1]")
+        if not isinstance(self.assignment_weights, Mapping):
+            raise GenotypeModelError("assignment_weights must be a mapping")
         for state, weight in self.assignment_weights.items():
-            if weight < 0:
+            try:
+                weight_f = float(weight)
+            except (TypeError, ValueError) as exc:
+                raise GenotypeModelError(
+                    f"assignment weight for {state!r} must be a number"
+                ) from exc
+            if weight_f < 0:
                 raise GenotypeModelError(
                     f"assignment weight for {state!r} must be >= 0"
                 )
+        if not isinstance(self.product_efficiencies, Mapping):
+            raise GenotypeModelError("product_efficiencies must be a mapping")
         for product_id, efficiency in self.product_efficiencies.items():
-            if efficiency <= 0:
+            try:
+                efficiency_f = float(efficiency)
+            except (TypeError, ValueError) as exc:
+                raise GenotypeModelError(
+                    f"product efficiency for {product_id!r} must be a number"
+                ) from exc
+            if efficiency_f <= 0:
                 raise GenotypeModelError(
                     f"product efficiency for {product_id!r} must be > 0"
                 )
-        if self.haplotype_priors and any(
-            value <= 0 for value in self.haplotype_priors.values()
-        ):
-            raise GenotypeModelError("haplotype priors must be > 0")
+        if not isinstance(self.haplotype_priors, Mapping):
+            raise GenotypeModelError("haplotype_priors must be a mapping")
+        for haplotype_id, value in self.haplotype_priors.items():
+            try:
+                prior_f = float(value)
+            except (TypeError, ValueError) as exc:
+                raise GenotypeModelError(
+                    f"haplotype prior for {haplotype_id!r} must be a number"
+                ) from exc
+            if prior_f <= 0:
+                raise GenotypeModelError("haplotype priors must be > 0")
 
 
 @dataclass(frozen=True)
