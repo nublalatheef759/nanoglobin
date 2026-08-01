@@ -1,0 +1,23 @@
+# Research posterior parameters. Report and later calibrate these against
+# assay-matched reference material rather than hiding them in code.
+min_assigned_reads: 3
+effective_read_cap: 200
+effective_count_cap: 200
+artifact_probability: 0.02
+product_background_mass: 0.01
+count_concentration: 20
+minimum_dirichlet_alpha: 0.05
+dropout_probability: 0.05
+resolved_posterior: 0.80
+resolved_odds: 3.0
+max_unresolved_fraction: 0.80
+assignment_weights:
+  unique_sequence: 1.0
+  equivalent_haplotypes: 1.0
+  low_margin: 0.35
+  ambiguous_product_definition: 0.25
+  poor_sequence_fit: 0.10
+  no_compiled_sequence: 0.0
+  "": 0.0
+product_efficiencies: {}
+haplotype_priors: {}
