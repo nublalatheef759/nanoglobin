@@ -1,0 +1,31 @@
+# Introduction
+
+## Clinical and molecular background
+
+Draft the alpha- and beta-thalassaemia background around chromosome haplotypes,
+not isolated VCF records. Explain that HBA states vary in copy number, copy order,
+hybrid sequence and linked small variants, whereas HBB phenotypes depend on the
+primary beta-globin genotype and co-inherited modifiers.
+
+## Original project scope
+
+The original project was a retrospective analysis of thalassaemia genetic testing
+at Dubai Genetics Center with five linked aims:
+
+1. characterise the HBA and HBB variant landscape in a diverse referral cohort;
+2. investigate whether co-inherited HBA variants modify haematological parameters
+   and clinical severity in HBB carriers;
+3. assess representation of cohort variants in public genomic databases;
+4. characterise a group evaluated using ONT long-read sequencing; and
+5. compare findings from conventional Sanger/gap-PCR and ONT testing.
+
+NanoGlobin is the methods component connecting those aims: the cohort defines the
+locally relevant genotype states, while the assay model defines which of those
+states an ONT primer design can observe.
+
+## Contributions
+
+State contributions only after the final analyses are frozen. Separate cohort data
+engineering, retrospective genotype and phenotype results, assay compilation and
+observability, primer-aware molecule analysis, candidate chromosome-haplotype
+inference, and validation under each declared truth source.
