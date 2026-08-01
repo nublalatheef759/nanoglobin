@@ -1,0 +1,56 @@
+project:
+  type: book
+  output-dir: _book
+  execute-dir: project
+
+book:
+  title: "Cohort-driven, assay-aware thalassaemia genotyping"
+  subtitle: "From retrospective molecular records to an open ONT amplicon haplotype model"
+  author: "NanoGlobin thesis draft"
+  date: today
+  output-file: nanoglobin-thesis-draft
+  chapters:
+    - index.qmd
+    - chapters/01-introduction.qmd
+    - chapters/02-study-design.qmd
+    - chapters/03-cohort-landscape.qmd
+    - chapters/04-genotype-phenotype.qmd
+    - chapters/05-assay-model.qmd
+    - chapters/06-evaluation.qmd
+    - chapters/07-discussion.qmd
+  appendices:
+    - appendices/software.qmd
+    - appendices/data-contract.qmd
+
+bibliography: references.bib
+lang: en
+
+format:
+  html:
+    theme: cosmo
+    css: styles/thesis.scss
+    toc: true
+    code-fold: true
+    code-summary: "Show analysis code"
+    fig-format: svg
+  typst:
+    toc: true
+    number-sections: true
+    papersize: a4
+    margin:
+      x: 22mm
+      y: 22mm
+    fontsize: 10.5pt
+    fig-format: svg
+    keep-typ: true
+    citeproc: true
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  freeze: auto
+
+crossref:
+  fig-title: Figure
+  tbl-title: Table
