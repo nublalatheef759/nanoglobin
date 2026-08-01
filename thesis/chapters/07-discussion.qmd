@@ -1,0 +1,27 @@
+# Discussion
+
+## Main findings
+
+Write this section from the frozen result tables. Lead with the strongest result,
+not with every software component. Distinguish what was established about the UAE
+referral cohort, what was established about assay observability, and what remains
+unvalidated analytically.
+
+## Interpretation
+
+Discuss the advantage of modelling physical PCR products and chromosome
+haplotypes instead of treating generic caller agreement as a biological genotype.
+Ambiguity and no-call are substantive results when they follow from the declared
+assay contract.
+
+## Limitations
+
+Separate data-access limitations, cohort ascertainment, selective reporting,
+truth-set scope, assay calibration and candidate-catalogue incompleteness. Avoid
+using time available as the scientific reason for a limitation.
+
+## Next experiments
+
+Prioritize assay-matched reference materials, paired historical/ONT cases where
+linkage is recoverable, product-efficiency/dropout calibration, held-out external
+assays and orthogonal confirmation of coherent novel products.
