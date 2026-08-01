@@ -28,7 +28,6 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: thesis
-          dependencies: all
 
       - uses: quarto-dev/quarto-actions/setup@v2
 
