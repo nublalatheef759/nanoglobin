@@ -19,7 +19,6 @@ from nanoglobin.molecules import (  # noqa: E402
     AdmissionEngine,
     MoleculeAdmissionError,
     OBSERVATION_FIELDS,
-    admit_molecule,
     load_compiled_assay,
     read_fastq,
     summary_payload,
