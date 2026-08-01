@@ -1,0 +1,6 @@
+>HBA2_anchor synthetic anchor
+ACGTACGTACGT
+>HBA1_copy synthetic copy-specific substitution
+ACCTACGTACGT
+>HBA_hybrid synthetic deletion/hybrid transition
+ACGTACGACGT
