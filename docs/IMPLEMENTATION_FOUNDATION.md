@@ -69,9 +69,20 @@ copy order, junction sequence, or a named allele such as an anti-3.7
 triplication. `sample_report.py` therefore ranks an unconfirmed gain as an
 unresolved finding rather than a pathogenic call.
 
-## 4. What remains
+## 4. Molecule admission
 
-The next engine slices are primer-aware read admission, read-to-product
-likelihoods, HBA sequence-equivalence mapping, product-abundance/dropout models,
-and a posterior over chromosome-haplotype pairs. Analytical sensitivity and
-specificity remain contingent on sealed, assay-matched ground truth.
+The second executable layer is now implemented in
+[`MOLECULE_ADMISSION.md`](MOLECULE_ADMISSION.md). It recognises terminal primers,
+orients reads, preserves incomplete/dimer/chimera/off-target states and scores
+complete molecules against compiled product sequences. It does not force a
+diploid genotype.
+
+The bounded MSc vertical slice and the distinction from the longer research
+programme are defined in [`MSC_VERTICAL_SLICE.md`](MSC_VERTICAL_SLICE.md).
+
+## 5. What remains
+
+The next engine slices are a HBA sequence-equivalence map, product-abundance and
+dropout models, and a posterior over chromosome-haplotype pairs. Analytical
+sensitivity and specificity remain contingent on sealed, assay-matched ground
+truth.

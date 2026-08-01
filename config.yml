@@ -23,3 +23,20 @@ assay_profile: null
 haplotype_catalogue: null
 cohort_input: null
 cohort_contract: null
+
+# Primer-aware molecule admission. These parameters recognise read-end primers
+# and score complete reads against products emitted by compile_assay. They are
+# sequencing-evidence settings, distinct from template-binding max_mismatches in
+# the assay profile.
+molecule_admission:
+  end_search_bp: 100
+  primer_seed_length: 7
+  min_primer_overlap: 10
+  max_primer_mismatches: 4
+  max_primer_error_rate: 0.25
+  length_tolerance_fraction: 0.10
+  max_sequence_edit_rate: 0.25
+  sequence_assignment_margin: 0.02
+  assumed_sequence_error_rate: 0.10
+  max_reads: 0
+

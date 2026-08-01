@@ -7,7 +7,7 @@ name = "nanoglobin"
 version = "0.1.0"
 description = "Assay-aware globin genotyping and cohort normalisation kernels"
 requires-python = ">=3.10"
-dependencies = ["PyYAML>=6"]
+dependencies = ["PyYAML>=6", "rapidfuzz>=3.9,<4"]
 
 [tool.setuptools]
 packages = ["nanoglobin", "scripts"]
