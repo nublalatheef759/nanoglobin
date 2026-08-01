@@ -677,7 +677,7 @@ class AdmissionEngine:
             candidates.update(index.get(window[start : start + seed_length], ()))
 
         # Exact seeding is a performance shortcut, never a scientific gate.
-        if not candidates:
+        if candidates == unindexed:
             return self._all_primers
         return tuple(sorted(candidates))
 
