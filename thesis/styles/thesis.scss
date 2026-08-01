@@ -1,0 +1,13 @@
+/*-- scss:defaults --*/
+$font-size-root: 16px;
+$headings-font-weight: 600;
+
+/*-- scss:rules --*/
+.callout {
+  border-radius: 0.25rem;
+}
+
+.figure-caption,
+.table-caption {
+  font-size: 0.9rem;
+}
