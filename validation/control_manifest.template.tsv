@@ -1,4 +1,4 @@
 sample_id	molecules_tsv	haplotype_1	haplotype_2	stratum	truth_status	truth_source	assay_scope
 CONTROL_001	../results/assay/molecules/CONTROL_001.molecules.tsv	HAPLOTYPE_A	HAPLOTYPE_B	lot_1	orthogonally_resolved	GAP-PCR plus junction sequencing	assay_matched
 CONTROL_002	../results/assay/molecules/CONTROL_002.molecules.tsv	HAPLOTYPE_A	HAPLOTYPE_A	lot_1	certified_reference	reference material certificate plus local identity check	assay_matched
-SIMULATION_001	../results/assay/molecules/SIMULATION_001.molecules.tsv	HAPLOTYPE_A	HAPLOTYPE_C	synthetic	 synthetic	sealed exact-product fixture	synthetic_assay
+SIMULATION_001	../results/assay/molecules/SIMULATION_001.molecules.tsv	HAPLOTYPE_A	HAPLOTYPE_C	synthetic	synthetic	sealed exact-product fixture	synthetic_assay
