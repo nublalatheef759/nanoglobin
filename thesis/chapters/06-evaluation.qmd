@@ -6,6 +6,14 @@ posterior <- read_tsv_or_example(
   "../results/assay/genotypes/example.posteriors.tsv",
   "data/example/genotype_posteriors.tsv"
 )
+calibration_fit <- read_tsv_or_example(
+  "../results/assay/calibration/sample_product_fit.tsv",
+  "data/example/calibration_sample_product_fit.tsv"
+)
+backend_timings <- read_csv_or_example(
+  "../results/benchmarks/genotype_backend_timings.csv",
+  "data/example/genotype_backend_timings.csv"
+)
 ```
 
 ## Evaluation layers
@@ -17,9 +25,14 @@ Keep the following evaluations separate:
 3. real unlabelled amplicon mechanics, including endpoint, length and artifact
    distributions;
 4. WGS small-variant benchmarking within declared truth/confident regions;
-5. structural evidence compared with DRAGEN or graph calls as comparators; and
-6. analytical sensitivity/specificity on certified or orthogonally characterised
-   assay-matched material.
+5. structural evidence compared with DRAGEN or graph calls as comparators;
+6. control-based estimation of assay-product efficiency and dropout; and
+7. analytical sensitivity/specificity on an independent certified or
+   orthogonally characterised assay-matched set.
+
+Calibration controls and final evaluation samples must be disjoint. The assay
+profile, candidate catalogue and model parameters are frozen before blinded
+analysis of the evaluation set.
 
 ## Posterior example
 
@@ -30,8 +43,57 @@ Keep the following evaluations separate:
 plot_genotype_posterior(posterior)
 ```
 
+## Calibration residuals
+
+```{r}
+#| label: fig-calibration-fit
+#| fig-cap: "Observed and fitted effective product evidence in calibration controls."
+#| fig-alt: "Faceted scatter plot comparing observed and fitted product weights with an identity line."
+plot_calibration_fit(calibration_fit)
+```
+
+Residuals should be examined by product, genotype, run, lot and operator. A
+well-fitting average can still conceal complete dropout for a clinically important
+allele or one batch.
+
+## Execution performance
+
+The full-sequence edit-distance path already uses a native RapidFuzz kernel. The
+Cython implementation therefore targets grouped class-by-evidence scoring. Every
+performance result first requires numerical agreement with the Python reference
+for all likelihood terms and posterior probabilities.
+
+```{r}
+#| label: fig-backend-runtime
+#| fig-cap: "Repeated wall-clock measurements for the Python reference and grouped Cython genotype scorers."
+#| fig-alt: "Boxplots and individual timing points for Python and Cython backends."
+plot_backend_timings(backend_timings)
+```
+
+Report the frozen input size, candidate haplotype count, observable class count,
+read count, grouped evidence count, hardware, software commit, warm-up procedure,
+and all repeated timings. Do not report only the fastest run.
+
+## Ground-truth acquisition
+
+The executable acquisition registry is maintained in `validation/resources.tsv`.
+The immediate programme is:
+
+- public multiplex-PCR reads for assay mechanics, not accuracy;
+- HPRC and GIAB for sequence/caller questions after locus-confidence audit;
+- the published Huang 2023 primer design as an executable public assay contract;
+- requests for raw reads and truth tables from the Huang, Wei and Yang cohorts;
+- orderable Coriell/CDC alpha- and beta-globin controls; and
+- a blinded exact- AmplideX set paired with pre-existing orthogonal laboratory
+  results.
+
+DRAGEN and vendor Reporter calls remain comparators. They may enrich discordance
+review but do not enter independent-truth accuracy denominators without separate
+adjudication.
+
 ## Reporting
 
 For each accuracy number, report the exact sample set, truth provenance, confidence
-regions, variant class, TP/FP/FN denominators and comparison configuration. Do not
+regions, variant class, TP/FP/FN denominators and comparison configuration. For the
+amplicon model also report ambiguity, no-call and assay-not-observable rates. Do not
 refer to DRAGEN-concordant deletion carriers as independent truth.
