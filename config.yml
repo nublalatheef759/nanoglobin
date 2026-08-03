@@ -27,6 +27,15 @@ hba_family_anchor: null
 cohort_input: null
 cohort_contract: null
 
+# Genotype execution and optional control calibration. The Cython extension is
+# built in the pinned Python environment before the genotype rule. `auto` falls
+# back to the Python reference only when the compiled backend cannot represent the
+# current candidate catalogue.
+genotype_backend: "auto"
+build_cython_extension: true
+calibration_control_manifest: null
+calibration_settings: "examples/calibration_settings.example.yml"
+
 # Primer-aware molecule admission. These parameters recognise read-end primers
 # and score complete reads against products emitted by compile_assay. They are
 # sequencing-evidence settings, distinct from template-binding max_mismatches in
