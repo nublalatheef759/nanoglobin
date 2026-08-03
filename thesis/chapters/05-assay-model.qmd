@@ -10,6 +10,10 @@ molecule_status <- read_csv_or_example(
   "../results/thesis/molecule_status.csv",
   "data/example/molecule_status.csv"
 )
+calibration_products <- read_tsv_or_example(
+  "../results/assay/calibration/product_parameters.tsv",
+  "data/example/calibration_product_parameters.tsv"
+)
 ```
 
 ## Forward assay model
@@ -60,3 +64,28 @@ is represented inside each chromosome-haplotype sequence; the human genotype
 remains diploid. Named pairs with the same observable product signature are
 collapsed before assigning the default prior, preventing catalogue duplication
 from manufacturing posterior mass.
+
+## Control-based assay calibration
+
+The model does not assume that all PCR products amplify equally. Controls with a
+declared chromosome-haplotype pair, truth source and assay scope are used to fit
+relative product efficiencies, required-product dropout and unsupported-molecule
+mass. Comparator-only calls and non-assay-matched WGS controls are excluded by
+default.
+
+Relative efficiency is identifiable only among products connected by at least one
+control genotype that is expected to produce them together. A single isolated
+product has no scale that can be inferred from library size, and disconnected
+product groups retain independent scales. These states are reported rather than
+hidden by a fitted number.
+
+```{r}
+#| label: fig-product-efficiency
+#| fig-cap: "Relative PCR-product efficiencies fitted from declared control genotypes."
+#| fig-alt: "Horizontal bars of relative product efficiency with a dashed neutral reference at one."
+plot_product_efficiency(calibration_products)
+```
+
+The plotted example is synthetic unless governed control outputs exist under
+`results/assay/calibration/`. The fitted configuration remains a research model
+until evaluated on an independent blinded assay-matched set.
