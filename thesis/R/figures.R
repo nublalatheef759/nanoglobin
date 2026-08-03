@@ -109,3 +109,25 @@ plot_backend_timings <- function(data) {
       caption = "Replace synthetic timings with repeated measurements on frozen inputs."
     )
 }
+
+plot_parameter_stability <- function(data) {
+  data |>
+    mutate(
+      dropout_probability = factor(dropout_probability),
+      artifact_probability = factor(artifact_probability)
+    ) |>
+    ggplot(aes(artifact_probability, dropout_probability, fill = top_posterior)) +
+    geom_tile(linewidth = 0.25) +
+    geom_text(aes(label = percent(top_posterior, accuracy = 0.1)), size = 3) +
+    scale_fill_continuous(labels = percent_format(accuracy = 1), limits = c(0, 1)) +
+    labs(
+      x = "Unsupported-molecule probability",
+      y = "Required-product dropout probability",
+      fill = "Top posterior",
+      title = "Genotype posterior stability across declared model parameters",
+      caption = paste(
+        "The top class may remain stable while the call threshold changes;",
+        "replace synthetic values with a frozen parameter-grid result."
+      )
+    )
+}
