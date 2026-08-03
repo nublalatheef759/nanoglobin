@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from nanoglobin.calibration_io import load_calibration_provenance  # noqa: E402
+from nanoglobin.calibration_types import CalibrationError  # noqa: E402
+from nanoglobin.fast_genotype import score_genotypes_auto  # noqa: E402
 from nanoglobin.genotype import (  # noqa: E402
     GenotypeModelError,
     analysis_payload,
@@ -19,7 +22,6 @@ from nanoglobin.genotype import (  # noqa: E402
     load_config,
     make_call,
     read_molecule_evidence,
-    score_genotypes,
     write_scores_tsv,
 )
 
@@ -34,6 +36,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--compiled-json", required=True)
     parser.add_argument("--molecules-tsv", required=True)
     parser.add_argument("--model-config")
+    parser.add_argument(
+        "--calibration-json",
+        help=(
+            "Optional provenance emitted by calibrate_amplicon_model.py. The "
+            "embedded calibrated config must exactly match --model-config."
+        ),
+    )
+    parser.add_argument(
+        "--backend",
+        choices=("auto", "python", "cython"),
+        default="auto",
+        help="Scoring backend. auto uses the compiled Cython kernel when available.",
+    )
     parser.add_argument("--posteriors-tsv", required=True)
     parser.add_argument("--call-json", required=True)
     parser.add_argument("--summary-json", required=True)
@@ -46,7 +61,17 @@ def main(argv: list[str] | None = None) -> int:
         space = load_compiled_space(args.compiled_json)
         evidence = read_molecule_evidence(args.molecules_tsv)
         config = load_config(args.model_config)
-        scores, useful_effective_reads = score_genotypes(space, evidence, config)
+        calibration = load_calibration_provenance(
+            args.calibration_json,
+            space,
+            config,
+        )
+        scores, useful_effective_reads, backend_used = score_genotypes_auto(
+            space,
+            evidence,
+            config,
+            backend=args.backend,
+        )
         call = make_call(scores, evidence, useful_effective_reads, config)
         payload = analysis_payload(
             space=space,
@@ -54,6 +79,12 @@ def main(argv: list[str] | None = None) -> int:
             scores=scores,
             call=call,
         )
+        payload["execution_backend"] = backend_used
+        if calibration is not None:
+            payload["calibration"] = calibration
+            payload["model"]["calibration_status"] = calibration[
+                "calibration_status"
+            ]
         write_scores_tsv(args.posteriors_tsv, scores)
         call_path = Path(args.call_json)
         call_path.parent.mkdir(parents=True, exist_ok=True)
@@ -67,10 +98,27 @@ def main(argv: list[str] | None = None) -> int:
             json.dumps(payload, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
-    except (GenotypeModelError, OSError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        CalibrationError,
+        GenotypeModelError,
+        OSError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"genotype_amplicons: {exc}", file=sys.stderr)
         return 2
-    print(json.dumps(call.to_dict(), sort_keys=True))
+    print(
+        json.dumps(
+            {
+                **call.to_dict(),
+                "execution_backend": backend_used,
+                "calibration_id": (
+                    calibration["calibration_id"] if calibration else None
+                ),
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 

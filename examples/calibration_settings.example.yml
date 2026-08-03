@@ -1,0 +1,23 @@
+# Empirical-Bayes calibration settings. These are estimation controls, not
+# clinically established acceptance limits.
+min_effective_reads: 10
+max_iterations: 250
+tolerance: 1.0e-9
+
+efficiency_prior_strength: 5
+stratum_prior_strength: 20
+
+dropout_prior_alpha: 1
+dropout_prior_beta: 19
+stratum_dropout_prior_strength: 20
+
+artifact_prior_alpha: 1
+artifact_prior_beta: 49
+stratum_artifact_prior_strength: 50
+
+detection_threshold: 0.5
+min_controls_per_stratum: 2
+
+# DRAGEN or vendor calls are comparator evidence, not independent truth. Keep
+# this false unless a deliberate sensitivity analysis is being performed.
+allow_comparator_controls: false

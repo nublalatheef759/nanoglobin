@@ -1,0 +1,8 @@
+# Sensitivity grid around the fitted/declared genotype model. Values should be
+# revised around the actual control posterior rather than treated as universal.
+max_scenarios: 500
+axes:
+  dropout_probability: [0.01, 0.03, 0.05, 0.10, 0.20]
+  artifact_probability: [0.005, 0.01, 0.02, 0.05]
+  count_concentration: [5, 20, 80]
+  effective_read_cap: [50, 200]

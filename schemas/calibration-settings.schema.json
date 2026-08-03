@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nanoglobin.local/schemas/calibration-settings.schema.json",
+  "title": "NanoGlobin amplicon calibration settings",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "min_effective_reads": {"type": "number", "exclusiveMinimum": 0},
+    "max_iterations": {"type": "integer", "minimum": 1},
+    "tolerance": {"type": "number", "exclusiveMinimum": 0},
+    "efficiency_prior_strength": {"type": "number", "exclusiveMinimum": 0},
+    "stratum_prior_strength": {"type": "number", "exclusiveMinimum": 0},
+    "dropout_prior_alpha": {"type": "number", "exclusiveMinimum": 0},
+    "dropout_prior_beta": {"type": "number", "exclusiveMinimum": 0},
+    "stratum_dropout_prior_strength": {"type": "number", "exclusiveMinimum": 0},
+    "artifact_prior_alpha": {"type": "number", "exclusiveMinimum": 0},
+    "artifact_prior_beta": {"type": "number", "exclusiveMinimum": 0},
+    "stratum_artifact_prior_strength": {"type": "number", "exclusiveMinimum": 0},
+    "detection_threshold": {"type": "number", "minimum": 0},
+    "min_controls_per_stratum": {"type": "integer", "minimum": 1},
+    "allow_comparator_controls": {"type": "boolean"}
+  }
+}

@@ -1,0 +1,11 @@
+backend,repeat,seconds
+python,1,0.480
+python,2,0.465
+python,3,0.492
+python,4,0.474
+python,5,0.487
+cython,1,0.061
+cython,2,0.058
+cython,3,0.060
+cython,4,0.059
+cython,5,0.062

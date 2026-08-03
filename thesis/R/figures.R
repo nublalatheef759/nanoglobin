@@ -61,3 +61,73 @@ plot_genotype_posterior <- function(data, n = 10) {
       title = "Ranked assay-observable genotype classes"
     )
 }
+
+plot_product_efficiency <- function(data) {
+  data |>
+    mutate(product_id = reorder(product_id, relative_efficiency)) |>
+    ggplot(aes(product_id, relative_efficiency)) +
+    geom_col() +
+    geom_hline(yintercept = 1, linetype = 2) +
+    coord_flip() +
+    labs(
+      x = "Compiled PCR product",
+      y = "Relative fitted efficiency",
+      title = "Control-fitted product efficiencies",
+      caption = paste(
+        "Efficiencies are relative within identifiable product components;",
+        "a single product has no independently identified scale."
+      )
+    )
+}
+
+plot_calibration_fit <- function(data) {
+  data |>
+    filter(eligible, product_id != "") |>
+    ggplot(aes(fitted_weight, observed_weight, shape = stratum)) +
+    geom_abline(slope = 1, intercept = 0, linetype = 2) +
+    geom_point(size = 2.2) +
+    facet_wrap(vars(product_id), scales = "free") +
+    labs(
+      x = "Fitted effective product weight",
+      y = "Observed effective product weight",
+      shape = "Calibration stratum",
+      title = "Observed versus fitted control-product evidence"
+    )
+}
+
+plot_backend_timings <- function(data) {
+  data |>
+    mutate(backend = factor(backend, levels = unique(backend))) |>
+    ggplot(aes(backend, seconds)) +
+    geom_boxplot(width = 0.55, outlier.shape = NA) +
+    geom_point(position = position_jitter(width = 0.06), alpha = 0.7) +
+    scale_y_continuous(labels = label_number(accuracy = 0.001)) +
+    labs(
+      x = NULL,
+      y = "Wall-clock seconds",
+      title = "Reference Python and grouped Cython scoring runtimes",
+      caption = "Replace synthetic timings with repeated measurements on frozen inputs."
+    )
+}
+
+plot_parameter_stability <- function(data) {
+  data |>
+    mutate(
+      dropout_probability = factor(dropout_probability),
+      artifact_probability = factor(artifact_probability)
+    ) |>
+    ggplot(aes(artifact_probability, dropout_probability, fill = top_posterior)) +
+    geom_tile(linewidth = 0.25) +
+    geom_text(aes(label = percent(top_posterior, accuracy = 0.1)), size = 3) +
+    scale_fill_continuous(labels = percent_format(accuracy = 1), limits = c(0, 1)) +
+    labs(
+      x = "Unsupported-molecule probability",
+      y = "Required-product dropout probability",
+      fill = "Top posterior",
+      title = "Genotype posterior stability across declared model parameters",
+      caption = paste(
+        "The top class may remain stable while the call threshold changes;",
+        "replace synthetic values with a frozen parameter-grid result."
+      )
+    )
+}

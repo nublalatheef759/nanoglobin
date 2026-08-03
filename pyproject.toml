@@ -1,5 +1,10 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = [
+    "setuptools>=68",
+    "wheel",
+    "Cython>=3.0,<4",
+    "numpy>=1.24,<3",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +12,11 @@ name = "nanoglobin"
 version = "0.1.0"
 description = "Assay-aware globin genotyping and cohort normalisation kernels"
 requires-python = ">=3.10"
-dependencies = ["PyYAML>=6", "rapidfuzz>=3.9,<4"]
+dependencies = [
+    "PyYAML>=6",
+    "numpy>=1.24,<3",
+    "rapidfuzz>=3.9,<4",
+]
 
 [tool.setuptools]
 packages = ["nanoglobin", "scripts"]

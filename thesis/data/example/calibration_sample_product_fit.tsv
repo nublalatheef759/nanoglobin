@@ -1,0 +1,6 @@
+sample_id	stratum	truth_status	assay_scope	eligible	exclusion_reason	product_id	multiplicity	observed_weight	fitted_weight	residual	required	detected
+CONTROL_A	lot_1	certified_reference	assay_matched	True		HBA_whole_and_rearranged	2	78	75	3	True	True
+CONTROL_A	lot_1	certified_reference	assay_matched	True		SEA_deletion	1	16	18	-2	True	True
+CONTROL_B	lot_1	orthogonally_resolved	assay_matched	True		HBA_whole_and_rearranged	2	63	65	-2	True	True
+CONTROL_B	lot_1	orthogonally_resolved	assay_matched	True		SEA_deletion	1	17	15	2	True	True
+CONTROL_C	lot_2	orthogonally_resolved	assay_matched	True		HBB_HBD_whole	2	92	92	0	True	True
