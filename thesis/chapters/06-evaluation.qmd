@@ -14,6 +14,10 @@ backend_timings <- read_csv_or_example(
   "../results/benchmarks/genotype_backend_timings.csv",
   "data/example/genotype_backend_timings.csv"
 )
+parameter_stability <- read_csv_or_example(
+  "../results/assay/stability/example.scenarios.csv",
+  "data/example/genotype_parameter_stability.csv"
+)
 ```
 
 ## Evaluation layers
@@ -26,8 +30,9 @@ Keep the following evaluations separate:
    distributions;
 4. WGS small-variant benchmarking within declared truth/confident regions;
 5. structural evidence compared with DRAGEN or graph calls as comparators;
-6. control-based estimation of assay-product efficiency and dropout; and
-7. analytical sensitivity/specificity on an independent certified or
+6. control-based estimation of assay-product efficiency and dropout;
+7. parameter-stability analysis around the fitted or declared model; and
+8. analytical sensitivity/specificity on an independent certified or
    orthogonally characterised assay-matched set.
 
 Calibration controls and final evaluation samples must be disjoint. The assay
@@ -55,6 +60,26 @@ plot_calibration_fit(calibration_fit)
 Residuals should be examined by product, genotype, run, lot and operator. A
 well-fitting average can still conceal complete dropout for a clinically important
 allele or one batch.
+
+## Parameter stability
+
+A posterior can be numerically sharp while depending heavily on an uncertain
+product-dropout or artifact parameter. The declared grid therefore varies selected
+scalar parameters, reruns the complete posterior and records both the top
+observable class and the final call state.
+
+```{r}
+#| label: fig-parameter-stability
+#| fig-cap: "Top-class posterior across declared dropout and unsupported-molecule parameter values."
+#| fig-alt: "Heat map of top posterior over dropout and artifact probabilities, with percentages printed in cells."
+plot_parameter_stability(parameter_stability)
+```
+
+Stability has two distinct meanings: the same biological class may remain top
+ranked while its posterior drops below the research-call threshold, or the leading
+class itself may change. Both the modal-class fraction and call-state distribution
+should be reported. The grid is a sensitivity analysis, not a substitute for
+control-based estimation.
 
 ## Execution performance
 
