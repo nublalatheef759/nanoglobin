@@ -1,11 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from setuptools import Extension, setup
-
-
-ROOT = Path(__file__).resolve().parent
 
 
 def build_extensions():
@@ -15,7 +10,7 @@ def build_extensions():
         import numpy
         from Cython.Build import cythonize
     except ImportError:
-        # PEP 517 installs these through pyproject.toml.  Returning no extension
+        # PEP 517 installs these through pyproject.toml. Returning no extension
         # keeps source-tree tooling usable in deliberately minimal environments;
         # production/editable installs build the Cython path.
         return []
@@ -23,8 +18,9 @@ def build_extensions():
     extensions = [
         Extension(
             "nanoglobin._genotype_fast",
-            [str(ROOT / "nanoglobin" / "_genotype_fast.pyx")],
+            ["nanoglobin/_genotype_fast.pyx"],
             include_dirs=[numpy.get_include()],
+            define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
         )
     ]
     return cythonize(
