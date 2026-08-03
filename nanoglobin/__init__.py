@@ -158,6 +158,24 @@ __all__ += [
     "read_control_manifest",
 ]
 
+from .stability import (
+    StabilityError,
+    StabilityGrid,
+    StabilityScenario,
+    load_stability_grid,
+    run_stability_grid,
+    stability_summary,
+)
+
+__all__ += [
+    "StabilityError",
+    "StabilityGrid",
+    "StabilityScenario",
+    "load_stability_grid",
+    "run_stability_grid",
+    "stability_summary",
+]
+
 from .truth_regions import (
     RegionAudit,
     TargetRegion,
