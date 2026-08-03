@@ -35,6 +35,7 @@ genotype_backend: "auto"
 build_cython_extension: true
 calibration_control_manifest: null
 calibration_settings: "examples/calibration_settings.example.yml"
+genotype_stability_profile: "examples/genotype_stability.example.yml"
 
 # Primer-aware molecule admission. These parameters recognise read-end primers
 # and score complete reads against products emitted by compile_assay. They are
