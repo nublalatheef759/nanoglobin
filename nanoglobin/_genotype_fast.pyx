@@ -11,20 +11,19 @@ import numpy as np
 cimport numpy as cnp
 
 from libc.math cimport lgamma, log
-from libc.stdint cimport int64_t, uint64_t, uint8_t
 
 cnp.import_array()
 
 
 def score_dense_classes(
-    cnp.ndarray[uint8_t, ndim=2] class_exact,
-    cnp.ndarray[uint8_t, ndim=2] class_product,
-    cnp.ndarray[uint8_t, ndim=2] class_required,
-    cnp.ndarray[int64_t, ndim=2] class_multiplicity,
-    cnp.ndarray[uint64_t, ndim=1] class_haplotype_masks,
-    cnp.ndarray[int64_t, ndim=1] group_product,
-    cnp.ndarray[int64_t, ndim=1] group_key,
-    cnp.ndarray[uint64_t, ndim=1] group_candidate_masks,
+    cnp.ndarray[cnp.uint8_t, ndim=2] class_exact,
+    cnp.ndarray[cnp.uint8_t, ndim=2] class_product,
+    cnp.ndarray[cnp.uint8_t, ndim=2] class_required,
+    cnp.ndarray[cnp.int64_t, ndim=2] class_multiplicity,
+    cnp.ndarray[cnp.uint64_t, ndim=1] class_haplotype_masks,
+    cnp.ndarray[cnp.int64_t, ndim=1] group_product,
+    cnp.ndarray[cnp.int64_t, ndim=1] group_key,
+    cnp.ndarray[cnp.uint64_t, ndim=1] group_candidate_masks,
     cnp.ndarray[cnp.float64_t, ndim=1] group_weight,
     cnp.ndarray[cnp.float64_t, ndim=1] group_edit_penalty,
     cnp.ndarray[cnp.float64_t, ndim=1] observed_counts,
@@ -48,9 +47,9 @@ def score_dense_classes(
     cdef Py_ssize_t product_count = class_product.shape[1]
     cdef Py_ssize_t group_count = group_product.shape[0]
     cdef Py_ssize_t c, g, p
-    cdef int64_t product_index, key_index
+    cdef cnp.int64_t product_index, key_index
     cdef double read_value, count_value, dropout_value, total_value
-    cdef double probability, edit_penalty, mass, total_mass
+    cdef double log_probability, edit_penalty, mass, total_mass
     cdef double alpha, alpha0, n_total, count
     cdef double log_exact = log(1.0 - artifact_probability)
     cdef double log_half = log(
@@ -95,10 +94,18 @@ def score_dense_classes(
     if group_edit_penalty.shape[0] != group_count:
         raise ValueError("group_edit_penalty length does not match")
 
-    cdef cnp.ndarray[cnp.float64_t, ndim=1] read_out = np.zeros(class_count, dtype=np.float64)
-    cdef cnp.ndarray[cnp.float64_t, ndim=1] count_out = np.zeros(class_count, dtype=np.float64)
-    cdef cnp.ndarray[cnp.float64_t, ndim=1] dropout_out = np.zeros(class_count, dtype=np.float64)
-    cdef cnp.ndarray[cnp.float64_t, ndim=1] score_out = np.zeros(class_count, dtype=np.float64)
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] read_out = np.zeros(
+        class_count, dtype=np.float64
+    )
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] count_out = np.zeros(
+        class_count, dtype=np.float64
+    )
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] dropout_out = np.zeros(
+        class_count, dtype=np.float64
+    )
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] score_out = np.zeros(
+        class_count, dtype=np.float64
+    )
 
     with nogil:
         for c in range(class_count):
@@ -121,15 +128,17 @@ def score_dense_classes(
                     and (class_haplotype_masks[c] & group_candidate_masks[g]) != 0
                 )
                 if exact_present:
-                    probability = log_exact
-                elif key_index < 0 and product_present and candidate_overlap:
-                    probability = log_half
+                    log_probability = log_exact
+                elif key_index == -1 and product_present and candidate_overlap:
+                    # -1 means the molecule has no compiled-sequence hash.  -2
+                    # means a hash was supplied but no candidate class predicts it.
+                    log_probability = log_half
                 elif product_present:
-                    probability = log_quarter
+                    log_probability = log_quarter
                 else:
-                    probability = log_artifact
+                    log_probability = log_artifact
                 edit_penalty = group_edit_penalty[g]
-                read_value += group_weight[g] * probability - edit_penalty
+                read_value += group_weight[g] * log_probability - edit_penalty
 
             total_mass = 0.0
             alpha0 = 0.0
