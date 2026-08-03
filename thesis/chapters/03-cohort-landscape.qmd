@@ -1,0 +1,36 @@
+# Reported genotype landscape and database representation
+
+```{r}
+source("R/figures.R")
+cohort_spectrum <- read_csv_or_example(
+  "../results/thesis/cohort_reported_spectrum.csv",
+  "data/example/cohort_reported_spectrum.csv"
+)
+```
+
+## Reported diagnostic spectrum
+
+The primary descriptive unit must be declared: person, test episode, reported
+finding, allele, chromosome haplotype or diploid genotype. The positive fraction
+in a referral cohort is not population prevalence.
+
+```{r}
+#| label: fig-reported-spectrum
+#| fig-cap: "Example structure for the reported diagnostic spectrum."
+#| fig-alt: "Horizontal bar chart of reported genotype categories."
+plot_reported_spectrum(cohort_spectrum)
+```
+
+## Database representation
+
+For each normalized allele or structural haplotype, compare nomenclature,
+reference sequence, transcript, exact sequence/junction representation, clinical
+assertions and population-resource coverage across IthaGenes/IthaCNVs, HbVar,
+ClinVar and appropriate population resources.
+
+## Haplotype and evolutionary context
+
+A pathogenic HBB allele alone does not identify a classical beta-globin haplotype.
+Individual-level founder or selection analyses require linked markers and phase.
+Where those are absent, use external phased resources to describe known backgrounds
+without assigning them to report-only patients.

@@ -17,10 +17,13 @@ targets:
 reference_region: "HBB"
 coverage_bin_size: 200
 
-# Optional cohort-to-caller contracts. Set both values in a pair to activate the
-# corresponding explicit Snakemake target.
+# Explicit cohort-to-caller contracts. Set the relevant values to activate the
+# corresponding Snakemake targets.
 assay_profile: null
 haplotype_catalogue: null
+genotype_inference_profile: null
+hba_family_sequences: null
+hba_family_anchor: null
 cohort_input: null
 cohort_contract: null
 
@@ -39,4 +42,3 @@ molecule_admission:
   sequence_assignment_margin: 0.02
   assumed_sequence_error_rate: 0.10
   max_reads: 0
-

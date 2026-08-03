@@ -1,0 +1,62 @@
+# Assay compiler, HBA family coordinates and genotype model
+
+```{r}
+source("R/figures.R")
+assay_coverage <- read_tsv_or_example(
+  "../results/assay/coverage.tsv",
+  "data/example/assay_coverage.tsv"
+)
+molecule_status <- read_csv_or_example(
+  "../results/thesis/molecule_status.csv",
+  "data/example/molecule_status.csv"
+)
+```
+
+## Forward assay model
+
+```{mermaid}
+flowchart LR
+  G[Diploid chromosome-haplotype pair] --> P[Primer binding and compiled products]
+  P --> A[Amplification efficiency and dropout]
+  A --> O[Observed ONT molecules]
+  O --> E[Primer, sequence, product and artifact evidence]
+  E --> R[Ranked genotype classes]
+```
+
+## HBA family-coordinate and marker map
+
+The family map is generated automatically by aligning HBA1, HBA2, hybrid and
+candidate-copy sequences to one declared anchor. It records homologous reference
+positions, insertion coordinates, gaps and copy-informative alleles. Adding HPRC
+or cohort-derived sequences regenerates the map; it is not a manually curated
+“full population equivalence map.”
+
+Its purpose is to project copy markers and variants across representations and to
+show when a read is copy-informative, family-informative or intrinsically
+ambiguous. Exact product-sequence likelihoods remain the primary inference path.
+
+## Assay coverage
+
+```{r}
+#| label: fig-assay-coverage
+#| fig-cap: "Compiled product observability across candidate chromosome haplotypes."
+#| fig-alt: "Tile plot of assay products by candidate haplotype, showing observable and absent products."
+plot_assay_coverage(assay_coverage)
+```
+
+## Molecule admission
+
+```{r}
+#| label: fig-molecule-status
+#| fig-cap: "Primer-aware classification of ONT reads."
+#| fig-alt: "Horizontal bar chart of complete, incomplete, off-target and artifact read fractions."
+plot_molecule_status(molecule_status)
+```
+
+## Candidate posterior
+
+The model scores pairs of chromosome haplotypes. Variable alpha-globin copy number
+is represented inside each chromosome-haplotype sequence; the human genotype
+remains diploid. Named pairs with the same observable product signature are
+collapsed before assigning the default prior, preventing catalogue duplication
+from manufacturing posterior mass.

@@ -14,6 +14,9 @@ BIN_ARGS = " ".join(
     for sample in SAMPLES
 )
 MOLECULE_CONFIG = config.get("molecule_admission", {})
+GENOTYPE_PROFILE = config.get("genotype_inference_profile")
+HBA_FAMILY_SEQUENCES = config.get("hba_family_sequences")
+HBA_FAMILY_ANCHOR = config.get("hba_family_anchor")
 
 rule all:
     input:
@@ -304,9 +307,8 @@ rule clinical_annotation:
         "python scripts/annotation/annotate_variants.py"
 
 
-# Optional cohort-to-caller foundations. These rules are defined only when the
-# corresponding contracts are declared in config.yml; they are explicit targets
-# rather than hidden prerequisites of the legacy caller pipeline.
+# Assay-aware targets are activated by explicit contracts in config.yml. They are
+# not hidden prerequisites of the legacy caller/report path.
 if config.get("assay_profile") and config.get("haplotype_catalogue"):
     rule compile_assay:
         input:
@@ -365,6 +367,48 @@ if config.get("assay_profile") and config.get("haplotype_catalogue"):
             "--sequence-assignment-margin {params.assignment_margin} "
             "--assumed-sequence-error-rate {params.assumed_error} "
             "--max-reads {params.max_reads}"
+
+    if GENOTYPE_PROFILE:
+        rule genotype_amplicons:
+            input:
+                compiled="results/assay/compiled_products.json",
+                molecules="results/assay/molecules/{sample}.molecules.tsv",
+                profile=GENOTYPE_PROFILE
+            output:
+                posteriors="results/assay/genotypes/{sample}.posteriors.tsv",
+                call="results/assay/genotypes/{sample}.call.json",
+                summary="results/assay/genotypes/{sample}.summary.json"
+            conda:
+                "envs/python.yaml"
+            shell:
+                "python scripts/genotype_amplicons.py "
+                "--compiled-json {input.compiled} "
+                "--molecules-tsv {input.molecules} "
+                "--model-config {input.profile} "
+                "--posteriors-tsv {output.posteriors} "
+                "--call-json {output.call} "
+                "--summary-json {output.summary}"
+
+if HBA_FAMILY_SEQUENCES and HBA_FAMILY_ANCHOR:
+    rule build_hba_family_map:
+        input:
+            sequences=HBA_FAMILY_SEQUENCES
+        output:
+            positions="results/family_map/positions.tsv",
+            markers="results/family_map/markers.tsv",
+            map="results/family_map/map.json",
+            summary="results/family_map/summary.json"
+        params:
+            anchor=HBA_FAMILY_ANCHOR
+        conda:
+            "envs/python.yaml"
+        shell:
+            "python scripts/build_hba_family_map.py "
+            "--sequences {input.sequences} --anchor-id {params.anchor} "
+            "--positions-tsv {output.positions} "
+            "--markers-tsv {output.markers} "
+            "--map-json {output.map} "
+            "--summary-json {output.summary}"
 
 if config.get("cohort_input") and config.get("cohort_contract"):
     rule normalise_cohort_reports:

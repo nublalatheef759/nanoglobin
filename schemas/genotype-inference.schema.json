@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nanoglobin.local/schemas/genotype-inference.schema.json",
+  "title": "NanoGlobin genotype inference profile",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "min_assigned_reads": {"type": "integer", "minimum": 1},
+    "effective_read_cap": {"type": "number", "exclusiveMinimum": 0},
+    "effective_count_cap": {"type": "number", "exclusiveMinimum": 0},
+    "artifact_probability": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 0.5},
+    "product_background_mass": {"type": "number", "exclusiveMinimum": 0},
+    "count_concentration": {"type": "number", "exclusiveMinimum": 0},
+    "minimum_dirichlet_alpha": {"type": "number", "exclusiveMinimum": 0},
+    "dropout_probability": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+    "resolved_posterior": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
+    "resolved_odds": {"type": "number", "minimum": 1},
+    "max_unresolved_fraction": {"type": "number", "minimum": 0, "maximum": 1},
+    "assignment_weights": {
+      "type": "object",
+      "additionalProperties": {"type": "number", "minimum": 0}
+    },
+    "product_efficiencies": {
+      "type": "object",
+      "additionalProperties": {"type": "number", "exclusiveMinimum": 0}
+    },
+    "haplotype_priors": {
+      "type": "object",
+      "additionalProperties": {"type": "number", "exclusiveMinimum": 0}
+    }
+  }
+}

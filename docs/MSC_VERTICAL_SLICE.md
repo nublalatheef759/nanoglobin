@@ -1,118 +1,129 @@
-# MSc vertical slice and post-MSc programme
+# Current research programme, thesis outputs and validation gates
 
-The repository contains a larger design programme because the correct biological
-object is a pair of globin chromosome haplotypes and because an amplicon assay
-observes primer-defined products rather than generic genomic depth. That does not
-mean the entire programme must appear as completed MSc software.
+The previous version of this document incorrectly pushed the HBA family-coordinate
+map and chromosome-haplotype posterior into a generic “post-MSc programme.” That
+framing was too conservative and technically misleading. Both are ordinary,
+important parts of the current method and can be implemented incrementally from
+well-established alignment, paralog-phasing, mixture-likelihood and amplicon-assay
+precedents.
 
-The distinction below is based on scientific completeness, not on using the
-calendar as an excuse for a generic pipeline.
+The useful distinction is not **MSc versus post-MSc**. It is:
 
-The concept-review repository and unmerged agent branches are a design envelope,
-not a list of features the student is expected to claim or reproduce. The
-write-up should describe only merged, tested behaviour and should label any
-remaining architecture as future work.
+1. what is implemented and executable;
+2. what is active model engineering and can produce thesis results; and
+3. what requires new biological data or governance before performance or deployment
+   claims are justified.
 
-## Thesis-critical vertical slice
-
-A coherent MSc software contribution is complete when one declared assay can be
-followed through this chain:
+## The current computational method
 
 ```text
-sequence-resolved candidate haplotypes
-    -> in-silico PCR under a versioned assay profile
-    -> assay coverage and intrinsic genotype ambiguity
-    -> primer-aware admission of real ONT molecules
-    -> product and artifact evidence
-    -> sequence compatibility to compiled products
-    -> explicit unresolved/no-call evidence
+candidate chromosome-haplotype sequences
+    -> declared primer/product assay profile
+    -> in-silico PCR and assay-observability matrix
+    -> HBA family-coordinate and copy-marker projection
+    -> primer-aware ONT molecule admission
+    -> product/sequence/artifact evidence
+    -> posterior over pairs of chromosome haplotypes
+    -> resolved / assay-equivalent / posterior-ambiguous / no-call
 ```
 
-The thesis-critical implementation is therefore:
+### Variable copy number is already inside the candidate haplotypes
 
-1. **Cohort contract and canonicalisation.** Preserve raw report wording and
-   distinguish `reported`, `not_reported` and `not_tested`; do not manufacture
-   wild-type calls from selective reports.
-2. **One executable assay profile.** Use a primer design whose physical contract
-   is available. A published profile can be used before private AmplideX data are
-   accessible.
-3. **Assay compiler.** Emit exact expected products, coverage gaps and genotype
-   indistinguishability classes over a bounded globin haplotype catalogue.
-4. **Molecule admission.** On real public amplicon FASTQ, report product
-   assignment, read-length distributions, incomplete molecules, off-targets,
-   primer dimers and chimera candidates.
-5. **Sequence evidence.** Rank complete reads against compiled product sequences
-   while preserving equivalent haplotypes, low-margin assignments and poor-fit
-   residuals.
-6. **Existing caller results as separate evidence.** Report the WGS small-variant
-   benchmark and CIGAR/SV observations with their actual truth provenance; do not
-   use them as assay-matched amplicon validation.
-7. **Reproducible tests and visual QA.** Synthetic fixtures test code paths and
-   known ambiguity; real unlabelled data test whether the assay model explains
-   observed molecules.
+Humans remain diploid at the chromosome level. An HBA chromosome haplotype may
+contain one, two, three or another number of alpha-like copies, with a declared copy
+order, hybrid sequence and linked variants. A posterior over pairs of those
+chromosome haplotypes is therefore already a variable-copy HBA posterior. It does
+not require a separate variable-ploidy model.
 
-This is already a real methods contribution. It is not merely a Snakemake wrapper:
-the compiler and admission model encode primer observability, PCR molecule
-identity and assay-induced ambiguity that generic callers do not represent.
+The candidate catalogue can begin with normal, common deletion, gain and hybrid
+haplotypes and expand as additional HPRC, cohort or orthogonally resolved sequences
+become available.
 
-## A defensible thesis result
+## What the HBA family-coordinate map means
 
-The strongest result does not need to be a clinical sensitivity number. It can
-be an executable assay audit:
+“Full HBA1/HBA2 population equivalence map” was a poor phrase. The implemented
+object is an **HBA family-coordinate and marker map**:
 
-- what fraction of public reads are explained by declared or inferred products;
-- which products dominate or fail;
-- observed product-length and orientation distributions;
-- incomplete, off-target, dimer and chimera fractions;
-- which candidate globin haplotypes the assay cannot distinguish by design;
-- which reads remain coherent but unexplained by the catalogue; and
-- how generic caller outputs agree or conflict with molecule-level evidence.
+- choose one sequence as a coordinate anchor;
+- align HBA1, HBA2, hybrid and candidate-copy sequences to it;
+- assign homologous bases to shared reference-position keys;
+- assign source insertions to explicit insertion keys;
+- retain deletions and substitutions rather than forcing equal offsets;
+- identify copy-informative, presence/absence and multi-allelic markers; and
+- project source-sequence positions and assay products through the same coordinate
+  system.
 
-A result of "the assay cannot distinguish these states" is informative when it
-is proven by compilation rather than hidden by a forced genotype.
+The map is generated from FASTA sequences. Adding population haplotypes means adding
+sequences and regenerating the outputs; it is not a manually curated, all-human
+prerequisite. Exact compiled product sequences remain the primary read-likelihood
+objects. The family map supports interpretation, copy-marker evidence, variant
+projection and visualization.
 
-## Optional extension if it becomes stable
+See [`HBA_FAMILY_MAP.md`](HBA_FAMILY_MAP.md).
 
-A bounded diploid candidate ranker over known haplotypes is a reasonable stretch
-result only after molecule admission is stable. It should expose sequence-only
-and prior-free scores and must return ambiguity when product evidence is
-insufficient.
+## Active thesis and method work
 
-It should not delay the cohort, assay-QC and write-up work merely to produce a
-nominal genotype column.
+The following are current work, not deferred research aspirations:
 
-## Post-MSc research programme
+- expanding the sequence-resolved chromosome-haplotype catalogue;
+- generating the HBA family-coordinate and copy-marker map;
+- scoring pairs of chromosome haplotypes from molecule evidence;
+- modelling product multiplicity and configurable product efficiency;
+- explicit dropout and artifact components;
+- collapsing assay-equivalent genotype labels before assigning priors;
+- returning resolved, ambiguity and no-call states;
+- testing synthetic known genotypes and deliberate indistinguishability;
+- describing real public amplicon endpoint, length, product and artifact
+  distributions; and
+- linking the resulting figures and tables directly into the thesis workspace.
 
-The following are extensions rather than prerequisites for a coherent thesis:
+The initial likelihood can be transparent and auditable. A pair-HMM, richer ONT
+context model or learned likelihood may improve it, but is not a prerequisite for
+having a real probabilistic genotyper.
 
-- a full HBA1/HBA2 sequence-equivalence map over population haplotypes;
-- a variable-copy chromosome-haplotype posterior covering arbitrary HBA gains,
-  hybrids and novel structures;
-- hierarchical product-efficiency, dropout, lot and laboratory calibration;
-- a calibrated ONT pair-HMM or neural read likelihood;
-- automatic novel-product consensus and structural assembly;
-- a legally supported AmplideX profile and raw-data integration;
-- certified reference-material and blinded clinical validation;
-- cross-assay and cross-laboratory portability; and
-- clinical reporting or deployment claims.
+## Calibration is a continuum, not a reason to omit the model
 
-Ground truth remains the final judge for those performance claims. The MSc slice
-builds and falsifies the physical assay model so that eventual validation tests a
-real method rather than a collection of correlated callers.
+Product efficiency and dropout can advance in layers:
 
-## Freeze criteria for the write-up
+1. declared neutral defaults and sensitivity analysis;
+2. estimates from public unlabelled runs for length, artifact and batch dispersion;
+3. truth-matched controls for genotype-conditioned efficiencies and dropout;
+4. hierarchical lot/laboratory calibration once enough replicated data exist.
 
-The implementation can be frozen for the thesis when:
+The current model exposes every parameter and labels the posterior as uncalibrated
+until the appropriate truth-matched controls are available. This is stronger than
+hard-coding a support threshold and calling it a genotype model.
 
-- one profile and haplotype catalogue compile reproducibly;
-- every input molecule is assigned to a product, artifact or unresolved state;
-- assay-indistinguishable haplotypes remain indistinguishable;
-- no blank report field becomes wild type;
-- no coverage-only gain becomes a definitive named allele;
-- public amplicon QC outputs are generated from exact declared samples;
-- synthetic tests cover orientation, primer error, dropout, dimer, chimera,
-  off-target and equivalent-haplotype cases; and
-- all accuracy statements name their truth source, variant class and scope.
+## Data- and governance-dependent gates
 
-Everything beyond this gate can improve the project, but it is not needed to make
-the software chapter scientifically coherent.
+The following are not postponed because they are computationally difficult. They
+require data or permissions that the repository does not currently possess:
+
+- exact AmplideX primer/product or legally accessible assay-matched raw data;
+- certified or event-appropriate orthogonal truth for analytical sensitivity and
+  specificity;
+- blinded held-out clinical evaluation;
+- lot, laboratory and operator replication;
+- clinical report validation, regulatory interpretation and deployment claims; and
+- public release of any resource derived from governed patient data.
+
+Automatic consensus or assembly of coherent unexplained products can also be added
+now, but a novel allele name or clinical assertion still requires independent
+confirmation.
+
+## Thesis outputs
+
+The thesis should lead with executable results rather than a feature checklist:
+
+- cohort and report data audit;
+- canonical reported genotype/haplotype landscape;
+- HBA × HBB phenotype analysis where eligible;
+- database and nomenclature representation;
+- compiled assay coverage and indistinguishability;
+- primer-aware molecule QC on real amplicon reads;
+- candidate genotype posteriors and explicit failure states;
+- synthetic falsification and truth-scoped benchmarking; and
+- a transparent account of which claims await assay-matched ground truth.
+
+The Quarto/Typst workspace under `thesis/` renders the same draft to reviewable HTML
+and submission-oriented PDF and consumes pipeline outputs directly.

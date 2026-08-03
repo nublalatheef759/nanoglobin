@@ -1,0 +1,44 @@
+name: Thesis render
+
+on:
+  pull_request:
+    paths:
+      - "thesis/**"
+      - ".github/workflows/thesis-render.yml"
+  push:
+    branches: [main]
+    paths:
+      - "thesis/**"
+      - ".github/workflows/thesis-render.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          working-directory: thesis
+
+      - uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render HTML book
+        run: quarto render thesis --to html
+
+      - name: Render Typst PDF
+        run: quarto render thesis --to typst
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nanoglobin-thesis-render
+          path: thesis/_book
+          if-no-files-found: error

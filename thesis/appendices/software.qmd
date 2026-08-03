@@ -1,0 +1,15 @@
+# Software and reproducibility
+
+Record the exact repository commit, assay profile, haplotype catalogue, model
+configuration, external database snapshots and commands used for every result.
+
+```bash
+python scripts/compile_assay.py --help
+python scripts/admit_amplicon_reads.py --help
+python scripts/build_hba_family_map.py --help
+python scripts/genotype_amplicons.py --help
+```
+
+The Quarto source is the manuscript authority. HTML is used for iterative review;
+Typst produces the PDF and preserves the generated `.typ` source for final layout
+inspection.
