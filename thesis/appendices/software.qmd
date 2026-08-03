@@ -1,14 +1,51 @@
 # Software and reproducibility
 
-Record the exact repository commit, assay profile, haplotype catalogue, model
-configuration, external database snapshots and commands used for every result.
+Record the exact repository commit, assay profile, haplotype catalogue, calibration
+control manifest, model configuration, external database snapshots and commands
+used for every result.
+
+## Core commands
 
 ```bash
 python scripts/compile_assay.py --help
 python scripts/admit_amplicon_reads.py --help
 python scripts/build_hba_family_map.py --help
+python scripts/calibrate_amplicon_model.py --help
 python scripts/genotype_amplicons.py --help
+python scripts/benchmark_genotype_backend.py --help
+python scripts/audit_truth_regions.py --help
 ```
+
+## Required provenance per model result
+
+Retain:
+
+- Git commit and Python package version;
+- assay ID/version and profile checksum;
+- haplotype catalogue checksum and candidate count;
+- family-map anchor and sequence checksums;
+- molecule-admission configuration;
+- calibration ID/status and control-manifest checksum;
+- calibrated model-config checksum;
+- execution backend and backend-build environment;
+- sample/run/lot/operator stratum where governed and available;
+- top class, alternatives, ambiguity/no-call reason; and
+- exact output-file checksums.
+
+## Truth-scoped benchmark provenance
+
+For each WGS benchmark, retain the VCF and BED release identifiers, genome build,
+contig naming, normalization/comparison command and exact target coverage from
+`audit_truth_regions.py`. For amplicon evaluation, retain the orthogonal method by
+event class and separate calibration controls from held-out blinded samples.
+
+## Performance provenance
+
+The backend benchmark must first pass numerical parity with the Python reference.
+Record the frozen compiled assay and molecule-table checksums, candidate haplotype
+count, observable class count, raw and grouped evidence counts, hardware, compiler,
+NumPy/Cython/Python versions, warm-ups and all repeated timings. Do not report only
+the minimum runtime.
 
 The Quarto source is the manuscript authority. HTML is used for iterative review;
 Typst produces the PDF and preserves the generated `.typ` source for final layout
