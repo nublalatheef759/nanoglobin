@@ -35,7 +35,7 @@ def _weighted_evidence(
         total += weight
     if total <= 0:
         return [], 0.0
-    scale = min(1.0, float(config.effective_count_cap) / total)
+    scale = min(1.0, float(config.effective_read_cap) / total)
     return [(item, weight * scale) for item, weight in weighted], total * scale
 
 
