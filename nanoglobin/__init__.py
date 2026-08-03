@@ -117,3 +117,61 @@ __all__ += [
     "read_molecule_evidence",
     "score_genotypes",
 ]
+
+from .fast_genotype import (
+    BackendName,
+    cython_backend_available,
+    score_genotypes_auto,
+)
+
+__all__ += [
+    "BackendName",
+    "cython_backend_available",
+    "score_genotypes_auto",
+]
+
+from .calibration_types import (
+    CalibrationError,
+    CalibrationResult,
+    CalibrationSettings,
+    ComponentFit,
+    ControlEvidence,
+    ControlManifestRow,
+)
+from .calibration_fit import calibrate_model
+from .calibration_io import (
+    load_calibration_provenance,
+    load_calibration_settings,
+    read_control_manifest,
+)
+
+__all__ += [
+    "CalibrationError",
+    "CalibrationResult",
+    "CalibrationSettings",
+    "ComponentFit",
+    "ControlEvidence",
+    "ControlManifestRow",
+    "calibrate_model",
+    "load_calibration_provenance",
+    "load_calibration_settings",
+    "read_control_manifest",
+]
+
+from .truth_regions import (
+    RegionAudit,
+    TargetRegion,
+    TruthRegionError,
+    audit_regions,
+    parse_target,
+    read_bed,
+)
+
+__all__ += [
+    "RegionAudit",
+    "TargetRegion",
+    "TruthRegionError",
+    "audit_regions",
+    "parse_target",
+    "read_bed",
+]
