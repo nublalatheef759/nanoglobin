@@ -2,123 +2,102 @@
 
 ```{r}
 source("R/figures.R")
-posterior <- read_tsv_or_example(
-  "../results/assay/genotypes/example.posteriors.tsv",
-  "data/example/genotype_posteriors.tsv"
-)
-calibration_fit <- read_tsv_or_example(
-  "../results/assay/calibration/sample_product_fit.tsv",
-  "data/example/calibration_sample_product_fit.tsv"
-)
-backend_timings <- read_csv_or_example(
-  "../results/benchmarks/genotype_backend_timings.csv",
-  "data/example/genotype_backend_timings.csv"
-)
-parameter_stability <- read_csv_or_example(
-  "../results/assay/stability/example.scenarios.csv",
-  "data/example/genotype_parameter_stability.csv"
-)
+small_variant_results <- read_required_tsv("../evaluation/small_variant_results.tsv")
+hba_comparators <- read_required_tsv("../evaluation/hba_structural_comparators.tsv")
+public_runs <- read_required_tsv("../evaluation/public_amplicon_runs.tsv")
+cython_proof <- read_required_json("../benchmarks/cython_genotype_proof.json")
 ```
 
-## Evaluation layers
+## Small-variant results
 
-Keep the following evaluations separate:
-
-1. compiler correctness against known primer sites and expected products;
-2. sealed synthetic genotype recovery and deliberate ambiguity fixtures;
-3. real unlabelled amplicon mechanics, including endpoint, length and artifact
-   distributions;
-4. WGS small-variant benchmarking within declared truth/confident regions;
-5. structural evidence compared with DRAGEN or graph calls as comparators;
-6. control-based estimation of assay-product efficiency and dropout;
-7. parameter-stability analysis around the fitted or declared model; and
-8. analytical sensitivity/specificity on an independent certified or
-   orthogonally characterised assay-matched set.
-
-Calibration controls and final evaluation samples must be disjoint. The assay
-profile, candidate catalogue and model parameters are frozen before blinded
-analysis of the evaluation set.
-
-## Posterior example
+The committed result table contains six scoped evaluations. Five rows are the
+original hap.py pool of HG002 plus five HPRC diploid-assembly genomes; the separate
+HG002 row records a regional
+GIAB `bcftools norm`/`isec` check. The original VCFs and per-sample hap.py output
+are external to this checkout, so the committed records preserve counts, arithmetic,
+truth source and comparison scope rather than pretending to recreate the benchmark
+without its inputs.
 
 ```{r}
-#| label: fig-genotype-posterior
-#| fig-cap: "Ranked conditional posterior over assay-observable genotype classes."
-#| fig-alt: "Horizontal bar chart of the leading candidate genotype classes and their posterior probabilities."
-plot_genotype_posterior(posterior)
+#| label: tbl-small-variant-results
+#| tbl-cap: "Truth-scoped small-variant evaluation records."
+small_variant_results |>
+  transmute(
+    Region = region,
+    Type = variant_type,
+    TP = tp,
+    FN = fn,
+    FP = fp,
+    `Recall (%)` = round(100 * recall, 1),
+    `Precision (%)` = round(100 * precision, 1)
+  ) |>
+  knitr::kable()
 ```
-
-## Calibration residuals
 
 ```{r}
-#| label: fig-calibration-fit
-#| fig-cap: "Observed and fitted effective product evidence in calibration controls."
-#| fig-alt: "Faceted scatter plot comparing observed and fitted product weights with an identity line."
-plot_calibration_fit(calibration_fit)
+#| label: fig-small-variant-performance
+#| fig-cap: "Recall and precision calculated from the committed HPRC/GIAB counts."
+#| fig-alt: "Point plot of recall and precision across six scoped globin evaluations."
+plot_small_variant_performance(small_variant_results)
 ```
 
-Residuals should be examined by product, genotype, run, lot and operator. A
-well-fitting average can still conceal complete dropout for a clinically important
-allele or one batch.
+The strongest recorded result is beta-globin gene-body SNV performance: 156 TP,
+5 FN and 1 FP. Indels are the main observed limitation. The 100% HG002 result
+contains 23 regional small variants and does not establish whole-locus, structural,
+or amplicon accuracy.
 
-## Parameter stability
+## HBA structural comparator checks
 
-A posterior can be numerically sharp while depending heavily on an uncertain
-product-dropout or artifact parameter. The declared grid therefore varies selected
-scalar parameters, reruns the complete posterior and records both the top
-observable class and the final call state.
+All committed structural rows are explicitly `comparator_only`.
 
 ```{r}
-#| label: fig-parameter-stability
-#| fig-cap: "Top-class posterior across declared dropout and unsupported-molecule parameter values."
-#| fig-alt: "Heat map of top posterior over dropout and artifact probabilities, with percentages printed in cells."
-plot_parameter_stability(parameter_stability)
+#| label: tbl-hba-structural-comparators
+#| tbl-cap: "CIGAR-deletion observations against DRAGEN-labelled comparator states."
+hba_comparators |>
+  select(
+    sample_id,
+    comparator_label,
+    observed_cigar_event_bp,
+    deletion_read_fraction,
+    interpretation,
+    truth_role
+  ) |>
+  knitr::kable()
 ```
 
-Stability has two distinct meanings: the same biological class may remain top
-ranked while its posterior drops below the research-call threshold, or the leading
-class itself may change. Both the modal-class fraction and call-state distribution
-should be reported. The grid is a sensitivity analysis, not a substitute for
-control-based estimation.
+Agreement with DRAGEN is useful for debugging and discordance review, not independent
+truth. Deletion size classes do not by themselves sequence-resolve every subtype;
+large events have too few spanning molecules for reliable fraction-based zygosity;
+and absence of a deletion signal in a gain comparator does not identify the exact
+gain structure.
 
-## Execution performance
-
-The full-sequence edit-distance path already uses a native RapidFuzz kernel. The
-Cython implementation therefore targets grouped class-by-evidence scoring. Every
-performance result first requires numerical agreement with the Python reference
-for all likelihood terms and posterior probabilities.
+## Cython replacement gate
 
 ```{r}
-#| label: fig-backend-runtime
-#| fig-cap: "Repeated wall-clock measurements for the Python reference and grouped Cython genotype scorers."
-#| fig-alt: "Boxplots and individual timing points for Python and Cython backends."
-plot_backend_timings(backend_timings)
+#| label: tbl-cython-proof
+#| tbl-cap: "Measured one-time replacement gate for the Cython genotype kernel."
+tibble::tibble(
+  `Candidate haplotypes` = cython_proof$workload$candidate_haplotypes,
+  `Observable classes` = cython_proof$workload$observable_genotype_classes,
+  `Molecule rows` = cython_proof$workload$molecule_rows,
+  `Scalar median (s)` = cython_proof$historical_python_seconds$median,
+  `Cython median (s)` = cython_proof$cython_seconds$median,
+  `Median speedup` = cython_proof$median_speedup
+) |>
+  knitr::kable(digits = 3)
 ```
 
-Report the frozen input size, candidate haplotype count, observable class count,
-read count, grouped evidence count, hardware, software commit, warm-up procedure,
-and all repeated timings. Do not report only the fastest run.
+Numerical parity was established before the scalar implementation was removed. The
+137.66-fold median improvement is a kernel result on a frozen workload, not an
+end-to-end FASTQ performance claim.
 
-## Ground-truth acquisition
+## Public amplicon data and missing truth
 
-The executable acquisition registry is maintained in `validation/resources.tsv`.
-The immediate programme is:
+The committed public-run registry contains `r dplyr::n_distinct(public_runs$run_accession)`
+GridION accessions. These reads can support endpoint, length, product-imbalance,
+artifact and runtime analyses. No independent sample-level genotype table is
+committed for them, so they do not support genotype sensitivity or specificity.
 
-- public multiplex-PCR reads for assay mechanics, not accuracy;
-- HPRC and GIAB for sequence/caller questions after locus-confidence audit;
-- the published Huang 2023 primer design as an executable public assay contract;
-- requests for raw reads and truth tables from the Huang, Wei and Yang cohorts;
-- orderable Coriell/CDC alpha- and beta-globin controls; and
-- a blinded exact- AmplideX set paired with pre-existing orthogonal laboratory
-  results.
-
-DRAGEN and vendor Reporter calls remain comparators. They may enrich discordance
-review but do not enter independent-truth accuracy denominators without separate
-adjudication.
-
-## Reporting
-
-For each accuracy number, report the exact sample set, truth provenance, confidence
-regions, variant class, TP/FP/FN denominators and comparison configuration. For the
-amplicon model also report ambiguity, no-call and assay-not-observable rates. Do not
-refer to DRAGEN-concordant deletion carriers as independent truth.
+A final analytical evaluation requires assay-matched raw reads paired with certified
+reference genotypes or event-appropriate orthogonal evidence. Calibration controls
+and the blinded evaluation set must remain disjoint.

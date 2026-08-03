@@ -1,0 +1,7 @@
+sample_id	comparator_label	observed_cigar_event_bp	deletion_read_fraction	interpretation	truth_role	note
+NA21106	-alpha4.2/alphaalpha	4257	0.58	heterozygous-sized event	comparator_only	DRAGEN-selected carrier; agreement is not independent truth.
+HG00642	-alpha3.7/alphaalpha	3804	0.71	heterozygous-sized event	comparator_only	DRAGEN-selected carrier; agreement is not independent truth.
+HG03136	-alpha3.7/-alpha3.7	3804	1.00	homozygous-sized event	comparator_only	DRAGEN-selected carrier; agreement is not independent truth.
+HG00735	alphaalphaalpha3.7/alphaalpha			no confident CIGAR deletion	comparator_only	Gain comparator; absence of a deletion signal excludes a deletion call but does not prove the exact gain structure.
+HG03862	--/alphaalpha	10553		large deletion candidate; zygosity unresolved	comparator_only	Too few spanning molecules for reliable fraction-based zygosity.
+normal_controls_aggregate	four DRAGEN-labelled alphaalpha/alphaalpha controls			no confident CIGAR deletion	comparator_only	Aggregate record; individual sample identifiers were not retained in the committed result snapshot.

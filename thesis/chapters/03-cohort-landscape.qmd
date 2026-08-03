@@ -1,36 +1,27 @@
 # Reported genotype landscape and database representation
 
-```{r}
-source("R/figures.R")
-cohort_spectrum <- read_csv_or_example(
-  "../results/thesis/cohort_reported_spectrum.csv",
-  "data/example/cohort_reported_spectrum.csv"
-)
-```
+The cohort landscape is defined from governed clinical data that are not committed
+to this repository. No synthetic cohort distribution is substituted in this book.
+The final analysis should report person- and episode-level denominators, referral
+strata, positive/negative/incomplete reports, HBA/HBB chromosome-haplotype classes,
+compound states, unresolved nomenclature and calendar-era changes.
 
-## Reported diagnostic spectrum
-
-The primary descriptive unit must be declared: person, test episode, reported
-finding, allele, chromosome haplotype or diploid genotype. The positive fraction
-in a referral cohort is not population prevalence.
-
-```{r}
-#| label: fig-reported-spectrum
-#| fig-cap: "Example structure for the reported diagnostic spectrum."
-#| fig-alt: "Horizontal bar chart of reported genotype categories."
-plot_reported_spectrum(cohort_spectrum)
-```
+The historical positive fraction is a property of an enriched referral cohort, not
+population prevalence. Likewise, differences between historical and ONT report
+frequencies combine biological, demographic, assay and reporting effects.
 
 ## Database representation
 
-For each normalized allele or structural haplotype, compare nomenclature,
-reference sequence, transcript, exact sequence/junction representation, clinical
-assertions and population-resource coverage across IthaGenes/IthaCNVs, HbVar,
-ClinVar and appropriate population resources.
+Each reported label should be linked to a canonical genomic allele or explicit
+structural haplotype while retaining the original wording. Public-database review
+should distinguish exact sequence representation from broad interval overlap and
+should record transcript, genome build, HBA copy ambiguity, junction definition,
+clinical assertion and ancestry coverage. An absent database record can reflect
+nomenclature or representation failure rather than biological rarity.
 
-## Haplotype and evolutionary context
+## Evolutionary interpretation
 
 A pathogenic HBB allele alone does not identify a classical beta-globin haplotype.
-Individual-level founder or selection analyses require linked markers and phase.
-Where those are absent, use external phased resources to describe known backgrounds
-without assigning them to report-only patients.
+Founder or selection analyses require linked markers and phase. Where these are not
+present in the report-derived cohort, external phased resources may describe known
+backgrounds but cannot assign them to individual patients.

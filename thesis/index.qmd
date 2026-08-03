@@ -1,42 +1,42 @@
 ---
 title: "Cohort-driven, assay-aware thalassaemia genotyping"
 abstract: |
-  This thesis combines a retrospective molecular-testing cohort with an explicit
-  computational model of ONT amplicon observability. The cohort work defines the
-  locally relevant HBA/HBB genotype and phenotype questions. NanoGlobin compiles
-  declared primer designs against chromosome-haplotype sequences, classifies
-  observed molecules, and ranks the diploid haplotype states that can explain
-  those products. Analytical accuracy is evaluated only where an appropriate
-  truth source exists.
+  This thesis combines a retrospective molecular-testing study with an explicit
+  computational model of ONT amplicon observability. The clinical study defines
+  the locally relevant HBA/HBB genotype and phenotype questions. NanoGlobin
+  compiles declared primer designs against chromosome-haplotype sequences,
+  classifies observed molecules, and ranks the diploid haplotype states that can
+  explain those products. Accuracy claims are restricted to the scope of each
+  independent truth source; caller concordance is reported separately.
 ---
 
 ```{r}
 source("R/setup.R")
 ```
 
-# Thesis question
+# Research question
 
-Can a canonical chromosome-haplotype and evidence representation unify the
+Can a canonical chromosome-haplotype and evidence representation unify
 retrospective thalassaemia records, support genotype--phenotype and database
 analyses, expose assay-dependent blind spots, and drive an open ONT amplicon
 genotyper?
 
-```{mermaid}
-flowchart LR
-  A[Historical and ONT reports] --> B[Canonical genotype and evidence ledger]
-  B --> C[Reported HBA/HBB landscape]
-  B --> D[HBA x HBB phenotype analysis]
-  C --> E[Sequence-resolved candidate haplotypes]
-  E --> F[Declared assay compiler]
-  F --> G[Primer-aware molecule evidence]
-  G --> H[Candidate haplotype posterior]
-  H --> I[Resolved, ambiguous, or no-call]
-  I --> J[Independent adjudication]
+```text
+historical and ONT reports
+    -> canonical genotype and evidence ledger
+    -> reported HBA/HBB landscape and HBA x HBB phenotype analysis
+    -> sequence-resolved candidate haplotypes
+    -> declared assay compiler
+    -> primer-aware molecule evidence
+    -> chromosome-haplotype posterior
+    -> resolved, ambiguous, or no-call
+    -> independent adjudication
 ```
 
-# Draft status
+# Evidence available in this checkout
 
-This Quarto book is a live analysis and writing workspace. It renders to HTML for
-rapid review and to a Typst PDF for submission-oriented typesetting. Patient-level
-source data and reports must remain outside the repository; chapters consume only
-approved de-identified tables or committed synthetic examples.
+The repository contains real, aggregate HPRC/GIAB small-variant result records,
+DRAGEN-labelled HBA comparator observations, public amplicon run metadata and the
+measured Cython replacement benchmark. Patient-level reports and governed cohort
+tables are not committed. Consequently, this book renders the software-method and
+evaluation chapters from committed evidence but does not invent cohort results.

@@ -1,5 +1,0 @@
-component_id	product_id	identifiability	relative_efficiency	observed_weight	fitted_exposure	controls_expected	controls_observed	dropout_events	dropout_trials	dropout_posterior_mean
-PC001	HBA_whole_and_rearranged	relative_within_connected_component	1.55	310	198	8	8	0	8	0.0357
-PC001	SEA_deletion	relative_within_connected_component	0.72	68	94	4	4	1	4	0.0833
-PC001	alpha_27_6_deletion	weak_relative_fit_unobserved_expected_product	0.38	8	24	2	1	1	2	0.1364
-PC002	HBB_HBD_whole	single_product_relative_efficiency_unidentifiable	1.00	220	0	6	6	0	6	0.0385

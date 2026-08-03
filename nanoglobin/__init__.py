@@ -94,6 +94,7 @@ from .genotype import (
     GenotypeClassScore,
     GenotypeConfig,
     GenotypeModelError,
+    GENOTYPE_KERNEL,
     MoleculeEvidence,
     analysis_payload,
     load_compiled_space,
@@ -109,6 +110,7 @@ __all__ += [
     "GenotypeClassScore",
     "GenotypeConfig",
     "GenotypeModelError",
+    "GENOTYPE_KERNEL",
     "MoleculeEvidence",
     "analysis_payload",
     "load_compiled_space",
@@ -116,18 +118,6 @@ __all__ += [
     "observable_classes",
     "read_molecule_evidence",
     "score_genotypes",
-]
-
-from .fast_genotype import (
-    BackendName,
-    cython_backend_available,
-    score_genotypes_auto,
-)
-
-__all__ += [
-    "BackendName",
-    "cython_backend_available",
-    "score_genotypes_auto",
 ]
 
 from .calibration_types import (

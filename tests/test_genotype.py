@@ -232,3 +232,26 @@ def test_cli_writes_call_and_ranked_posteriors(tmp_path: Path) -> None:
         json.loads(summary.read_text(encoding="utf-8"))["model"]["calibration_status"]
         == "research_uncalibrated"
     )
+
+
+def test_cython_kernel_supports_more_than_64_haplotype_candidates(
+    tmp_path: Path,
+) -> None:
+    compiled = tmp_path / "compiled-many.json"
+    molecules = tmp_path / "molecules-many.tsv"
+    haplotypes = {
+        f"H{index:02d}": [("P", f"hash-{index:02d}")]
+        for index in range(70)
+    }
+    write_compiled(compiled, haplotypes)
+    write_molecules(
+        molecules,
+        [
+            *[molecule(f"a{i}", "P", "hash-00", "H00") for i in range(4)],
+            *[molecule(f"b{i}", "P", "hash-69", "H69") for i in range(4)],
+        ],
+    )
+    scores, call = run_model(compiled, molecules)
+    assert call.top_class is not None
+    assert call.top_class.genotype_pairs == (("H00", "H69"),)
+    assert scores[0].posterior > 0.50

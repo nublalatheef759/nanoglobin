@@ -1,27 +1,22 @@
 # Discussion
 
-## Main findings
+The current evidence supports three bounded conclusions. First, small-variant SNV
+performance is strong in the recorded gene-body comparisons, whereas indels remain
+a material weakness. Second, the CIGAR path produces useful HBA deletion evidence,
+but its present sample set is comparator-selected and cannot estimate sensitivity
+or specificity. Third, the assay-aware model exposes physical observability,
+intrinsic ambiguity and no-call states that generic caller aggregation does not
+represent.
 
-Write this section from the frozen result tables. Lead with the strongest result,
-not with every software component. Distinguish what was established about the UAE
-referral cohort, what was established about assay observability, and what remains
-unvalidated analytically.
+The strongest scientific limitation is not implementation time. It is the absence
+of an accessible exact-assay cohort combining raw amplicon reads with independent,
+event-appropriate truth. HPRC and GIAB address sequence and WGS-caller questions;
+DRAGEN and vendor output are comparators; public unlabelled amplicon reads address
+assay mechanics. These roles must remain separate.
 
-## Interpretation
-
-Discuss the advantage of modelling physical PCR products and chromosome
-haplotypes instead of treating generic caller agreement as a biological genotype.
-Ambiguity and no-call are substantive results when they follow from the declared
-assay contract.
-
-## Limitations
-
-Separate data-access limitations, cohort ascertainment, selective reporting,
-truth-set scope, assay calibration and candidate-catalogue incompleteness. Avoid
-using time available as the scientific reason for a limitation.
-
-## Next experiments
-
-Prioritize assay-matched reference materials, paired historical/ONT cases where
-linkage is recoverable, product-efficiency/dropout calibration, held-out external
-assays and orthogonal confirmation of coherent novel products.
+The next decisive experiment is a blinded assay-matched panel retaining negatives,
+failures and no-calls. Small variants require independently validated sequence
+genotypes; alpha deletions require event-specific breakpoint evidence; gains need
+dosage plus junction/copy-order evidence; and novel products require independent
+confirmation. Product-efficiency/dropout calibration must be fitted on separate
+controls before that held-out evaluation.

@@ -3,7 +3,7 @@ Type: Project
 Title: Reproducible NanoGlobin Thesis Draft
 Version: 0.0.0.9000
 Authors@R: person("NanoGlobin", "Team", role = c("aut", "cre"), email = "noreply@example.org")
-Description: Quarto and Typst manuscript workspace with reproducible R visualisations for the NanoGlobin thesis.
+Description: Quarto and Typst manuscript workspace using committed NanoGlobin evaluation records and governed external cohort tables.
 License: MIT
 Encoding: UTF-8
 Imports:
@@ -14,4 +14,5 @@ Imports:
     readr,
     rmarkdown,
     scales,
+    tibble,
     tidyr

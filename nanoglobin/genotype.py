@@ -24,12 +24,14 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass, field
 from itertools import combinations_with_replacement
-from math import exp, lgamma, log
+from math import exp, log
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 import csv
 import hashlib
 import json
+
+import numpy as np
 
 
 class GenotypeModelError(ValueError):
@@ -400,60 +402,8 @@ def _effective_weights(
     if total <= 0:
         return [], 0.0
     scale = min(1.0, config.effective_read_cap / total)
-    return [(item, weight * scale) for item, weight in weighted if weight > 0], total * scale
-
-
-def _predicted_key_set(
-    signature: tuple[tuple[str, str, int], ...]
-) -> set[ProductKey]:
-    return {
-        ProductKey(product_id, sequence_hash)
-        for product_id, sequence_hash, _ in signature
-    }
-
-
-def _predicted_product_ids(
-    signature: tuple[tuple[str, str, int], ...]
-) -> set[str]:
-    return {product_id for product_id, _, _ in signature}
-
-
-def _read_log_likelihood(
-    genotype_class: ObservableGenotypeClass,
-    weighted_evidence: Sequence[tuple[MoleculeEvidence, float]],
-    config: GenotypeConfig,
-) -> float:
-    predicted_keys = _predicted_key_set(genotype_class.signature)
-    predicted_products = _predicted_product_ids(genotype_class.signature)
-    epsilon = config.artifact_probability
-    value = 0.0
-    for evidence, weight in weighted_evidence:
-        key = ProductKey(evidence.assigned_product_id, evidence.best_sequence_sha256)
-        pair_haplotypes = {
-            haplotype_id
-            for pair in genotype_class.genotype_pairs
-            for haplotype_id in pair
-        }
-        candidate_overlap = bool(
-            pair_haplotypes.intersection(evidence.candidate_haplotypes)
-        )
-        if evidence.best_sequence_sha256 and key in predicted_keys:
-            probability = 1.0 - epsilon
-        elif (
-            not evidence.best_sequence_sha256
-            and evidence.assigned_product_id in predicted_products
-            and candidate_overlap
-        ):
-            probability = max(epsilon, 0.5 * (1.0 - epsilon))
-        elif evidence.assigned_product_id in predicted_products:
-            probability = max(epsilon, 0.25 * (1.0 - epsilon))
-        else:
-            probability = epsilon
-        edit_penalty = 0.0
-        if evidence.edit_rate is not None:
-            edit_penalty = min(1.0, max(0.0, evidence.edit_rate))
-        value += weight * (log(max(1e-12, probability)) - edit_penalty)
-    return value
+    scaled = [(item, weight * scale) for item, weight in weighted if weight > 0]
+    return scaled, total * scale
 
 
 def _observed_product_counts(
@@ -468,47 +418,6 @@ def _observed_product_counts(
         return {}
     scale = min(1.0, config.effective_count_cap / total)
     return {product_id: count * scale for product_id, count in counts.items()}
-
-
-def _predicted_product_multiplicity(
-    signature: tuple[tuple[str, str, int], ...]
-) -> dict[str, int]:
-    counts: Counter[str] = Counter()
-    for product_id, _sequence_hash, multiplicity in signature:
-        counts[product_id] += multiplicity
-    return dict(counts)
-
-
-def _dirichlet_multinomial_score(
-    observed: Mapping[str, float],
-    predicted: Mapping[str, int],
-    config: GenotypeConfig,
-) -> float:
-    if not observed:
-        return 0.0
-    categories = sorted(set(observed) | set(predicted))
-    masses: dict[str, float] = {}
-    for product_id in categories:
-        efficiency = float(config.product_efficiencies.get(product_id, 1.0))
-        masses[product_id] = (
-            float(predicted.get(product_id, 0)) * efficiency
-            + config.product_background_mass
-        )
-    total_mass = sum(masses.values())
-    alpha = {
-        product_id: max(
-            config.minimum_dirichlet_alpha,
-            config.count_concentration * masses[product_id] / total_mass,
-        )
-        for product_id in categories
-    }
-    alpha0 = sum(alpha.values())
-    n_total = sum(float(observed.get(product_id, 0.0)) for product_id in categories)
-    value = lgamma(alpha0) - lgamma(alpha0 + n_total)
-    for product_id in categories:
-        count = float(observed.get(product_id, 0.0))
-        value += lgamma(alpha[product_id] + count) - lgamma(alpha[product_id])
-    return value
 
 
 def _required_product_ids_for_class(
@@ -526,22 +435,6 @@ def _required_product_ids_for_class(
             if record.required:
                 required.add(record.key.product_id)
     return required
-
-
-def _dropout_log_likelihood(
-    space: CompiledGenotypeSpace,
-    genotype_class: ObservableGenotypeClass,
-    observed: Mapping[str, float],
-    config: GenotypeConfig,
-) -> float:
-    value = 0.0
-    for product_id in _required_product_ids_for_class(space, genotype_class):
-        value += log(
-            1.0 - config.dropout_probability
-            if observed.get(product_id, 0.0) > 0
-            else config.dropout_probability
-        )
-    return value
 
 
 def _class_priors(
@@ -575,48 +468,236 @@ def _class_priors(
     return {class_id: value / total for class_id, value in raw.items()}
 
 
+GENOTYPE_KERNEL = "cython_grouped_v1"
+
+
+def _prepare_dense_problem(
+    *,
+    space: CompiledGenotypeSpace,
+    classes: Sequence[ObservableGenotypeClass],
+    evidence: Sequence[MoleculeEvidence],
+    config: GenotypeConfig,
+) -> tuple[Any, ...]:
+    """Encode the candidate posterior into dense arrays for the Cython kernel."""
+
+    weighted_evidence, useful_effective_reads = _effective_weights(evidence, config)
+    observed = _observed_product_counts(weighted_evidence, config)
+
+    product_ids = sorted(
+        set(observed)
+        | {
+            product_id
+            for item in classes
+            for product_id, _sequence_hash, _multiplicity in item.signature
+        }
+    )
+    product_index = {
+        product_id: index for index, product_id in enumerate(product_ids)
+    }
+
+    exact_keys = sorted(
+        {
+            ProductKey(product_id, sequence_hash)
+            for item in classes
+            for product_id, sequence_hash, _multiplicity in item.signature
+        }
+    )
+    exact_key_index = {key: index for index, key in enumerate(exact_keys)}
+    haplotype_ids = tuple(sorted(space.haplotype_ids))
+    haplotype_index = {
+        haplotype_id: index for index, haplotype_id in enumerate(haplotype_ids)
+    }
+    mask_word_count = max(1, (len(haplotype_ids) + 63) // 64)
+
+    class_count = len(classes)
+    product_count = len(product_ids)
+    key_count = len(exact_keys)
+    class_exact = np.zeros((class_count, key_count), dtype=np.uint8)
+    class_product = np.zeros((class_count, product_count), dtype=np.uint8)
+    class_required = np.zeros((class_count, product_count), dtype=np.uint8)
+    class_multiplicity = np.zeros((class_count, product_count), dtype=np.int64)
+    class_haplotype_masks = np.zeros(
+        (class_count, mask_word_count), dtype=np.uint64
+    )
+
+    for class_index, item in enumerate(classes):
+        class_haplotypes = {
+            haplotype_id
+            for pair in item.genotype_pairs
+            for haplotype_id in pair
+        }
+        for haplotype_id in class_haplotypes:
+            position = haplotype_index[haplotype_id]
+            class_haplotype_masks[class_index, position // 64] |= np.uint64(
+                1 << (position % 64)
+            )
+        for product_id, sequence_hash, multiplicity in item.signature:
+            product_position = product_index[product_id]
+            key_position = exact_key_index[ProductKey(product_id, sequence_hash)]
+            class_product[class_index, product_position] = 1
+            class_exact[class_index, key_position] = 1
+            class_multiplicity[class_index, product_position] += int(multiplicity)
+        for product_id in _required_product_ids_for_class(space, item):
+            if product_id in product_index:
+                class_required[class_index, product_index[product_id]] = 1
+
+    # key_index=-1 means no compiled sequence hash was emitted. key_index=-2
+    # means a hash was emitted but no candidate class predicts it.
+    grouped: dict[tuple[int, int, tuple[int, ...]], list[float]] = defaultdict(
+        lambda: [0.0, 0.0]
+    )
+    for item, weight in weighted_evidence:
+        product_position = product_index[item.assigned_product_id]
+        if item.best_sequence_sha256:
+            key_position = exact_key_index.get(
+                ProductKey(item.assigned_product_id, item.best_sequence_sha256),
+                -2,
+            )
+        else:
+            key_position = -1
+        candidate_words = [0] * mask_word_count
+        for haplotype_id in item.candidate_haplotypes:
+            position = haplotype_index.get(haplotype_id)
+            if position is not None:
+                candidate_words[position // 64] |= 1 << (position % 64)
+        key = (product_position, key_position, tuple(candidate_words))
+        edit_penalty = (
+            min(1.0, max(0.0, float(item.edit_rate)))
+            if item.edit_rate is not None
+            else 0.0
+        )
+        grouped[key][0] += float(weight)
+        grouped[key][1] += float(weight) * edit_penalty
+
+    group_items = sorted(grouped.items())
+    group_product = np.asarray(
+        [key[0] for key, _values in group_items], dtype=np.int64
+    )
+    group_key = np.asarray(
+        [key[1] for key, _values in group_items], dtype=np.int64
+    )
+    group_candidate_masks = np.asarray(
+        [key[2] for key, _values in group_items], dtype=np.uint64
+    ).reshape(len(group_items), mask_word_count)
+    group_weight = np.asarray(
+        [values[0] for _key, values in group_items], dtype=np.float64
+    )
+    group_edit_penalty = np.asarray(
+        [values[1] for _key, values in group_items], dtype=np.float64
+    )
+    observed_counts = np.asarray(
+        [float(observed.get(product_id, 0.0)) for product_id in product_ids],
+        dtype=np.float64,
+    )
+    product_efficiencies = np.asarray(
+        [
+            float(config.product_efficiencies.get(product_id, 1.0))
+            for product_id in product_ids
+        ],
+        dtype=np.float64,
+    )
+    priors = _class_priors(classes, config)
+    log_priors = np.asarray(
+        [log(priors[item.class_id]) for item in classes], dtype=np.float64
+    )
+
+    return (
+        class_exact,
+        class_product,
+        class_required,
+        class_multiplicity,
+        class_haplotype_masks,
+        group_product,
+        group_key,
+        group_candidate_masks,
+        group_weight,
+        group_edit_penalty,
+        observed_counts,
+        product_efficiencies,
+        log_priors,
+        useful_effective_reads,
+    )
+
+
 def score_genotypes(
     space: CompiledGenotypeSpace,
     evidence: Sequence[MoleculeEvidence],
     config: GenotypeConfig | None = None,
 ) -> tuple[list[GenotypeClassScore], float]:
+    """Score observable genotype classes with the required Cython kernel."""
+
     config = config or GenotypeConfig()
     config.validate()
+    try:
+        from ._genotype_kernel import score_dense_classes
+    except ImportError as exc:  # pragma: no cover - packaging failure boundary
+        raise GenotypeModelError(
+            "the compiled NanoGlobin genotype kernel is unavailable; reinstall "
+            "the package so the Cython extension is built"
+        ) from exc
+
     classes = observable_classes(space)
-    weighted_evidence, useful_effective_reads = _effective_weights(evidence, config)
-    observed_counts = _observed_product_counts(weighted_evidence, config)
-    priors = _class_priors(classes, config)
-
-    raw: list[tuple[ObservableGenotypeClass, float, float, float, float, float]] = []
-    for item in classes:
-        read_ll = _read_log_likelihood(item, weighted_evidence, config)
-        count_ll = _dirichlet_multinomial_score(
-            observed_counts,
-            _predicted_product_multiplicity(item.signature),
-            config,
-        )
-        dropout_ll = _dropout_log_likelihood(space, item, observed_counts, config)
-        log_prior = log(priors[item.class_id])
-        log_score = read_ll + count_ll + dropout_ll + log_prior
-        raw.append((item, read_ll, count_ll, dropout_ll, log_prior, log_score))
-
-    normalizer = _logsumexp([item[-1] for item in raw])
+    if not classes:
+        raise GenotypeModelError("compiled assay yields no observable genotype classes")
+    prepared = _prepare_dense_problem(
+        space=space,
+        classes=classes,
+        evidence=evidence,
+        config=config,
+    )
+    (
+        class_exact,
+        class_product,
+        class_required,
+        class_multiplicity,
+        class_haplotype_masks,
+        group_product,
+        group_key,
+        group_candidate_masks,
+        group_weight,
+        group_edit_penalty,
+        observed_counts,
+        product_efficiencies,
+        log_priors,
+        useful_effective_reads,
+    ) = prepared
+    read_ll, count_ll, dropout_ll, log_scores = score_dense_classes(
+        class_exact,
+        class_product,
+        class_required,
+        class_multiplicity,
+        class_haplotype_masks,
+        group_product,
+        group_key,
+        group_candidate_masks,
+        group_weight,
+        group_edit_penalty,
+        observed_counts,
+        product_efficiencies,
+        log_priors,
+        float(config.artifact_probability),
+        float(config.product_background_mass),
+        float(config.count_concentration),
+        float(config.minimum_dirichlet_alpha),
+        float(config.dropout_probability),
+    )
+    normalizer = _logsumexp([float(value) for value in log_scores])
     output = [
         GenotypeClassScore(
             class_id=item.class_id,
             genotype_pairs=item.genotype_pairs,
             signature=item.signature,
-            log_read_likelihood=read_ll,
-            log_count_likelihood=count_ll,
-            log_dropout_likelihood=dropout_ll,
-            log_prior=log_prior,
-            log_score=log_score,
-            posterior=exp(log_score - normalizer),
+            log_read_likelihood=float(read_ll[index]),
+            log_count_likelihood=float(count_ll[index]),
+            log_dropout_likelihood=float(dropout_ll[index]),
+            log_prior=float(log_priors[index]),
+            log_score=float(log_scores[index]),
+            posterior=exp(float(log_scores[index]) - normalizer),
         )
-        for item, read_ll, count_ll, dropout_ll, log_prior, log_score in raw
+        for index, item in enumerate(classes)
     ]
     output.sort(key=lambda item: (-item.posterior, item.class_id))
-    return output, useful_effective_reads
+    return output, float(useful_effective_reads)
 
 
 def make_call(
@@ -805,6 +886,7 @@ def analysis_payload(
         "observable_genotype_class_count": len(scores),
         "model": {
             "name": "nanoglobin_candidate_product_posterior",
+            "kernel": GENOTYPE_KERNEL,
             "calibration_status": "research_uncalibrated",
             "prior_unit": (
                 "haplotype-frequency"
@@ -824,6 +906,7 @@ __all__ = [
     "GenotypeClassScore",
     "GenotypeConfig",
     "GenotypeModelError",
+    "GENOTYPE_KERNEL",
     "MoleculeEvidence",
     "ObservableGenotypeClass",
     "analysis_payload",

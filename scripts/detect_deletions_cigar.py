@@ -1,40 +1,17 @@
-#!/usr/bin/env python3
-"""
-detect_deletions_cigar.py -- long-read deletion detection for the globin regions.
+"""Detect large CIGAR deletions as inspectable long-read evidence.
 
-Oxford Nanopore reads are long enough to span whole alpha-globin deletions, so a
-deletion appears DIRECTLY inside a single read's alignment as a large CIGAR 'D'
-operation, rather than only as a coverage dip. This is the ONT long-read
-advantage: short-read methods must infer deletions from depth or split-reads,
-whereas a long read shows the deletion breakpoint-to-breakpoint in one alignment.
+A read alignment can contain a large ``D`` operation when one molecule bridges a
+deleted reference interval. This command clusters such operations by size, compares
+the consensus size with ``databases/cnvs.csv``, and reports the fraction of
+breakpoint-spanning reads carrying the event.
 
-This detector, validated against DRAGEN-genotyped carriers:
-  * scans reads in the target regions for CIGAR deletions above a size threshold
-  * clusters them by size and reports the consensus deletion size
-  * maps the size to a known deletion type via databases/cnvs.csv (size_min/max)
-  * estimates zygosity from the fraction of spanning reads carrying the deletion
-    (~0.5 -> heterozygous, ~1.0 -> homozygous)
-  * reports NO deletion for normals and for triplications (a gain has no deletion
-    signature -- this correctly distinguishes aaa3.7 triplications, which coverage
-    methods misclassify)
-
-VALIDATION (5 DRAGEN-genotyped ONT carriers + normal controls):
-  -a4.2/aa      -> 4257 bp deletion, fraction 0.57  (het)      correct
-  -a3.7/aa      -> 3804 bp deletion, fraction 0.71  (het)      correct
-  -a3.7/-a3.7   -> 3804 bp deletion, fraction 1.00  (hom)      correct
-  --/aa         -> 10553 bp deletion (see LIMITATION)          correct type
-  aaa3.7/aa     -> no deletion (triplication)                  correct
-  normals       -> no deletion                                 correct
-
-LIMITATION: a read must be long enough to span the ENTIRE deletion to show it as
-one CIGAR 'D'. Deletions up to ~read length (the ~3.8-4.2 kb single-gene
-deletions) are captured with good depth; very large deletions (e.g. the ~10.5 kb
--- double-gene deletion) are spanned by fewer reads, so the deletion-read
-fraction under-counts and zygosity from this method alone is unreliable for them.
-For large deletions, combine with the (flanking-normalised, localised) coverage
-method, which detects them robustly by depth. The two methods are complementary:
-CIGAR-deletion gives precise size/type + zygosity for deletions within read
-length; coverage catches the large ones.
+The output is evidence, not an independently validated genotype. Current HBA
+examples were selected or labelled by DRAGEN and must remain comparator-only. Size
+compatibility cannot sequence-resolve every -alpha3.7/-alpha4.2 subtype, and a
+coverage gain with no deletion CIGAR does not establish the exact gain structure.
+Fraction-based zygosity is a research heuristic; it becomes unreliable when few
+molecules span a large deletion. Event-appropriate junction sequence, dosage or
+other orthogonal evidence is required for ground truth.
 """
 import argparse
 import csv

@@ -5,13 +5,12 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --output=dipcall_carriers_%j.log
 #
-# dipcall_carriers.sh -- run the existing dipcall workflow on the three alpha-
-# deletion carriers, to obtain assembly-based truth for the alpha-globin region
-# (independent of DRAGEN). Reuses dipcall_one.sh's exact steps.
+# dipcall_carriers.sh -- audit diploid assembly evidence for three
+# DRAGEN-labelled alpha-deletion candidates. Reuses the existing dipcall steps.
 #
-# The alpha deletions live in a segmental duplication (HBA1/HBA2), so the key
-# question is whether the Verkko hybrid assemblies resolve the deletion cleanly.
-# The per-sample GLOBIN TRUTH block at the end prints what the assembly shows.
+# HBA1/HBA2 lie in a highly homologous segmental duplication. The purpose is to
+# inspect representation, copy structure and breakpoint sequence, not to assume
+# that a dipcall VCF or callable-BED gap is automatically independent truth.
 #
 # Run:  sbatch dipcall_carriers.sh
 # (downloads are large; the job downloads then dipcalls each carrier in turn)
@@ -24,7 +23,7 @@ K8=/rds/homes/f/fnl759/.conda/envs/dipcall/bin/k8
 PAFTOOLS=/rds/homes/f/fnl759/.conda/envs/dipcall/bin/paftools.js
 BEDTK=/rds/homes/f/fnl759/.conda/envs/dipcall/bin/bedtk
 
-# the three deletion carriers (DRAGEN-genotyped: HG00642 -a3.7/aa,
+# three DRAGEN-labelled deletion candidates: HG00642 -a3.7/aa,
 # HG03136 -a3.7/-a3.7, NA21106 -a4.2/aa)
 for S in HG00642 HG03136 NA21106; do
   echo ""
@@ -82,7 +81,7 @@ for S in HG00642 HG03136 NA21106; do
     | /rds/homes/f/fnl759/.conda/envs/dipcall/bin/htsbox bgzip > ${S}.dip.vcf.gz
 
   # --- the key output: what does the assembly show at the alpha locus? ---
-  echo "=== $S ALPHA-GLOBIN TRUTH (chr16:170000-178000) ==="
+  echo "=== $S ALPHA-GLOBIN ASSEMBLY EVIDENCE (chr16:170000-178000) ==="
   echo -n "HBA variant records: "
   zcat ${S}.dip.vcf.gz | grep -v "^#" \
     | awk '$1=="chr16" && $2>=170000 && $2<=178000' | wc -l
@@ -96,8 +95,10 @@ done
 
 echo ""
 echo "=== INTERPRETATION ==="
-echo "For a -a3.7/-a4.2 deletion, expect either explicit DEL variant records in the"
-echo "alpha region, OR a GAP in the dip.bed callable intervals where the deleted"
-echo "segment is (the assembly haplotype simply lacks that sequence). A clean gap"
-echo "matching the known breakpoints = assembly-confirmed deletion truth,"
-echo "independent of DRAGEN."
+echo "A resolved deletion-bearing haplotype is expected to remain sequence-continuous"
+echo "across its recombination junction. Absence of a simple dipcall DEL record or"
+echo "absence of a gap in dip.bed does not prove that the assembly missed the event."
+echo "Audit each haplotype using unique flanks on both sides, alpha-copy number/order,"
+echo "the hybrid or breakpoint sequence, and matched long-read support. Only a"
+echo "sequence-resolved, molecule-supported result should be promoted beyond the"
+echo "DRAGEN comparator label."

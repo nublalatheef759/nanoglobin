@@ -307,6 +307,23 @@ rule clinical_annotation:
         "python scripts/annotation/annotate_variants.py"
 
 
+rule build_cython_genotype_kernel:
+    input:
+        "pyproject.toml",
+        "setup.py",
+        "nanoglobin/_genotype_kernel.pyx",
+        "nanoglobin/genotype.py"
+    output:
+        touch("results/build/cython_genotype_kernel.done")
+    conda:
+        "envs/python.yaml"
+    shell:
+        "python setup.py build_ext --inplace && "
+        "python -c 'from nanoglobin._genotype_kernel import score_dense_classes; "
+        "assert callable(score_dense_classes)' && "
+        "touch {output}"
+
+
 # Assay-aware targets are activated by explicit contracts in config.yml. They are
 # not hidden prerequisites of the legacy caller/report path.
 if config.get("assay_profile") and config.get("haplotype_catalogue"):
@@ -373,7 +390,8 @@ if config.get("assay_profile") and config.get("haplotype_catalogue"):
             input:
                 compiled="results/assay/compiled_products.json",
                 molecules="results/assay/molecules/{sample}.molecules.tsv",
-                profile=GENOTYPE_PROFILE
+                profile=GENOTYPE_PROFILE,
+                cython="results/build/cython_genotype_kernel.done"
             output:
                 posteriors="results/assay/genotypes/{sample}.posteriors.tsv",
                 call="results/assay/genotypes/{sample}.call.json",

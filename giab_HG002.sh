@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --output=giab_HG002_%j.log
 
-# GIAB HG002 gold-standard SNV/indel validation.
+# GIAB HG002 benchmark-scoped SNV/indel comparison.
 # HG002's HBA is normal (aa/aa) and GIAB v4.2.1 excludes segmental duplications,
 # so this primarily validates HBB (chr11) against the community-standard truth.
 

@@ -117,14 +117,12 @@ def test_stability_grid_reports_consistent_top_class(tmp_path: Path) -> None:
         evidence,
         config,
         grid,
-        backend="python",
     )
     summary = stability_summary(scenarios, base_config=config, grid=grid)
     assert len(scenarios) == 12
     assert summary["scenario_count"] == 12
     assert summary["modal_top_class_fraction"] == 1.0
     assert set(summary["call_state_counts"]) == {"RESOLVED_RESEARCH_CALL"}
-    assert all(item.execution_backend == "python_reference" for item in scenarios)
 
 
 def test_invalid_grid_is_rejected() -> None:
@@ -174,8 +172,6 @@ def test_stability_cli_writes_scenarios_and_summary(tmp_path: Path) -> None:
             str(config),
             "--grid",
             str(grid),
-            "--backend",
-            "python",
             "--scenarios-tsv",
             str(scenarios),
             "--summary-json",

@@ -1,10 +1,9 @@
 # cython: language_level=3, boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
-"""Cython kernel for dense assay-observable genotype scoring.
+"""Required Cython kernel for assay-observable genotype scoring.
 
-The expensive edit-distance work is already handled by RapidFuzz in native code.
-This kernel accelerates the remaining quadratic stage: scoring many observable
-chromosome-haplotype classes against grouped molecule evidence and product-count
-terms.
+Read/product edit distance already runs in RapidFuzz's native implementation. This
+kernel handles the remaining class-by-evidence likelihood, product-composition and
+required-product terms. Equivalent molecule observations are grouped before entry.
 """
 
 import numpy as np
@@ -20,10 +19,10 @@ def score_dense_classes(
     cnp.ndarray[cnp.uint8_t, ndim=2] class_product,
     cnp.ndarray[cnp.uint8_t, ndim=2] class_required,
     cnp.ndarray[cnp.int64_t, ndim=2] class_multiplicity,
-    cnp.ndarray[cnp.uint64_t, ndim=1] class_haplotype_masks,
+    cnp.ndarray[cnp.uint64_t, ndim=2] class_haplotype_masks,
     cnp.ndarray[cnp.int64_t, ndim=1] group_product,
     cnp.ndarray[cnp.int64_t, ndim=1] group_key,
-    cnp.ndarray[cnp.uint64_t, ndim=1] group_candidate_masks,
+    cnp.ndarray[cnp.uint64_t, ndim=2] group_candidate_masks,
     cnp.ndarray[cnp.float64_t, ndim=1] group_weight,
     cnp.ndarray[cnp.float64_t, ndim=1] group_edit_penalty,
     cnp.ndarray[cnp.float64_t, ndim=1] observed_counts,
@@ -35,18 +34,14 @@ def score_dense_classes(
     double minimum_dirichlet_alpha,
     double dropout_probability,
 ):
-    """Score every observable genotype class using typed dense arrays.
-
-    Molecules are grouped before entering this kernel, so runtime scales with the
-    number of distinct evidence states rather than raw PCR read count whenever
-    reads share product, compiled sequence and candidate-haplotype states.
-    """
+    """Score every observable genotype class using typed dense arrays."""
 
     cdef Py_ssize_t class_count = class_exact.shape[0]
     cdef Py_ssize_t key_count = class_exact.shape[1]
     cdef Py_ssize_t product_count = class_product.shape[1]
     cdef Py_ssize_t group_count = group_product.shape[0]
-    cdef Py_ssize_t c, g, p
+    cdef Py_ssize_t mask_word_count = class_haplotype_masks.shape[1]
+    cdef Py_ssize_t c, g, p, word
     cdef cnp.int64_t product_index, key_index
     cdef double read_value, count_value, dropout_value, total_value
     cdef double log_probability, edit_penalty, mass, total_mass
@@ -77,8 +72,8 @@ def score_dense_classes(
         raise ValueError("class_required product count does not match")
     if class_multiplicity.shape[1] != product_count:
         raise ValueError("class_multiplicity product count does not match")
-    if class_haplotype_masks.shape[0] != class_count:
-        raise ValueError("class_haplotype_masks length does not match")
+    if class_haplotype_masks.shape[0] != class_count or mask_word_count < 1:
+        raise ValueError("class_haplotype_masks shape does not match")
     if observed_counts.shape[0] != product_count:
         raise ValueError("observed_counts length does not match product count")
     if product_efficiencies.shape[0] != product_count:
@@ -88,7 +83,9 @@ def score_dense_classes(
     if group_key.shape[0] != group_count:
         raise ValueError("group_key length does not match")
     if group_candidate_masks.shape[0] != group_count:
-        raise ValueError("group_candidate_masks length does not match")
+        raise ValueError("group_candidate_masks row count does not match")
+    if group_candidate_masks.shape[1] != mask_word_count:
+        raise ValueError("candidate and class haplotype masks do not match")
     if group_weight.shape[0] != group_count:
         raise ValueError("group_weight length does not match")
     if group_edit_penalty.shape[0] != group_count:
@@ -123,15 +120,19 @@ def score_dense_classes(
                     and key_index < key_count
                     and class_exact[c, key_index] != 0
                 )
-                candidate_overlap = (
-                    group_candidate_masks[g] != 0
-                    and (class_haplotype_masks[c] & group_candidate_masks[g]) != 0
-                )
+                candidate_overlap = False
+                for word in range(mask_word_count):
+                    if (
+                        class_haplotype_masks[c, word]
+                        & group_candidate_masks[g, word]
+                    ) != 0:
+                        candidate_overlap = True
+                        break
                 if exact_present:
                     log_probability = log_exact
                 elif key_index == -1 and product_present and candidate_overlap:
-                    # -1 means the molecule has no compiled-sequence hash.  -2
-                    # means a hash was supplied but no candidate class predicts it.
+                    # -1 means no compiled-sequence hash. -2 means a supplied
+                    # hash is absent from every candidate class.
                     log_probability = log_half
                 elif product_present:
                     log_probability = log_quarter

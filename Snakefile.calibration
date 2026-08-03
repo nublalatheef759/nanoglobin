@@ -1,4 +1,4 @@
-"""Control calibration and accelerated genotype scoring.
+"""Control calibration and required Cython genotype scoring.
 
 Run after the main assay compiler and molecule-admission targets, for example:
 
@@ -11,7 +11,6 @@ SAMPLES = config["samples"]
 GENOTYPE_PROFILE = config.get("genotype_inference_profile")
 CONTROL_MANIFEST = config.get("calibration_control_manifest")
 CALIBRATION_SETTINGS = config.get("calibration_settings")
-BACKEND = config.get("genotype_backend", "auto")
 
 if not config.get("assay_profile") or not config.get("haplotype_catalogue"):
     raise ValueError("assay_profile and haplotype_catalogue are required")
@@ -34,20 +33,20 @@ rule all:
         "results/assay/calibration/sample_product_fit.tsv",
 
 
-rule build_cython_genotype_backend:
+rule build_cython_genotype_kernel:
     input:
         "pyproject.toml",
         "setup.py",
-        "nanoglobin/_genotype_fast.pyx",
-        "nanoglobin/fast_genotype.py",
+        "nanoglobin/_genotype_kernel.pyx",
+        "nanoglobin/genotype.py",
     output:
-        touch("results/build/cython_genotype_backend.done")
+        touch("results/build/cython_genotype_kernel.done")
     conda:
         "envs/python.yaml"
     shell:
         "python setup.py build_ext --inplace && "
-        "python -c 'from nanoglobin.fast_genotype import cython_backend_available; "
-        "assert cython_backend_available()' && "
+        "python -c 'from nanoglobin._genotype_kernel import score_dense_classes; "
+        "assert callable(score_dense_classes)' && "
         "touch {output}"
 
 
@@ -82,17 +81,11 @@ rule genotype_amplicons_calibrated:
         molecules="results/assay/molecules/{sample}.molecules.tsv",
         model="results/assay/calibration/calibrated_model.yml",
         calibration="results/assay/calibration/calibration.json",
-        cython=(
-            "results/build/cython_genotype_backend.done"
-            if config.get("build_cython_extension", True) and BACKEND in ("auto", "cython")
-            else []
-        ),
+        cython="results/build/cython_genotype_kernel.done",
     output:
         posteriors="results/assay/genotypes_calibrated/{sample}.posteriors.tsv",
         call="results/assay/genotypes_calibrated/{sample}.call.json",
         summary="results/assay/genotypes_calibrated/{sample}.summary.json",
-    params:
-        backend=BACKEND,
     conda:
         "envs/python.yaml"
     shell:
@@ -101,7 +94,6 @@ rule genotype_amplicons_calibrated:
         "--molecules-tsv {input.molecules} "
         "--model-config {input.model} "
         "--calibration-json {input.calibration} "
-        "--backend {params.backend} "
         "--posteriors-tsv {output.posteriors} "
         "--call-json {output.call} "
         "--summary-json {output.summary}"

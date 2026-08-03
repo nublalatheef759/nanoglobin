@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "purpose": "one-time gate for replacing the merged scalar Python scorer with the Cython genotype kernel",
+  "workflow_run_id": 30822000236,
+  "benchmark_commit": "c3c061a9f216f52842ae750baa6bfa540b2ee41d",
+  "runner": {
+    "image": "ubuntu-24.04",
+    "python": "3.10.20"
+  },
+  "workload": {
+    "candidate_haplotypes": 24,
+    "observable_genotype_classes": 300,
+    "molecule_rows": 12000,
+    "warmups": 1,
+    "measured_repetitions": 7
+  },
+  "numerical_parity": "passed for every likelihood component and posterior",
+  "historical_python_seconds": {
+    "minimum": 7.873843570999995,
+    "median": 8.013485015,
+    "mean": 8.040106717714282,
+    "maximum": 8.356539834999992,
+    "population_sd": 0.15248770570158568
+  },
+  "cython_seconds": {
+    "minimum": 0.05673023999999316,
+    "median": 0.0582102529999986,
+    "mean": 0.05971547685714386,
+    "maximum": 0.0658062070000085,
+    "population_sd": 0.0035198595523085996
+  },
+  "median_speedup": 137.6644938306692,
+  "decision": "Cython is the sole production genotype-scoring implementation; the Python scorer and runtime backend selector are removed.",
+  "scope_note": "This deterministic expanded-catalogue workload proves that the grouped Cython kernel materially improves the previously merged implementation. It is not a claim about complete end-to-end runtime on every assay or dataset."
+}

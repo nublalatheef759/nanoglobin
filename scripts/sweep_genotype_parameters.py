@@ -38,11 +38,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--molecules-tsv", required=True)
     parser.add_argument("--model-config")
     parser.add_argument("--grid", required=True)
-    parser.add_argument(
-        "--backend",
-        choices=("auto", "python", "cython"),
-        default="auto",
-    )
     parser.add_argument("--scenarios-tsv", required=True)
     parser.add_argument("--summary-json", required=True)
     return parser.parse_args(argv)
@@ -55,13 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         evidence = read_molecule_evidence(args.molecules_tsv)
         config = load_config(args.model_config)
         grid = load_stability_grid(args.grid, config)
-        scenarios = run_stability_grid(
-            space,
-            evidence,
-            config,
-            grid,
-            backend=args.backend,
-        )
+        scenarios = run_stability_grid(space, evidence, config, grid)
         summary = stability_summary(
             scenarios,
             base_config=config,

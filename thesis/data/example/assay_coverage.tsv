@@ -1,9 +1,0 @@
-haplotype_id	product_id	required	observable	n_products	lengths_bp	forward_mismatches	reverse_mismatches
-alpha_alpha	HBA_whole	TRUE	TRUE	1	6210	0	0
-alpha_alpha	DEL_3p7	FALSE	FALSE	0			
-minus_alpha_3p7	HBA_whole	TRUE	TRUE	1	3804	0	0
-minus_alpha_3p7	DEL_3p7	FALSE	TRUE	1	3804	0	0
-minus_alpha_4p2	HBA_whole	TRUE	TRUE	1	4257	0	0
-minus_alpha_4p2	DEL_3p7	FALSE	FALSE	0			
-alpha_triplication	HBA_whole	TRUE	TRUE	2	6210;6210	0;0	0;0
-alpha_triplication	DEL_3p7	FALSE	FALSE	0			

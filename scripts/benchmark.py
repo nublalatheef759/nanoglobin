@@ -1,26 +1,17 @@
-#!/usr/bin/env python3
-"""
-benchmark_report.py -- score the pipeline's FINAL report against truth VCFs.
+"""Score final report rows against a declared synthetic truth manifest.
 
-Unlike benchmark.py (which scores raw caller VCFs), this reads
-results/comprehensive_report.csv -- i.e. what the pipeline actually reports
-after filtering, reciprocal-overlap matching and naming. That makes precision
-reflect the deployed tool, not the raw caller.
+This utility is for software regression fixtures. It reads
+``results/comprehensive_report.csv`` and matches reported SNV/SV rows to the truth
+VCFs listed in ``simulation/benchmark_truth.tsv``. It does not provide biological
+or clinical validation.
 
-SVs: matched by reciprocal overlap + size concordance, size parsed from the
-report's Consequence field (SV_DEL_-3812bp). SNVs: exact position + allele.
-Only the specified SV tool is counted (default Sniffles), since CuteSV's raw
-over-calling is filtered downstream and zygosity is taken from Sniffles.
+Usage::
 
-Usage:
-  python benchmark_report.py --report results/comprehensive_report.csv \
-      --config bench_truth.tsv --sv-tool Sniffles --out results/benchmark.tsv
-
-bench_truth.tsv columns:
-  sample   truth_vcf                     class
-  HET_a37  simulation/truth_a37.vcf      SV
-  HET_hbs  simulation/truth_hbs.vcf      SNV
-  WT_control  -                          SV
+    python scripts/benchmark.py \
+      --report results/comprehensive_report.csv \
+      --config simulation/benchmark_truth.tsv \
+      --sv-tool Sniffles \
+      --out results/synthetic_benchmark.tsv
 """
 import argparse, csv, re, sys
 

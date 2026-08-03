@@ -12,13 +12,13 @@ from typing import Any, Mapping, Sequence
 import csv
 import json
 
-from .fast_genotype import BackendName, score_genotypes_auto
 from .genotype import (
     CompiledGenotypeSpace,
     GenotypeConfig,
     GenotypeModelError,
     MoleculeEvidence,
     make_call,
+    score_genotypes,
 )
 
 
@@ -97,7 +97,6 @@ class StabilityScenario:
     genotype_pairs: tuple[tuple[str, str], ...]
     assigned_reads: int
     unresolved_fraction: float
-    execution_backend: str
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -114,7 +113,6 @@ class StabilityScenario:
             ),
             "assigned_reads": self.assigned_reads,
             "unresolved_fraction": self.unresolved_fraction,
-            "execution_backend": self.execution_backend,
         }
 
 
@@ -177,20 +175,13 @@ def run_stability_grid(
     evidence: Sequence[MoleculeEvidence],
     base_config: GenotypeConfig,
     grid: StabilityGrid,
-    *,
-    backend: BackendName = "auto",
 ) -> list[StabilityScenario]:
     grid.validate(base_config)
     output: list[StabilityScenario] = []
     for parameters, config in _scenarios(grid, base_config):
         canonical = json.dumps(parameters, sort_keys=True, separators=(",", ":"))
         scenario_id = "SG_" + sha256(canonical.encode("utf-8")).hexdigest()[:12]
-        scores, effective, backend_used = score_genotypes_auto(
-            space,
-            evidence,
-            config,
-            backend=backend,
-        )
+        scores, effective = score_genotypes(space, evidence, config)
         call = make_call(scores, evidence, effective, config)
         if call.top_class is None:
             raise StabilityError(f"scenario {scenario_id} produced no top class")
@@ -215,7 +206,6 @@ def run_stability_grid(
                 genotype_pairs=call.top_class.genotype_pairs,
                 assigned_reads=call.assigned_reads,
                 unresolved_fraction=call.unresolved_fraction,
-                execution_backend=backend_used,
             )
         )
     output.sort(key=lambda item: tuple(item.parameters[name] for name in sorted(item.parameters)))

@@ -1,14 +1,19 @@
 name: Thesis render
+# Final gate after the focused Cython likelihood-semantics regression test.
 
 on:
   pull_request:
     paths:
       - "thesis/**"
+      - "evaluation/**"
+      - "benchmarks/cython_genotype_proof.json"
       - ".github/workflows/thesis-render.yml"
   push:
     branches: [main]
     paths:
       - "thesis/**"
+      - "evaluation/**"
+      - "benchmarks/cython_genotype_proof.json"
       - ".github/workflows/thesis-render.yml"
   workflow_dispatch:
 
@@ -18,25 +23,20 @@ permissions:
 jobs:
   render:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: thesis
-
       - uses: quarto-dev/quarto-actions/setup@v2
-
       - name: Render HTML book
         run: quarto render thesis --to html
-
       - name: Render Typst PDF
-        run: quarto render thesis --to typst
-
+        run: timeout 10m quarto render thesis --to typst
       - uses: actions/upload-artifact@v4
         with:
           name: nanoglobin-thesis-render

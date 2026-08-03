@@ -1,27 +1,22 @@
 # HBA modification of HBB-associated phenotypes
 
-## Analysis population
+This analysis is restricted to historical individuals with an interpretable
+primary HBB genotype, a canonical HBA state and temporally meaningful phenotype
+measurements. Eligible denominators for Hb, MCV, MCH, HbA2 and HbF must be reported
+separately.
 
-Restrict this analysis to historical individuals with an interpretable primary HBB
-genotype, a canonical HBA state and temporally meaningful phenotype measurements.
-Report the eligible denominator for Hb, MCV, MCH, HbA2 and HbF separately.
-
-## Model
-
-A primary explanatory model can be written as
+A primary explanatory model is
 
 $$
 Y = \beta_0 + \beta_{HBA} + \beta_{HBB} +
     \beta_{HBA\times HBB} + \gamma^T X + u_{family/person} + \epsilon,
 $$
 
-where $X$ includes available age, sex, referral indication, ancestry proxy, iron
-status, transfusion/treatment context and measurement timing. Use clustered or
-mixed models where repeated measurements or related people are present.
+where $X$ contains available age, sex, referral indication, ancestry proxy, iron
+status, transfusion/treatment context and measurement timing. Repeated measurements
+or related individuals require clustered or mixed-effects inference.
 
-## Computational effect annotations
-
-Use variant-class-specific predictors as secondary evidence: splice models for
-splice variants, regulatory models for promoter/enhancer variants and protein or
-structure models for coding missense variants. Deletions, gains and hybrid genes
-require explicit structural representation rather than a generic protein score.
+Variant-effect predictors are secondary, class-specific evidence: splice models
+for splice variants, regulatory models for promoter variants and protein/structure
+models for coding missense variants. Deletions, gains and hybrid genes require an
+explicit structural representation rather than a generic protein score.

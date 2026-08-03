@@ -1,4 +1,5 @@
 name: Python unit tests
+# Final gate after the focused Cython likelihood-semantics regression test.
 
 on:
   push:

@@ -14,14 +14,15 @@ if str(ROOT) not in sys.path:
 
 from nanoglobin.calibration_io import load_calibration_provenance  # noqa: E402
 from nanoglobin.calibration_types import CalibrationError  # noqa: E402
-from nanoglobin.fast_genotype import score_genotypes_auto  # noqa: E402
 from nanoglobin.genotype import (  # noqa: E402
+    GENOTYPE_KERNEL,
     GenotypeModelError,
     analysis_payload,
     load_compiled_space,
     load_config,
     make_call,
     read_molecule_evidence,
+    score_genotypes,
     write_scores_tsv,
 )
 
@@ -43,12 +44,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "embedded calibrated config must exactly match --model-config."
         ),
     )
-    parser.add_argument(
-        "--backend",
-        choices=("auto", "python", "cython"),
-        default="auto",
-        help="Scoring backend. auto uses the compiled Cython kernel when available.",
-    )
     parser.add_argument("--posteriors-tsv", required=True)
     parser.add_argument("--call-json", required=True)
     parser.add_argument("--summary-json", required=True)
@@ -66,12 +61,7 @@ def main(argv: list[str] | None = None) -> int:
             space,
             config,
         )
-        scores, useful_effective_reads, backend_used = score_genotypes_auto(
-            space,
-            evidence,
-            config,
-            backend=args.backend,
-        )
+        scores, useful_effective_reads = score_genotypes(space, evidence, config)
         call = make_call(scores, evidence, useful_effective_reads, config)
         payload = analysis_payload(
             space=space,
@@ -79,7 +69,6 @@ def main(argv: list[str] | None = None) -> int:
             scores=scores,
             call=call,
         )
-        payload["execution_backend"] = backend_used
         if calibration is not None:
             payload["calibration"] = calibration
             payload["model"]["calibration_status"] = calibration[
@@ -111,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(
             {
                 **call.to_dict(),
-                "execution_backend": backend_used,
+                "kernel": GENOTYPE_KERNEL,
                 "calibration_id": (
                     calibration["calibration_id"] if calibration else None
                 ),

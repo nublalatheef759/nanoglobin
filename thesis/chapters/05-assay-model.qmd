@@ -1,91 +1,49 @@
-# Assay compiler, HBA family coordinates and genotype model
-
-```{r}
-source("R/figures.R")
-assay_coverage <- read_tsv_or_example(
-  "../results/assay/coverage.tsv",
-  "data/example/assay_coverage.tsv"
-)
-molecule_status <- read_csv_or_example(
-  "../results/thesis/molecule_status.csv",
-  "data/example/molecule_status.csv"
-)
-calibration_products <- read_tsv_or_example(
-  "../results/assay/calibration/product_parameters.tsv",
-  "data/example/calibration_product_parameters.tsv"
-)
-```
+# Assay compiler and chromosome-haplotype model
 
 ## Forward assay model
 
-```{mermaid}
-flowchart LR
-  G[Diploid chromosome-haplotype pair] --> P[Primer binding and compiled products]
-  P --> A[Amplification efficiency and dropout]
-  A --> O[Observed ONT molecules]
-  O --> E[Primer, sequence, product and artifact evidence]
-  E --> R[Ranked genotype classes]
+```text
+diploid chromosome-haplotype pair
+    -> primer binding and compiled PCR products
+    -> amplification efficiency and dropout
+    -> observed ONT molecules
+    -> primer, sequence, product, and artifact evidence
+    -> ranked genotype classes
 ```
 
-## HBA family-coordinate and marker map
+An assay profile declares primers, expected orientation, length bounds, pools and
+required products. The compiler performs in-silico PCR against sequence-resolved
+chromosome haplotypes and emits exact product sequences, product multiplicities,
+primer mismatches, assay-coverage gaps and genotype pairs that are intrinsically
+indistinguishable under the assay.
 
-The family map is generated automatically by aligning HBA1, HBA2, hybrid and
-candidate-copy sequences to one declared anchor. It records homologous reference
-positions, insertion coordinates, gaps and copy-informative alleles. Adding HPRC
-or cohort-derived sequences regenerates the map; it is not a manually curated
-“full population equivalence map.”
+## HBA family coordinates
 
-Its purpose is to project copy markers and variants across representations and to
-show when a read is copy-informative, family-informative or intrinsically
-ambiguous. Exact product-sequence likelihoods remain the primary inference path.
+The HBA family-coordinate map is generated from FASTA sequences rather than kept as
+a hand-written population table. HBA1, HBA2, hybrid and candidate-copy sequences
+are aligned to a declared anchor; substitutions, insertions and deletions remain
+explicit. The map supports copy-marker interpretation and coordinate projection.
+Exact compiled product sequences remain the primary likelihood objects.
 
-## Assay coverage
+## Molecule evidence
 
-```{r}
-#| label: fig-assay-coverage
-#| fig-cap: "Compiled product observability across candidate chromosome haplotypes."
-#| fig-alt: "Tile plot of assay products by candidate haplotype, showing observable and absent products."
-plot_assay_coverage(assay_coverage)
-```
+FASTQ molecules are oriented from terminal primers and classified as complete,
+one-ended, unexpected-length, primer-dimer, chimera-candidate or off-target.
+Complete molecules are compared with the compiled product sequences while retaining
+equivalent haplotypes, low-margin assignments and unexplained residuals.
 
-## Molecule admission
+## Genotype posterior
 
-```{r}
-#| label: fig-molecule-status
-#| fig-cap: "Primer-aware classification of ONT reads."
-#| fig-alt: "Horizontal bar chart of complete, incomplete, off-target and artifact read fractions."
-plot_molecule_status(molecule_status)
-```
+The state is an unordered pair of chromosome haplotypes. Variable alpha-globin copy
+number is encoded inside each chromosome-haplotype sequence; human chromosome
+ploidy remains two. Named pairs with the same count-aware product signature are
+collapsed before assigning the default prior.
 
-## Candidate posterior
+The model combines molecule compatibility, capped effective evidence for PCR
+non-independence, a Dirichlet-multinomial product-composition term, relative product
+efficiencies and required-product dropout. It returns one of four states:
+`RESOLVED_RESEARCH_CALL`, `AMBIGUOUS_ASSAY_EQUIVALENT`,
+`AMBIGUOUS_POSTERIOR`, or `NO_CALL_INSUFFICIENT_EVIDENCE`.
 
-The model scores pairs of chromosome haplotypes. Variable alpha-globin copy number
-is represented inside each chromosome-haplotype sequence; the human genotype
-remains diploid. Named pairs with the same observable product signature are
-collapsed before assigning the default prior, preventing catalogue duplication
-from manufacturing posterior mass.
-
-## Control-based assay calibration
-
-The model does not assume that all PCR products amplify equally. Controls with a
-declared chromosome-haplotype pair, truth source and assay scope are used to fit
-relative product efficiencies, required-product dropout and unsupported-molecule
-mass. Comparator-only calls and non-assay-matched WGS controls are excluded by
-default.
-
-Relative efficiency is identifiable only among products connected by at least one
-control genotype that is expected to produce them together. A single isolated
-product has no scale that can be inferred from library size, and disconnected
-product groups retain independent scales. These states are reported rather than
-hidden by a fitted number.
-
-```{r}
-#| label: fig-product-efficiency
-#| fig-cap: "Relative PCR-product efficiencies fitted from declared control genotypes."
-#| fig-alt: "Horizontal bars of relative product efficiency with a dashed neutral reference at one."
-plot_product_efficiency(calibration_products)
-```
-
-The plotted example is synthetic unless governed control outputs exist under
-`results/assay/calibration/`. The fitted configuration remains a research model
-until evaluated on an independent blinded assay-matched set.
+The production scorer is the required Cython kernel `cython_grouped_v1`; there is
+no second runtime backend.

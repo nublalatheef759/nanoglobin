@@ -1,3 +1,4 @@
+# Input data and generated workflow outputs
 fastq/
 aligned/
 sorted_reads/
@@ -5,23 +6,26 @@ variants/
 results/
 reference/
 logs/
-simulation/*.fa
+scratch_tmp/
 .snakemake/
+models/
+happy_out/
+wide_val/
+
+# Python/build outputs
 __pycache__/
 *.pyc
+*.so
 *.egg-info/
-models/
-*.xlsx
-variant_summary.txt.gz
-ithacnv.html
-variant_summary.txt.gz
-hbvar.tsv
+build/
+dist/
+.pytest_cache/
 
-# ---- appended: large logs, alignments, backups, checkpoints ----
-*.log
-*.log.stats
-*.out
-*.err
+# Manuscript/render outputs
+thesis/_book/
+thesis/.quarto/
+
+# Large genomics and container files
 *.bam
 *.bam.bai
 *.bai
@@ -32,27 +36,31 @@ hbvar.tsv
 *.fq.gz
 *.vcf.gz
 *.vcf.gz.tbi
-scratch_tmp/
+*.sif
+
+# Logs, scratch exports and local configuration
+*.log
+*.log.stats
+*.out
+*.err
+*.xlsx
+config_HG*.yml
 Snakefile.backup
 best_score:
 test_export.csv
+variant_summary.txt.gz
+ithacnv.html
+hbvar.tsv
+
+# Local catalogue backups/checkpoints
 databases/*.bak
 databases/*.checkpoint_*
 databases/naming_layer.csv.checkpoint_*
 databases/variants.csv.pre_swap_bak
-config_HG*.yml
-*.sif
-happy_out/
-wide_val/
 *.pre_*_bak
-*.pre_extend_bak
-# large containers and generated validation outputs
-*.sif
-happy_out/
-wide_val/
-# backups from catalogue/subtype edits
 *.pre_extend_bak
 *.pre_subtype_fix_bak
-*.pre_*_bak
-# scratch diagnostic files
+
+# Generated simulation reads; truth definitions remain tracked
+simulation/*.fa
 simulation/truth_triple.vcf

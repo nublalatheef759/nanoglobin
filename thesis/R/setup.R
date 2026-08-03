@@ -2,8 +2,10 @@ suppressPackageStartupMessages({
   library(dplyr)
   library(ggplot2)
   library(jsonlite)
+  library(knitr)
   library(readr)
   library(scales)
+  library(tibble)
   library(tidyr)
 })
 
@@ -22,20 +24,22 @@ theme_nanoglobin <- function(base_size = 10.5) {
 
 theme_set(theme_nanoglobin())
 
-resolve_input <- function(primary, fallback) {
-  primary <- normalizePath(primary, mustWork = FALSE)
-  fallback <- normalizePath(fallback, mustWork = TRUE)
-  if (file.exists(primary)) primary else fallback
+require_input <- function(path) {
+  normalized <- normalizePath(path, mustWork = FALSE)
+  if (!file.exists(normalized)) {
+    stop("Required analysis input is missing: ", path, call. = FALSE)
+  }
+  normalized
 }
 
-read_tsv_or_example <- function(primary, fallback, ...) {
-  readr::read_tsv(resolve_input(primary, fallback), show_col_types = FALSE, ...)
+read_required_tsv <- function(path, ...) {
+  readr::read_tsv(require_input(path), show_col_types = FALSE, ...)
 }
 
-read_csv_or_example <- function(primary, fallback, ...) {
-  readr::read_csv(resolve_input(primary, fallback), show_col_types = FALSE, ...)
+read_required_csv <- function(path, ...) {
+  readr::read_csv(require_input(path), show_col_types = FALSE, ...)
 }
 
-read_json_or_example <- function(primary, fallback, ...) {
-  jsonlite::read_json(resolve_input(primary, fallback), simplifyVector = TRUE, ...)
+read_required_json <- function(path, ...) {
+  jsonlite::read_json(require_input(path), simplifyVector = TRUE, ...)
 }
