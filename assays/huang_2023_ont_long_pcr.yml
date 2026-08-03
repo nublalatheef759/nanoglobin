@@ -1,0 +1,120 @@
+# Executable transcription of the primer table in Huang et al., Clinical
+# Chemistry 2023, doi:10.1093/clinchem/hvad073. This is a published analogue,
+# not an AmplideX profile. Product length bounds encode the reported roughly
+# 5.0-12.5 kb amplicon range and should be checked against the exact haplotype
+# catalogue used for an experiment.
+assay_id: huang_2023_ont_long_pcr
+version: "1.0-published-table"
+platform: ont
+max_products_per_haplotype: 1000
+
+primers:
+  HBA_F:
+    sequence: AGCTAGAGCATTGGTGGTCATGCCC
+    max_mismatches: 0
+  HBA_R:
+    sequence: GACTTCGCGGTGGCTCCACTTTCC
+    max_mismatches: 0
+  HBD_F:
+    sequence: ATGCTCATGGGTGTGTATTTGTCTGCC
+    max_mismatches: 0
+  HBB_R:
+    sequence: ACAGAGACAACTAAGGCTGAGTGGCC
+    max_mismatches: 0
+  HBG_F:
+    sequence: GCTTTGTTGCGCAGGTCAACATGTATC
+    max_mismatches: 0
+  HBG_R:
+    sequence: GGGGCTGCTCTGCCTATGCAGTAGTC
+    max_mismatches: 0
+  SEA_F:
+    sequence: ACGGAGCGATCTGGGCTCTGTGTTC
+    max_mismatches: 0
+  SEA_R:
+    sequence: CTAGCCCAGCCAACTGTCTCCAAGG
+    max_mismatches: 0
+  TF_F:
+    sequence: GGACTCCCAGCCCACACAAACCATC
+    max_mismatches: 0
+  TF_R:
+    sequence: CTTGGATCTGCACCTCTGGGTAGGTTC
+    max_mismatches: 0
+  SH_R:
+    sequence: GGAGCTCTGGCCTCTTGAGATGTTCA
+    max_mismatches: 0
+  DB_R:
+    sequence: CCCCAGAAATTGCCTCATGTCTCTCCC
+    max_mismatches: 0
+
+products:
+  - id: HBA_whole_and_rearranged
+    forward_primer: HBA_F
+    reverse_primer: HBA_R
+    min_length: 3000
+    max_length: 14000
+    pool: alpha
+    roles: [whole_gene, HBA1_HBA2, local_rearrangement, multicopy]
+    required: true
+
+  - id: HBB_HBD_whole
+    forward_primer: HBD_F
+    reverse_primer: HBB_R
+    min_length: 8000
+    max_length: 13000
+    pool: beta
+    roles: [whole_gene, HBB, HBD]
+    required: true
+
+  - id: HBG_whole
+    forward_primer: HBG_F
+    reverse_primer: HBG_R
+    min_length: 7000
+    max_length: 13000
+    pool: beta
+    roles: [whole_gene, HBG1, HBG2]
+    required: true
+
+  - id: SEA_deletion
+    forward_primer: SEA_F
+    reverse_primer: SEA_R
+    min_length: 3000
+    max_length: 14000
+    pool: alpha
+    roles: [allele_specific, deletion_junction, SEA]
+    required: true
+
+  - id: THAI_FIL_deletion
+    forward_primer: TF_F
+    reverse_primer: TF_R
+    min_length: 3000
+    max_length: 14000
+    pool: alpha
+    roles: [allele_specific, deletion_junction, THAI, FIL]
+    required: true
+
+  - id: alpha_27_6_deletion
+    forward_primer: TF_F
+    reverse_primer: HBA_R
+    min_length: 3000
+    max_length: 14000
+    pool: alpha
+    roles: [allele_specific, deletion_junction, alpha_27_6]
+    required: true
+
+  - id: SEA_HPFH_deletion
+    forward_primer: HBD_F
+    reverse_primer: SH_R
+    min_length: 3000
+    max_length: 14000
+    pool: beta
+    roles: [allele_specific, deletion_junction, SEA_HPFH]
+    required: true
+
+  - id: Chinese_Ggamma_Agammadeltabeta0_deletion
+    forward_primer: HBG_F
+    reverse_primer: DB_R
+    min_length: 3000
+    max_length: 14000
+    pool: beta
+    roles: [allele_specific, deletion_junction, Ggamma_plus_Agammadeltabeta0]
+    required: true
