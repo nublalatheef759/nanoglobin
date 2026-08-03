@@ -5,7 +5,7 @@ Oxford Nanopore reads and retrospective molecular-testing records. It targets th
 `HBA1`/`HBA2` and beta-globin loci and treats the biological result as a pair of
 chromosome haplotypes rather than a bag of unrelated SNV, indel and CNV calls.
 
-The repository now contains four connected layers:
+The repository contains four connected layers:
 
 ```text
 retrospective reports
@@ -18,7 +18,7 @@ candidate chromosome-haplotype sequences + declared primers
 FASTQ
     -> primer-aware molecule admission
     -> product, sequence and artifact evidence
-    -> posterior over chromosome-haplotype pairs
+    -> calibrated posterior over chromosome-haplotype pairs
     -> resolved / assay-equivalent / posterior-ambiguous / no-call
 
 FASTQ or BAM
@@ -28,23 +28,28 @@ FASTQ or BAM
 
 The generic callers remain useful evidence producers and baselines. The amplicon
 model supplies semantics they do not own: primer observability, physical product
-identity, PCR abundance, copy-marker ambiguity and assay-induced no-call states.
+identity, PCR abundance, copy-marker ambiguity, assay-induced no-call states and
+explicit genotype indistinguishability.
 
 ## Current programme
 
 The useful boundary is **implementation versus validation**, not MSc versus
 post-MSc.
 
-Current method development includes:
+Current executable method development includes:
 
 - sequence-resolved chromosome-haplotype candidates;
 - a generated HBA family-coordinate and copy-marker map;
 - declared assay profiles and exact in-silico products;
 - primer-aware FASTQ molecule classification;
 - product and compiled-sequence compatibility;
-- an initial posterior over pairs of chromosome haplotypes;
-- configurable product efficiency, dropout and artifact terms;
-- assay-equivalent ambiguity and explicit no-call states; and
+- a posterior over pairs of chromosome haplotypes;
+- truth-scoped estimation of relative product efficiency, dropout and unsupported
+  molecule mass;
+- global and empirical-Bayes lot/run/operator calibration strata;
+- assay-equivalent ambiguity and explicit no-call states;
+- a grouped Cython genotype-scoring backend checked against the Python reference;
+- exact benchmark-confidence-region auditing; and
 - a Quarto/Typst thesis workspace that consumes pipeline results.
 
 Analytical sensitivity, specificity, posterior calibration, lot/laboratory
@@ -55,9 +60,11 @@ requires legally accessible assay documentation or reads.
 See:
 
 - [`docs/MSC_VERTICAL_SLICE.md`](docs/MSC_VERTICAL_SLICE.md) — active programme and validation gates;
-- [`docs/HBA_FAMILY_MAP.md`](docs/HBA_FAMILY_MAP.md) — family coordinate and marker semantics;
+- [`docs/HBA_FAMILY_MAP.md`](docs/HBA_FAMILY_MAP.md) — family-coordinate and marker semantics;
 - [`docs/GENOTYPE_MODEL.md`](docs/GENOTYPE_MODEL.md) — candidate posterior;
-- [`docs/MOLECULE_ADMISSION.md`](docs/MOLECULE_ADMISSION.md) — primer-aware read evidence; and
+- [`docs/MODEL_CALIBRATION.md`](docs/MODEL_CALIBRATION.md) — calibration, identifiability and Cython execution;
+- [`docs/MOLECULE_ADMISSION.md`](docs/MOLECULE_ADMISSION.md) — primer-aware read evidence;
+- [`validation/README.md`](validation/README.md) — validation-data acquisition and control design; and
 - [`thesis/README.md`](thesis/README.md) — Quarto HTML and Typst PDF workflow.
 
 ## Core assay-aware workflow
@@ -82,6 +89,11 @@ python scripts/compile_assay.py \
 Outputs include exact product sequences and hashes, primer mismatches, product
 multiplicity, assay coverage gaps and named genotype pairs that compile to the
 same observable products.
+
+The repository includes
+[`assays/huang_2023_ont_long_pcr.yml`](assays/huang_2023_ont_long_pcr.yml), an
+executable transcription of a published multiplex long-PCR design. It is a public
+assay analogue and **not** an AmplideX profile.
 
 ### 2. Build the HBA family-coordinate map
 
@@ -124,22 +136,58 @@ one-ended, unexpected-length, primer-dimer, chimera-candidate or off-target.
 Complete products are compared with compiled sequences while retaining equivalent
 haplotypes, low-margin assignments and poor-fit residuals.
 
-### 4. Rank chromosome-haplotype pairs
+Full-sequence edit distance already executes in RapidFuzz's native kernel. The
+Cython work therefore targets the remaining class-by-evidence genotype scorer,
+not code that is already native.
+
+### 4. Calibrate assay-product terms
+
+A tab-separated control manifest declares the known chromosome-haplotype pair,
+truth source, assay scope and calibration stratum for every control. WGS and
+caller-comparator controls are excluded by default because they do not estimate
+multiplex-PCR efficiency or independent truth.
+
+```bash
+python scripts/calibrate_amplicon_model.py \
+  --compiled-json results/assay/compiled_products.json \
+  --control-manifest validation/controls.tsv \
+  --base-model-config examples/genotype_inference.example.yml \
+  --calibration-settings examples/calibration_settings.example.yml \
+  --calibration-json results/assay/calibration/calibration.json \
+  --calibrated-model-config results/assay/calibration/calibrated_model.yml \
+  --product-parameters-tsv results/assay/calibration/product_parameters.tsv \
+  --sample-product-fit-tsv results/assay/calibration/sample_product_fit.tsv
+```
+
+The fitter estimates:
+
+- relative product efficiency within identifiable connected product groups;
+- required-product dropout with explicit Beta priors;
+- unsupported complete-molecule mass;
+- optional run/lot/operator strata shrunk toward the global fit; and
+- every excluded control and identifiability warning.
+
+One isolated product has no independently identifiable relative efficiency, and
+disconnected product groups have no common observed scale. Those states are
+reported rather than inferred from total library size.
+
+### 5. Rank chromosome-haplotype pairs
 
 ```bash
 python scripts/genotype_amplicons.py \
   --compiled-json results/assay/compiled_products.json \
   --molecules-tsv results/assay/molecules/SAMPLE.molecules.tsv \
-  --model-config examples/genotype_inference.example.yml \
+  --model-config results/assay/calibration/calibrated_model.yml \
+  --calibration-json results/assay/calibration/calibration.json \
+  --backend auto \
   --posteriors-tsv results/assay/genotypes/SAMPLE.posteriors.tsv \
   --call-json results/assay/genotypes/SAMPLE.call.json \
   --summary-json results/assay/genotypes/SAMPLE.summary.json
 ```
 
-The initial transparent model combines molecule/product compatibility, an
-effective evidence cap for PCR non-independence, a Dirichlet-multinomial product
-composition term, configurable product efficiencies, required-product dropout and
-optional haplotype priors.
+The transparent model combines molecule/product compatibility, an effective
+evidence cap for PCR non-independence, a Dirichlet-multinomial product-composition
+term, product efficiencies, required-product dropout and optional haplotype priors.
 
 Named genotype pairs with the same count-aware product signature are collapsed
 before the default prior is assigned. The output states are:
@@ -149,9 +197,81 @@ before the default prior is assigned. The output states are:
 - `AMBIGUOUS_POSTERIOR`; and
 - `NO_CALL_INSUFFICIENT_EVIDENCE`.
 
-These probabilities are conditional on the candidate catalogue, assay profile and
-current parameters. They are explicitly labelled research/uncalibrated until
-truth-matched material supports calibration.
+The calibration document embeds the exact fitted model configuration. Inference
+fails if a different config is supplied under the same calibration provenance.
+The probabilities remain conditional on the candidate catalogue, assay profile
+and declared model.
+
+### 6. Accelerate and benchmark the posterior
+
+Editable/standard package installs build the Cython extension through PEP 517.
+For a source checkout:
+
+```bash
+python setup.py build_ext --inplace
+```
+
+`--backend python` is the semantic reference. `--backend cython` fails closed if
+the extension is unavailable. `--backend auto` uses the grouped dense Cython
+kernel when the current candidate catalogue is representable and otherwise
+records the explicit Python fallback reason.
+
+```bash
+python scripts/benchmark_genotype_backend.py \
+  --compiled-json results/assay/compiled_products.json \
+  --molecules-tsv results/assay/molecules/SAMPLE.molecules.tsv \
+  --model-config results/assay/calibration/calibrated_model.yml \
+  --warmups 2 --repeats 10 \
+  --output-json results/benchmarks/SAMPLE.genotype_backend.json
+```
+
+The benchmark requires numerical parity across all likelihood terms and posterior
+probabilities before reporting every repeated timing, median, spread and speedup.
+No speed claim is made from a single favourable run.
+
+A standalone calibrated Snakemake layer is available:
+
+```bash
+snakemake -s Snakefile.calibration --use-conda --cores 4
+```
+
+### 7. Audit benchmark truth coverage
+
+A WGS benchmark applies only where its confidence BED covers the exact locus and
+variant class. Audit the intervals before running or interpreting `hap.py`:
+
+```bash
+python scripts/audit_truth_regions.py \
+  --bed truth/HG002.confident.bed \
+  --target HBA=chr16:170000-178000 \
+  --target HBB=chr11:5225000-5310000 \
+  --output-tsv results/truth/HG002.globin_coverage.tsv \
+  --summary-json results/truth/HG002.globin_coverage.json
+```
+
+`--require-full-coverage` returns a distinct non-zero status when any requested
+interval is incomplete.
+
+## Validation data programme
+
+[`validation/resources.tsv`](validation/resources.tsv) is the executable resource
+registry. The acquisition order is:
+
+1. use public multiplex-PCR reads for molecule mechanics, endpoint reconstruction,
+   artifact distributions and runtime—not genotype accuracy without truth;
+2. audit HPRC and GIAB at sequence and confidence-region level for candidate
+   haplotypes and WGS caller behaviour;
+3. request raw reads and sample-level truth from published truth-matched ONT
+   haemoglobinopathy cohorts;
+4. order and orthogonally reconfirm available Coriell/CDC HBA and HBB controls;
+5. recover an exact AmplideX blinded set with the historical pre-ONT GAP-PCR,
+   MLPA or Sanger result for each sample; and
+6. fit on a training/control subset, freeze the assay profile, catalogue and model,
+   then evaluate an independent held-out set.
+
+Vendor Reporter and DRAGEN outputs remain comparators unless the genotype is
+independently adjudicated. Validation must retain negatives, failures, ambiguous
+results and no-calls, and must be stratified by event class.
 
 ## Legacy and baseline workflow
 
@@ -209,7 +329,8 @@ confidence scope and the exact included bases remain part of the result.
 Within released globin high-confidence regions and represented variant classes,
 the current comparison reports 23/23 true positives, 0 false negatives and 0
 false positives. This is a small regional small-variant result, not structural or
-amplicon validation.
+amplicon validation. The exact confidence BED should be re-audited with
+`audit_truth_regions.py` for every frozen benchmark release.
 
 ### HBA structural-event comparator set
 
@@ -279,14 +400,14 @@ submission-oriented Typst PDF. It includes chapter scaffolds for:
 2. cohort design, ETL and data contracts;
 3. reported genotype landscape and database representation;
 4. HBA modification of HBB-associated phenotypes;
-5. assay compiler, family coordinates and genotype model;
-6. truth-scoped evaluation; and
+5. assay compiler, family coordinates, calibration and genotype model;
+6. truth-scoped evaluation and performance; and
 7. discussion and next experiments.
 
-Reusable R functions generate cohort-spectrum, assay-coverage, molecule-QC and
-posterior figures. Chapters prefer approved pipeline results and fall back to
-clearly labelled synthetic examples so the document remains renderable without
-committing patient data.
+Reusable R functions generate cohort-spectrum, assay-coverage, molecule-QC,
+calibration, posterior and backend-performance figures. Chapters prefer approved
+pipeline results and fall back to clearly labelled synthetic examples so the
+document remains renderable without committing patient data.
 
 ```bash
 cd thesis
@@ -299,10 +420,14 @@ CI renders both formats and uploads the book artifact.
 
 ## Known limitations
 
-- No currently accessible assay-matched truth cohort establishes analytical
-  sensitivity or specificity for the public amplicon path.
-- Product-efficiency and dropout defaults are explicit research parameters, not
-  calibrated clinical constants.
+- No currently accessible exact-assay truth cohort establishes analytical
+  sensitivity or specificity for the AmplideX path.
+- Control-fitted parameters remain conditional on the controls, event classes,
+  runs and candidate catalogue used; they are not universal PCR constants.
+- The current likelihood uses one global required-product dropout probability for
+  inference while retaining product-specific dropout estimates as diagnostics.
+- The current Cython dense backend uses a `uint64` haplotype mask and falls back to
+  the Python reference for catalogues larger than 64 named candidates.
 - The family-coordinate implementation uses deterministic pairwise projection to
   one anchor; highly repetitive equally optimal alignments require unique-flank,
   graph or explicit candidate-haplotype adjudication.
@@ -318,6 +443,7 @@ CI renders both formats and uploads the book artifact.
 
 ```text
 Snakefile
+Snakefile.calibration
 config.yml
 envs/
 
@@ -329,14 +455,21 @@ nanoglobin/
   product_evidence.py      compiled product sequence evidence
   molecules.py             molecule admission orchestration
   molecule_reporting.py    molecule/product QC summaries
-  genotype.py              chromosome-haplotype posterior
+  genotype.py              Python reference chromosome-haplotype posterior
+  fast_genotype.py         automatic grouped Python/Cython scoring
+  _genotype_fast.pyx       typed dense scoring kernel
+  calibration_*.py         truth-scoped calibration and provenance
+  truth_regions.py         benchmark-confidence-region auditing
   cohort.py                selective-report cohort normalisation
 
 scripts/
   compile_assay.py
   build_hba_family_map.py
   admit_amplicon_reads.py
+  calibrate_amplicon_model.py
   genotype_amplicons.py
+  benchmark_genotype_backend.py
+  audit_truth_regions.py
   normalise_cohort_reports.py
   detect_deletions_cigar.py
   coverage_profile.py
@@ -347,6 +480,8 @@ scripts/
   patient_summary.py
   sample_report.py
 
+assays/
+validation/
 schemas/
 examples/
 databases/
