@@ -134,8 +134,12 @@ def test_invalid_grid_is_rejected() -> None:
     with pytest.raises(StabilityError, match="maximum"):
         StabilityGrid(
             axes={
-                "dropout_probability": tuple(index / 100 for index in range(20)),
-                "artifact_probability": tuple(index / 1000 + 0.001 for index in range(20)),
+                "dropout_probability": tuple(
+                    (index + 1) / 100 for index in range(20)
+                ),
+                "artifact_probability": tuple(
+                    (index + 1) / 1000 for index in range(20)
+                ),
             },
             max_scenarios=100,
         ).validate(config)
