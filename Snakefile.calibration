@@ -82,7 +82,11 @@ rule genotype_amplicons_calibrated:
         molecules="results/assay/molecules/{sample}.molecules.tsv",
         model="results/assay/calibration/calibrated_model.yml",
         calibration="results/assay/calibration/calibration.json",
-        cython="results/build/cython_genotype_backend.done",
+        cython=(
+            "results/build/cython_genotype_backend.done"
+            if config.get("build_cython_extension", True) and BACKEND in ("auto", "cython")
+            else []
+        ),
     output:
         posteriors="results/assay/genotypes_calibrated/{sample}.posteriors.tsv",
         call="results/assay/genotypes_calibrated/{sample}.call.json",
