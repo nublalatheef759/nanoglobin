@@ -1,14 +1,7 @@
-name: Executable README
+name: Manual README render
 
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
-
-concurrency:
-  group: executable-readme-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -32,5 +25,3 @@ jobs:
             README.md
             README_files
           if-no-files-found: error
-      - name: Require generated README to be committed
-        run: git diff --exit-code -- README.md README_files

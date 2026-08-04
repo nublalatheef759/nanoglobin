@@ -1,20 +1,6 @@
-name: Thesis render
-# Final gate after the focused Cython likelihood-semantics regression test.
+name: Manual thesis render
 
 on:
-  pull_request:
-    paths:
-      - "thesis/**"
-      - "evaluation/**"
-      - "benchmarks/cython_genotype_proof.json"
-      - ".github/workflows/thesis-render.yml"
-  push:
-    branches: [main]
-    paths:
-      - "thesis/**"
-      - "evaluation/**"
-      - "benchmarks/cython_genotype_proof.json"
-      - ".github/workflows/thesis-render.yml"
   workflow_dispatch:
 
 permissions:

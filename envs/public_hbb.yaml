@@ -1,0 +1,26 @@
+name: nanoglobin-public-hbb
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - sra-tools=3
+  - snakemake-minimal=8
+  - numpy=1.26
+  - pandas=2.2
+  - pyyaml=6
+  - pysam=0.22
+  - cython=3
+  - c-compiler
+  - setuptools>=68
+  - rapidfuzz=3.14
+  - minimap2=2.28
+  - samtools=1.20
+  - bcftools=1.20
+  - quarto=1.7
+  - jupyter=1
+  - matplotlib=3.9
+  - tabulate=0.9
+  - pytest=8
