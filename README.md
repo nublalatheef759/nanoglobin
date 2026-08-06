@@ -61,13 +61,18 @@ install cannot shadow the pinned one.
 
 ## Validation
 
-Validated on real Oxford Nanopore data against three independent truth sources —
-no single truth set carries the whole claim.
+Validated on real Oxford Nanopore data against two independent truth sources —
+HPRC diploid assemblies and the GIAB HG002 benchmark. DRAGEN calls are used as a
+**comparator** for deletion carriers, not as independent truth. No single truth
+set carries the whole claim.
 
-**1. SNV/indel — HPRC assembly truth (5 genomes), GA4GH-standard hap.py.**
-Pipeline calls benchmarked against HPRC diploid assemblies using hap.py
-(jmcdani20/hap.py v0.3.12, the GA4GH-standard benchmarking tool), pooled across
-5 genomes (HG02071, HG02083, HG02514, HG02074, HG02622):
+**1. SNV/indel — assembly and benchmark truth, GA4GH-standard hap.py.**
+Pipeline calls benchmarked using hap.py (jmcdani20/hap.py v0.3.12, the
+GA4GH-standard benchmarking tool), pooled across six samples: five HPRC genomes
+with diploid assembly-derived truth (HG02071, HG02083, HG02514, HG02074,
+HG02622) plus HG002 against GIAB v4.2.1 high-confidence truth. HG002 therefore
+contributes to the pooled figures below and is not an additional independent
+sample:
 
 | region | type | recall | precision |
 |---|---|---|---|
@@ -84,23 +89,28 @@ tandem-repeat region (chr16:171,206–171,221). Across the full extended interva
 94.1%, driven by false positives in repetitive/regulatory intergenic and LCR
 sequence rather than in the globin genes themselves.
 
-**2. SNV/indel — GIAB gold standard (HG002).**
-Against NIST v4.2.1 benchmark, restricted to globin high-confidence regions:
-**23/23 true positives, 0 FN, 0 FP = 100% / 100%.** HG002 is clean in the globin
-region (no calls at the tandem-repeat positions), complementing the HPRC breadth.
+**2. SNV/indel — GIAB HG002, region-restricted concordance check.**
+Against the NIST v4.2.1 benchmark, restricted to globin targets intersected with
+the GIAB high-confidence BED: **23/23 concordant, 0 FN, 0 FP.** This is a
+region-restricted check on 23 small variants, not a sensitivity estimate, and
+HG002 is the same sample included in the pooled rows above. HG002 is clean in
+the globin region (no calls at the tandem-repeat positions).
 
-**3. Deletions — DRAGEN-concordant carriers (CIGAR method).**
+**3. Deletions — DRAGEN-concordant carriers (CIGAR method), comparator only.**
 α-globin deletion carriers with ONT reads, typed by the CIGAR method (below) and
-checked against DRAGEN calls — 0 false positives:
+checked against DRAGEN calls. DRAGEN is a **comparator, not independent truth** —
+agreement is concordance between two callers, not proof of correctness. No
+false-positive deletion call was made in the four DRAGEN-labelled αα/αα controls;
+their individual sample identifiers were not retained in the result snapshot:
 
-| sample | truth | detected | zygosity |
+| sample | comparator label | detected | zygosity |
 |---|---|---|---|
 | NA21106 | -α4.2/αα | 4257 bp = -α4.2 | het (0.58) |
 | HG00642 | -α3.7/αα | 3804 bp = -α3.7 | het |
 | HG03136 | -α3.7/-α3.7 | 3804 bp = -α3.7 | hom (1.00) |
 | HG00735 | ααα3.7/αα | (triplication) | correctly excluded |
 | HG03862 | --/αα | 10553 bp | deferred to coverage (below read span) |
-| normals ×4 | αα/αα | none | — |
+| normals ×4 (IDs not retained) | αα/αα | none | — |
 
 Synthetic positives (`scripts/simulate/`) were used during development to build
 and unit-test the callers against known-answer cases before real data; they are
@@ -112,7 +122,8 @@ development scaffolding, not a validation pillar.
 α-deletion carry it as a single large `D` operation in their CIGAR string. The
 method:
 
-- **detects** the deletion from the CIGAR of spanning reads (0 false positives);
+- **detects** the deletion from the CIGAR of spanning reads (no false-positive
+  calls across the four αα/αα controls tested);
 - **types** it by breakpoint size against `cnvs.csv` size columns, distinguishing
   the `-α3.7` and `-α4.2` deletion classes (the ~450 bp size difference is robust to
   CIGAR-size variance and is corroborated by independent assembly-derived breakpoint
