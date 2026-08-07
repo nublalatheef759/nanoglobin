@@ -55,3 +55,8 @@ wide_val/
 *.pre_*_bak
 # scratch diagnostic files
 simulation/truth_triple.vcf
+*.bak
+/tmp/
+*.bak
+phasing/*.vcf.gz
+phasing/*.tbi

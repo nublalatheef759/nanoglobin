@@ -155,13 +155,17 @@ def main():
         for r in rows:
             if r["Type"] == "gain":
                 named = (r.get("Name") or "").strip()
+                # Coverage establishes that extra material is present; it does NOT
+                # establish copy order, chromosome assignment, hybrid orientation or
+                # the junction. A reciprocal catalogue overlap is therefore reported
+                # as a candidate match, never as a definitive named triplication.
                 if named:
-                    # e.g. "ααα(anti-3.7) (98% reciprocal; ithaID=2561)"
-                    common = re.split(r"\s*\(\d+%", named)[0].strip()
-                    klass = "Causative (gain)"
+                    match = re.split(r"\s*\(\d+%", named)[0].strip()
+                    common = "unresolved structural-gain candidate (best catalogue match: %s)" % named
+                    klass = "gain, unresolved (coverage only)"
                 else:
-                    common = "triplication/gain"
-                    klass = "gain, unclassified"
+                    common = "unresolved structural-gain candidate"
+                    klass = "gain, unresolved (coverage only)"
                 hgvs_disp = "%s, ~%s× depth" % (r["Region"], r.get("Fold", "?"))
                 if not any(e[1] == common for e in samples[s_name]):
                     samples[s_name].append((1, common, hgvs_disp, "", klass, "coverage"))

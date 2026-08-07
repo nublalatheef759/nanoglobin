@@ -229,13 +229,18 @@ rule merge_annotations:
 
 rule comprehensive_summary:
     input:
-        "results/all_variants_annotated.csv"
+        annotated=expand("results/{s}.annotated.csv", s=SAMPLES),
+        sniffles=expand("variants/{s}/{s}.sniffles.vcf", s=SAMPLES),
+        cutesv=expand("variants/{s}/{s}.cutesv.vcf", s=SAMPLES),
+        coverage=expand("variants/{s}/{s}.coverage.tsv", s=SAMPLES)
     output:
         "results/comprehensive_report.csv"
+    params:
+        samples=" ".join(SAMPLES)
     conda:
         "envs/python.yaml"
     shell:
-        "python scripts/comprehensive_report.py {output}"
+        "python scripts/comprehensive_report.py {output} {params.samples}"
         
 rule cnv_calls:
     input:
