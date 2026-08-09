@@ -1,0 +1,46 @@
+
+# ---- SUMMARY ----
+# NA21106 (-a4.2/aa)
+#   deepest window: chr16:173000  ratio=0.356  flank=0.742  relative=0.480
+#   affected span: chr16:170000-174000 (8 windows < 0.75x flank)
+#   VERDICT: HETEROZYGOUS / single-chromosome deletion (deepest window ~0.5)
+#   NOTE: triplications are not depth-detectable (see header); a ratio near 1.0 does NOT exclude a gain.
+
+# ---- SUMMARY ----
+# HG00642 (-a3.7/aa)
+#   deepest window: chr16:172500  ratio=0.139  flank=0.526  relative=0.265
+#   affected span: chr16:172000-176000 (8 windows < 0.75x flank)
+#   VERDICT: HOMOZYGOUS deletion (deepest window ~0 -> both copies absent)
+#   NOTE: triplications are not depth-detectable (see header); a ratio near 1.0 does NOT exclude a gain.
+
+# ---- SUMMARY ----
+# HG03136 (-a3.7/-a3.7)
+#   deepest window: chr16:172500  ratio=0.000  flank=0.646  relative=0.000
+#   affected span: chr16:172000-176000 (8 windows < 0.75x flank)
+#   VERDICT: HOMOZYGOUS deletion (deepest window ~0 -> both copies absent)
+#   NOTE: triplications are not depth-detectable (see header); a ratio near 1.0 does NOT exclude a gain.
+
+# ---- SUMMARY ----
+# HG03862 (--/aa)
+#   deepest window: chr16:177000  ratio=0.416  flank=0.578  relative=0.719
+#   affected span: chr16:177000-178000 (2 windows < 0.75x flank)
+#   VERDICT: HETEROZYGOUS / single-chromosome deletion (deepest window ~0.5)
+#   NOTE: triplications are not depth-detectable (see header); a ratio near 1.0 does NOT exclude a gain.
+
+# ---- SUMMARY ----
+# HG00735 (aaa3.7/aa)
+#   deepest window: chr16:171000  ratio=0.581  flank=0.650  relative=0.893
+#   VERDICT: no localised deletion (profile is flat; deepest window is 0.89x the sample's own flanking baseline)
+#   NOTE: triplications are not depth-detectable (see header); a ratio near 1.0 does NOT exclude a gain.
+
+# ---- SUMMARY ----
+# HG02071 (aa/aa)
+#   deepest window: chr16:172000  ratio=0.922  flank=0.983  relative=0.938
+#   VERDICT: no localised deletion (profile is flat; deepest window is 0.94x the sample's own flanking baseline)
+#   NOTE: triplications are not depth-detectable (see header); a ratio near 1.0 does NOT exclude a gain.
+
+# ---- SUMMARY ----
+# HG02074 (aa/aa)
+#   deepest window: chr16:173500  ratio=0.866  flank=0.975  relative=0.889
+#   VERDICT: no localised deletion (profile is flat; deepest window is 0.89x the sample's own flanking baseline)
+#   NOTE: triplications are not depth-detectable (see header); a ratio near 1.0 does NOT exclude a gain.

@@ -133,25 +133,37 @@ def main():
     rvals = [r for _, r, _ in ratios]
     min_ratio = min(rvals)
     min_ws = ratios[rvals.index(min_ratio)][0]
-    # mean ratio over the contiguous run of low windows around the minimum
-    # (windows within the affected block, ratio < 0.75)
-    affected = [ws for ws, r, _ in ratios if r < 0.75]
+    # --- flank-relative criterion ---
+    # An absolute ratio threshold misfires when a sample's whole region is
+    # uniformly offset: a sample whose own flanking depth is atypical shifts
+    # every window down together, with no localised dip. A deletion must stand
+    # out from the sample's OWN flanks, not from an assumed baseline of 1.0.
+    # Flank baseline = median of the two outermost windows at each end.
+    flank_vals = rvals[:2] + rvals[-2:]
+    flank = stats.median(flank_vals) if flank_vals else 1.0
+    rel = (min_ratio / flank) if flank > 0 else 1.0
 
-    # --- verdict, grounded in copy-number expectation ---
-    # (deepest window is the discriminator: ~0 hom, ~0.5 het, ~1 normal)
-    if min_ratio <= 0.15:
+    # affected span measured against the sample's own flanks
+    affected = [ws for ws, r, _ in ratios if flank > 0 and r / flank < 0.75]
+
+    # --- verdict: localised dip required, then depth sets zygosity ---
+    if rel >= 0.75:
+        call = ("no localised deletion (profile is flat; deepest window is "
+                "%.2fx the sample's own flanking baseline)" % rel)
+    elif min_ratio <= 0.15:
         call = "HOMOZYGOUS deletion (deepest window ~0 -> both copies absent)"
     elif min_ratio <= 0.70:
         call = "HETEROZYGOUS / single-chromosome deletion (deepest window ~0.5)"
     else:
-        call = "no deletion detected by depth"
+        call = "possible partial loss (localised dip, shallow depth)"
 
     print("\n# ---- SUMMARY ----", file=sys.stderr)
     print(f"# {args.name} ({args.genotype})", file=sys.stderr)
-    print(f"#   deepest window: chr16:{min_ws}  ratio={min_ratio:.3f}", file=sys.stderr)
+    print(f"#   deepest window: chr16:{min_ws}  ratio={min_ratio:.3f}"
+          f"  flank={flank:.3f}  relative={rel:.3f}", file=sys.stderr)
     if affected:
         print(f"#   affected span: chr16:{min(affected)}-{max(affected)+args.win} "
-              f"({len(affected)} windows < 0.75)", file=sys.stderr)
+              f"({len(affected)} windows < 0.75x flank)", file=sys.stderr)
     print(f"#   VERDICT: {call}", file=sys.stderr)
     print(f"#   NOTE: triplications are not depth-detectable (see header); a "
           f"ratio near 1.0 does NOT exclude a gain.", file=sys.stderr)
