@@ -1,0 +1,49 @@
+=== NA21106 (-a4.2/aa) ===
+#   VERDICT: DELETION ~4257bp, HETEROZYGOUS (fraction ~0.5)
+#     NA21106 (-a4.2/aa) -> -α4.2
+# NA21106  (DRAGEN: -a4.2/aa)
+#   consensus deletion size: 4257 bp (range 4246-4261, n=15 reads)
+#   breakpoint ~chr16:169678   spanning reads: 26   deletion-read fraction: 0.58
+#   best size match: -α4.2 (4257-4257 bp; HBA2)
+#   other size-compatible: Czech, Indian, HS-40 deletion
+
+=== HG00642 (-a3.7/aa) ===
+#   VERDICT: DELETION ~3804bp, HETEROZYGOUS (fraction ~0.5)
+#     HG00642 (-a3.7/aa) -> -α3.7
+# HG00642  (DRAGEN: -a3.7/aa)
+#   consensus deletion size: 3804 bp (range 3802-3807, n=10 reads)
+#   breakpoint ~chr16:172241   spanning reads: 14   deletion-read fraction: 0.71
+#   best size match: -α3.7 (3803-3803 bp; α3.7 hybrid, HBA1, HBA2)
+#   other size-compatible: ααα(anti-3.7), -α3.7, -α3.7
+
+=== HG03136 (-a3.7/-a3.7) ===
+#   VERDICT: DELETION ~3804bp, HOMOZYGOUS (fraction ~1.0)
+#     HG03136 (-a3.7/-a3.7) -> -α3.7
+# HG03136  (DRAGEN: -a3.7/-a3.7)
+#   consensus deletion size: 3804 bp (range 2681-3810, n=14 reads)
+#   breakpoint ~chr16:172297   spanning reads: 14   deletion-read fraction: 1.00
+#   best size match: -α3.7 (3803-3803 bp; α3.7 hybrid, HBA1, HBA2)
+#   other size-compatible: ααα(anti-3.7), -α3.7, -α3.7
+
+=== HG03862 (--/aa) ===
+#   VERDICT: NO CONFIDENT DELETION (HG03862)
+# HG03862  (DRAGEN: --/aa)
+#   1 read(s) with a large deletion (~10553bp) -- below the 3-read threshold.
+#   RESULT: no confident CIGAR deletion. Either a normal/gain, or a large deletion spanned by too few reads (confirm by coverage).
+
+=== HG00735 (aaa3.7/aa) ===
+#   VERDICT: NO CONFIDENT DELETION (HG00735)
+# HG00735  (DRAGEN: aaa3.7/aa)
+#   2 read(s) with a large deletion (~8612bp) -- below the 3-read threshold.
+#   RESULT: no confident CIGAR deletion. Either a normal/gain, or a large deletion spanned by too few reads (confirm by coverage).
+
+=== HG02071 (aa/aa) ===
+#   VERDICT: NO CONFIDENT DELETION (HG02071)
+# HG02071  (DRAGEN: aa/aa)
+#   RESULT: no large deletion detected (normal, or a gain/triplication -- not depth-distinguishable here)
+
+=== HG02074 (aa/aa) ===
+#   VERDICT: NO CONFIDENT DELETION (HG02074)
+# HG02074  (DRAGEN: aa/aa)
+#   RESULT: no large deletion detected (normal, or a gain/triplication -- not depth-distinguishable here)
+
