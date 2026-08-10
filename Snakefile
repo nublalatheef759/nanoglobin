@@ -247,10 +247,12 @@ rule cnv_calls:
         expand("variants/{s}/{s}.coverage_bins.tsv", s=SAMPLES)
     output:
         "results/cnv_calls.csv"
+    params:
+        samples=" ".join(SAMPLES)
     conda:
         "envs/python.yaml"
     shell:
-        "python scripts/detect_cnv.py {output}"
+        "python scripts/detect_cnv.py {output} {params.samples}"
 
 rule sample_report:
     input:

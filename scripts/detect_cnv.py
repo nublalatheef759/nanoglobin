@@ -72,7 +72,7 @@ def call_file(path):
     return find_runs(rows, BASELINE), BASELINE
 
 
-def write_cnv_calls(out_path):
+def write_cnv_calls(out_path, samples):
     """Write one row per CNV call to a CSV the sample report can consume.
 
     Gains are matched against the IthaCNVs catalogue by reciprocal overlap
@@ -85,7 +85,15 @@ def write_cnv_calls(out_path):
         from identify_sv import identify_sv
     except Exception:
         identify_sv = None
-    paths = sorted(glob.glob("variants/*/*.coverage_bins.tsv"))
+    if not samples:
+        _sys.exit("ERROR: no samples declared. "
+                  "usage: detect_cnv.py <out.csv> <sample> [sample ...]")
+    paths = []
+    for s in samples:
+        hits = sorted(glob.glob("variants/%s/*.coverage_bins.tsv" % s))
+        if not hits:
+            _sys.exit("ERROR: no coverage bins found for declared sample %s" % s)
+        paths.extend(hits)
     with open(out_path, "w", newline="", encoding="utf-8-sig") as fh:
         w = _csv.writer(fh)
         w.writerow(["Sample", "Type", "Region", "Fold", "Name", "Confidence"])
@@ -127,7 +135,9 @@ if __name__ == "__main__":
 
     import sys as _sys
     if len(_sys.argv) > 1:
-        write_cnv_calls(_sys.argv[1])
+        if len(_sys.argv) < 3:
+            _sys.exit("usage: detect_cnv.py <out.csv> <sample> [sample ...]")
+        write_cnv_calls(_sys.argv[1], _sys.argv[2:])
         print("\nwrote CNV calls -> %s" % _sys.argv[1])
         
         
