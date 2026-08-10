@@ -78,8 +78,8 @@ sample:
 |---|---|---|---|
 | HBA/HBB core | SNV | 96.6% | 99.3% |
 | HBA/HBB core | INDEL | 63.6% | 73.7% |
-| β-cluster gene bodies | SNV | 96.9% | 99.4% |
-| β-cluster gene bodies | INDEL | 63.3% | 91.2% |
+| β-cluster gene bodies | SNV | 99.2% | 99.2% |
+| β-cluster gene bodies | INDEL | 100% | 100% |
 
 SNV calling is strong across both the core loci and the extended β-cluster gene
 bodies. Indels are the primary limitation (~63% recall), reflecting known ONT
@@ -106,10 +106,10 @@ their individual sample identifiers were not retained in the result snapshot:
 | sample | comparator label | detected | zygosity |
 |---|---|---|---|
 | NA21106 | -α4.2/αα | 4257 bp = -α4.2 | het (0.58) |
-| HG00642 | -α3.7/αα | 3804 bp = -α3.7 | het |
+| HG00642 | -α3.7/αα | 3804 bp = -α3.7 | het (0.71) |
 | HG03136 | -α3.7/-α3.7 | 3804 bp = -α3.7 | hom (1.00) |
-| HG00735 | ααα3.7/αα | (triplication) | correctly excluded |
-| HG03862 | --/αα | 10553 bp | deferred to coverage (below read span) |
+| HG00735 | ααα3.7/αα | none called | no confident call (2 reads, below threshold) |
+| HG03862 | --/αα | none called | no confident call; deferred to coverage |
 | normals ×4 (IDs not retained) | αα/αα | none | — |
 
 Synthetic positives (`scripts/simulate/`) were used during development to build
@@ -132,48 +132,80 @@ method:
   equivalent (single-gene α+-deletion);
 - **calls zygosity** from the deletion-read fraction *at the breakpoint*
   (het ~0.5–0.7, hom 1.0);
-- **excludes triplications** — an extra near-identical α-copy maps to the same
-  coordinates and produces no depth change, so `ααα3.7` is correctly *not* called
-  as a deletion (confirmed on HG00735).
+- **makes no deletion call on a triplication** — `ααα3.7` yields no confident
+  CIGAR deletion (HG00735), the correct output. The method does **not** identify
+  the gain: a triplication and a normal sample return the same verdict, because
+  the extra near-identical α-copy maps to the same coordinates and adds no unique
+  depth (23.1x vs 24.1x in a normal control).
 
 This is the long-read advantage short reads cannot structurally achieve: precise
 class (-α3.7 vs -α4.2) and zygosity within read length. Deletions exceeding read length
 (`--`, ~10.5 kb, spanned by too few reads) defer to the coverage method.
 
-**Coverage method** (`scripts/coverage_profile.py`, `panel_normalise.py`,
-`detect_alpha_cnv.py`): binned depth normalised against a *stable flanking region*
-(chr16:1,000,000–1,100,000), measuring the deepest localised window. This handles
-large (`--`) deletions the CIGAR method cannot span, but — because HBA1/HBA2 lie
-in a segmental duplication — coverage cannot reliably resolve zygosity (het/hom
-depth overlap) and misclassifies triplications as deletions. The two methods are
-complementary: CIGAR for precise typing within read length, flanking-normalised
-coverage for large deletions.
+**Coverage method.** Binned depth handles large (`--`) deletions the CIGAR method
+cannot span. It exists in **two normalisation frames**, and which one applies
+depends on the library design — neither covers both.
+
+*HBB-normalised* (`scripts/coverage_profile.py` → `detect_cnv.py`): HBA bin depth
+divided by median HBB depth, called against a fixed diploid baseline of 1.0. HBB
+lies on chr11, so the yardstick survives even when the entire α locus is deleted.
+This is what recovers `--/αα` (ratio 0.504), the genotype causing Hb Bart's
+hydrops fetalis, which within-region normalisation reports as normal. Validated on
+simulated genotypes: `-α3.7` het and hom, `-α4.2` het, `--/αα`, and a triplication
+(1.80× over the duplicated span) all called correctly with a clean wild-type
+control. The fixed baseline assumes HBA/HBB ≈ 1.0, which holds for targeted
+libraries but not for genome-wide data.
+
+*Panel- and flank-normalised* (`panel_normalise.py`, `detect_alpha_cnv.py`): bin
+depth self-normalised against a stable flanking region (chr16:1,000,000–1,100,000)
+and compared with a panel of normal `αα/αα` samples. This is required for real WGS,
+where HBA/HBB ranges 0.46–0.98 across normal samples because of GC and capture
+differences, so a fixed baseline of 1.0 misfires. A deletion is called only where
+the deepest window falls below 0.75× the sample's own flanking baseline, which
+prevents a uniformly offset profile being read as a loss. Validated on five HPRC
+samples with DRAGEN comparator labels: 4/4 deletion carriers detected (relative
+0.00–0.72), 2/2 normal controls clean (0.89, 0.94), and the triplication carrier
+HG00735 correctly returning no localised event (0.89). This frame requires
+coverage outside the globin loci and cannot run on targeted or simulated libraries.
+
+Because HBA1/HBA2 lie in a segmental duplication, neither frame resolves zygosity
+reliably for large deletions (het and hom depth overlap), and neither detects
+triplications: an extra near-identical α copy adds no unique depth (HG00735,
+23.1× vs 24.1× in a normal control). The CIGAR and coverage methods are
+complementary — CIGAR for precise typing within read length, coverage for
+deletions beyond it.
 
 ## Naming and classification layer
 
 Variants are named and classified against an **IthaGenes-primary catalogue**
-(`databases/naming_layer.csv` → converted to `databases/variants.csv`, 3,685
-entries), keyed on HGVS (`GENE:c.notation`). This supersedes the earlier
+(`databases/naming_layer.csv` → converted to `databases/variants.csv`, 4,027
+entries; 3,676 with coordinates), keyed on HGVS (`GENE:c.notation`). This supersedes the earlier
 ClinVar-derived catalogue (2,839 entries) — it is a strict superset (+846
 variants) that uses expert thalassaemia curation as the classification spine:
 
-- **IthaGenes (ITHANET)** — 2,081 HBA/HBB variants (2,028 Causative + 53 Neutral),
-  the curation spine. `scripts/build_naming_layer.py`.
+- **IthaGenes (ITHANET)** — 2,423 globin variants (2,367 Causative + 56 Neutral),
+  the curation spine. Loci: β 1,168; α2 421; α1 283; α-ambiguous 205; δ 193;
+  Gγ 88; Aγ 58; plus multi-gene and hybrid entries.
+  `scripts/build_naming_layer.py`.
 - **ClinVar** — 1,604 additional variants not in IthaGenes, plus classification
   cross-reference where both hold a variant.
-- Source per variant: 1,069 IthaGenes-only, 1,012 IthaGenes+ClinVar,
-  1,604 ClinVar-only.
+- Source per variant: 1,411 IthaGenes-only, 1,012 IthaGenes+ClinVar,
+  1,604 ClinVar-only (4,027 total; 3,676 with coordinates).
 
 Classification is **Functionality-first**: `sample_report.py:tier()` checks the
 IthaGenes Functionality (`Causative`) before ClinVar, so IthaGenes causative
 variants tier as pathogenic even where ClinVar is silent or VUS-heavy — the whole
-point of the IthaGenes-primary design. 1,055/1,069 IthaGenes-only variants tier
+point of the IthaGenes-primary design. 1,394/1,411 IthaGenes-only variants tier
 as causative (tier 1). No ClinVar terms are fabricated for IthaGenes-only
 variants; a blank ClinVar column is honest and does not demote them.
 
 **GRCh38 coordinates** were derived via the VariantValidator REST API and
 validated against 123 known coordinates (45 general + 78 HBB promoter) with zero
-mismatches before being trusted on unknowns. Coverage: **99.8% (3,676/3,685)**.
+mismatches before being trusted on unknowns. Coverage: **99.8% (3,676/3,685)** of coordinate-derivable entries. A further
+351 entries are retained for naming only and carry no coordinate: 342 HGVS-keyed
+extensions plus nine documented edge cases (protein-only notation,
+boundary-spanning deletions, a transcript numbering discrepancy). Unresolved
+states are recorded in `coord_status`, never force-filled.
 Derivation paths, each validated against known answers:
 
 - direct GRCh38 VCF block (in-transcript variants);
@@ -232,6 +264,10 @@ variant sat at DP 991. Populations separate on **depth**, not QUAL. Filter is no
 `FILTER=PASS` + `FORMAT/DP≥10` + `FORMAT/AF≥0.15`; QUAL dropped.
 
 **Phasing** — Clair3 `--enable_phasing`; het variants emitted as `0|1`.
+Benchmarked against HPRC assembly-derived truth with `whatshap compare` (v2.8,
+`run_whatshap_compare.sh`): 256 phased heterozygous variant pairs assessed
+across five samples, **zero switch errors** and zero Hamming distance. chr11
+only — too few heterozygous variants in the α-globin truth regions to assess.
 SRR37686273 carries six het variants across 1.3 kb of HBB, all in cis, read
 directly off single molecules.
 
@@ -280,7 +316,7 @@ Snakefile                        pipeline definition (incl. csq_annotate, cigar_
 config.yml                       paths, thresholds, target regions
 envs/                            per-rule conda environments (pinned)
 databases/
-  naming_layer.csv               IthaGenes-primary catalogue (3685, coord_status column)
+  naming_layer.csv               IthaGenes-primary catalogue (4027, coord_status column)
   variants.csv                   consumer-facing catalogue (naming_layer, 18-col schema)
   cnvs.csv                       IthaCNVs-derived CNV catalogue (311)
   build_naming_layer.py          build the IthaGenes-primary catalogue
