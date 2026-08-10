@@ -168,7 +168,10 @@ def main():
                     klass = "gain, unresolved (coverage only)"
                 hgvs_disp = "%s, ~%s× depth" % (r["Region"], r.get("Fold", "?"))
                 if not any(e[1] == common for e in samples[s_name]):
-                    samples[s_name].append((1, common, hgvs_disp, "", klass, "coverage"))
+                    # tier 2, not 1: coverage establishes extra material but not
+                    # copy order, chromosome assignment or junction, so an
+                    # unresolved gain must not be counted as a causative call.
+                    samples[s_name].append((5, common, hgvs_disp, "", klass, "coverage"))
 
     def display(common, hgvs):
         """Combined 'Name (HGVS)' for the detail column."""
@@ -183,7 +186,7 @@ def main():
                     "N_vus", "N_benign", "All_variants_ranked"])
         for s in sorted(samples):
             variants = sorted(samples[s], key=lambda x: x[0])
-            n = {1: 0, 2: 0, 3: 0, 4: 0}
+            n = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
             for t, *_ in variants:
                 n[t] += 1
 
@@ -200,6 +203,8 @@ def main():
                 result = "Conflicting classification — review"
             elif n[3]:
                 result = "VUS only — review"
+            elif n[5]:
+                result = "Unresolved structural-gain candidate — review"
             elif n[4]:
                 result = "Benign only"
             else:

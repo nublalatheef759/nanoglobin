@@ -1,0 +1,115 @@
+Sample,Tool,Chromosome,Position,Ref,Alt,HGVS,Gene,Consequence,Genotype,Quality
+HET_hbs,Clair3,chr11,5227002,T,A,ENST00000335295.4:c.20A>T,HBB,missense_variant,0/1,19.88
+HET_prom,Clair3,chr11,5227159,G,T,ENST00000485743.2:c.-138C>A,HBB,5_prime_UTR_variant,0/1,23.68
+SRR37686269,Clair3,chr11,5225469,A,T,ENST00000335295.4:c.*129T>A,HBB,3_prime_UTR_variant,0|1,22.56
+SRR37686269,Clair3,chr11,5227003,C,T,ENST00000335295.4:c.19G>A,HBB,missense_variant,1|0,17.74
+SRR37686269,Clair3,chr11,5227599,T,A,ENST00000380315.2:c.-86-20A>T,HBB,intron_variant,0|1,17.17
+SRR37686269,Clair3,chr11,5227612,G,A,ENST00000380315.2:c.-86-33C>T,HBB,intron_variant,1/1,14.25
+SRR37686269,Clair3,chr11,5227622,A,G,ENST00000380315.2:c.-86-43T>C,HBB,intron_variant,0|1,22.05
+SRR37686269,Clair3,chr11,5227774,A,G,ENST00000380315.2:c.-86-195T>C,HBB,intron_variant,0|1,22.24
+SRR37686269,Clair3,chr16,172870,G,C,ENST00000866237.2:c.-43G>C,HBA2,5_prime_UTR_variant,1/1,21.8
+SRR37686273,Clair3,chr11,5226496,G,A,ENST00000335295.4:c.315+81C>T,HBB,intron_variant,0|1,21.36
+SRR37686273,Clair3,chr11,5227013,A,G,ENST00000335295.4:c.9T>C,HBB,synonymous_variant,0|1,20.53
+SRR37686273,Clair3,chr11,5227411,G,A,ENST00000380315.2:c.-19+101C>T,HBB,intron_variant,0|1,19.12
+SRR37686273,Clair3,chr11,5227540,G,A,ENST00000380315.2:c.-47C>T,HBB,5_prime_UTR_variant,1/1,32.95
+SRR37686273,Clair3,chr11,5227599,T,A,ENST00000380315.2:c.-86-20A>T,HBB,intron_variant,0|1,10.36
+SRR37686273,Clair3,chr11,5227612,G,A,ENST00000380315.2:c.-86-33C>T,HBB,intron_variant,1/1,16.68
+SRR37686273,Clair3,chr11,5227622,A,G,ENST00000380315.2:c.-86-43T>C,HBB,intron_variant,0|1,21.09
+SRR37686273,Clair3,chr11,5227774,A,G,ENST00000380315.2:c.-86-195T>C,HBB,intron_variant,0|1,21.44
+SRR37686273,Clair3,chr16,172870,G,C,ENST00000866237.2:c.-43G>C,HBA2,5_prime_UTR_variant,1/1,20.86
+SRR37686273,Clair3,chr16,173707,A,G,ENST00000251595.11:c.*107A>G,HBA2,3_prime_UTR_variant,1/1,12.64
+SRR37686273,Clair3,chr16,173800,C,G,ENST00001097508.1:c.*200C>G,HBA2,3_prime_UTR_variant,1/1,2.41
+SRR37686273,Clair3,chr16,176800,G,T,ENST00000320868.9:c.84G>T,HBA1,missense_variant,0/1,20.63
+HET_100x,Sniffles,chr16,173707,AGCAGCCTGTGTGTGCCTGG...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3812bp,0/1,60
+HET_30x,Sniffles,chr16,173707,AGCAGCCTGTGTGTGCCTGG...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3812bp,0/1,60
+HET_500x,Sniffles,chr16,173707,AGCAGCCTGTGTGTGCCTGG...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3812bp,0/1,59
+HET_50x,Sniffles,chr16,173707,AGCAGCCTGTGTGTGCCTGG...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3812bp,0/1,60
+HET_a37,Sniffles,chr16,173707,AGCAGCCTGTGTGTGCCTGG...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3812bp,0/1,59
+HET_a42,Sniffles,chr16,169819,ATGCAAGTGCAGGTGCCAGA...,DEL,-α4.2 (100% reciprocal; ithaID=301),HBA,SV_DEL_-4256bp,0/1,60
+HET_fullalpha,Sniffles,chr16,169999,CTGGGGAGACTCTTCAGCAG...,DEL,--SPAN (100% reciprocal; ithaID=318),HBA,SV_DEL_-9001bp,0/1,59
+HOM_a37,Sniffles,chr16,173707,AGCAGCCTGTGTGTGCCTGG...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3812bp,1/1,59
+SRR37686273,Sniffles,chr16,173686,TTGAATAAAGTCTGAGTGGG...,DEL,unknown_DEL_2910bp,HBA,SV_DEL_-2910bp,0/1,47
+SRR37686273,Sniffles,chr16,173849,GGTGGGCCTGCTCAAGAGAA...,DEL,unknown_DEL_2241bp,HBA,SV_DEL_-2241bp,0/1,45
+SRR37686273,Sniffles,chr16,176155,TGAGTTCCTATGGGCCAGGG...,DEL,unknown_DEL_441bp,HBA,SV_DEL_-441bp,0/1,43
+HET_100x,CuteSV,chr16,173707,GCAGCCTGTGTGTGCCTGGG...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3810bp,0/1,115.7
+HET_500x,CuteSV,chr16,173708,CAGCCTGTGTGTGCCTGGGT...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3811bp,0/1,164.6
+HET_a37,CuteSV,chr16,173708,CAGCCTGTGTGTGCCTGGGT...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3811bp,./.,.
+HOM_a37,CuteSV,chr16,173709,AGCCTGTGTGTGCCTGGGTT...,DEL,-α3.7 (100% reciprocal; ithaID=2231),HBA,SV_DEL_-3805bp,./.,.
+SRR37686273,CuteSV,chr16,173886,GTCCTGAGAGGTGCCAGGCC...,DEL,unknown_DEL_2165bp,HBA,SV_DEL_-2165bp,./.,.
+SRR37686273,CuteSV,chr16,177046,GCGCACGTGGACGACATGCC...,DEL,unknown_DEL_99bp,HBA,SV_DEL_-99bp,0/0,0.1
+HET_a37,Coverage,,,,,,HBA_mean_depth,731.481,,
+HET_a37,Coverage,,,,,,HBB_mean_depth,999.981,,
+HET_a37,Coverage,,,,,,HBA_HBB_ratio,0.8716,,
+HET_a37,Coverage,,,,,,HBB_median_depth,1005.000,,
+HET_a42,Coverage,,,,,,HBA_mean_depth,734.917,,
+HET_a42,Coverage,,,,,,HBB_mean_depth,1004.423,,
+HET_a42,Coverage,,,,,,HBA_HBB_ratio,0.6881,,
+HET_a42,Coverage,,,,,,HBB_median_depth,1010.000,,
+HET_fullalpha,Coverage,,,,,,HBA_mean_depth,490.041,,
+HET_fullalpha,Coverage,,,,,,HBB_mean_depth,972.640,,
+HET_fullalpha,Coverage,,,,,,HBA_HBB_ratio,0.5031,,
+HET_fullalpha,Coverage,,,,,,HBB_median_depth,978.000,,
+HET_triple,Coverage,,,,,,HBA_mean_depth,1074.062,,
+HET_triple,Coverage,,,,,,HBB_mean_depth,1004.079,,
+HET_triple,Coverage,,,,,,HBA_HBB_ratio,1.0823,,
+HET_triple,Coverage,,,,,,HBB_median_depth,1009.000,,
+HG00642,Coverage,,,,,,HBA_mean_depth,12.446,,
+HG00642,Coverage,,,,,,HBB_mean_depth,20.025,,
+HG00642,Coverage,,,,,,HBA_HBB_ratio,0.7000,,
+HG00642,Coverage,,,,,,HBB_median_depth,20.000,,
+HG00735,Coverage,,,,,,HBA_mean_depth,23.089,,
+HG00735,Coverage,,,,,,HBB_mean_depth,40.432,,
+HG00735,Coverage,,,,,,HBA_HBB_ratio,0.4634,,
+HG00735,Coverage,,,,,,HBB_median_depth,41.000,,
+HG02071,Coverage,,,,,,HBA_mean_depth,24.085,,
+HG02071,Coverage,,,,,,HBB_mean_depth,36.738,,
+HG02071,Coverage,,,,,,HBA_HBB_ratio,0.5946,,
+HG02071,Coverage,,,,,,HBB_median_depth,37.000,,
+HG02074,Coverage,,,,,,HBA_mean_depth,14.154,,
+HG02074,Coverage,,,,,,HBB_mean_depth,19.878,,
+HG02074,Coverage,,,,,,HBA_HBB_ratio,0.6500,,
+HG02074,Coverage,,,,,,HBB_median_depth,20.000,,
+HG02083,Coverage,,,,,,HBA_mean_depth,24.348,,
+HG02083,Coverage,,,,,,HBB_mean_depth,20.183,,
+HG02083,Coverage,,,,,,HBA_HBB_ratio,1.1000,,
+HG02083,Coverage,,,,,,HBB_median_depth,20.000,,
+HG02514,Coverage,,,,,,HBA_mean_depth,21.693,,
+HG02514,Coverage,,,,,,HBB_mean_depth,15.939,,
+HG02514,Coverage,,,,,,HBA_HBB_ratio,1.3125,,
+HG02514,Coverage,,,,,,HBB_median_depth,16.000,,
+HG03136,Coverage,,,,,,HBA_mean_depth,12.388,,
+HG03136,Coverage,,,,,,HBB_mean_depth,24.676,,
+HG03136,Coverage,,,,,,HBA_HBB_ratio,0.5600,,
+HG03136,Coverage,,,,,,HBB_median_depth,25.000,,
+HG03862,Coverage,,,,,,HBA_mean_depth,13.373,,
+HG03862,Coverage,,,,,,HBB_mean_depth,24.743,,
+HG03862,Coverage,,,,,,HBA_HBB_ratio,0.5200,,
+HG03862,Coverage,,,,,,HBB_median_depth,25.000,,
+HOM_a37,Coverage,,,,,,HBA_mean_depth,509.133,,
+HOM_a37,Coverage,,,,,,HBB_mean_depth,1002.719,,
+HOM_a37,Coverage,,,,,,HBA_HBB_ratio,0.8494,,
+HOM_a37,Coverage,,,,,,HBB_median_depth,1009.000,,
+HOM_triple,Coverage,,,,,,HBA_mean_depth,1138.645,,
+HOM_triple,Coverage,,,,,,HBB_mean_depth,1053.160,,
+HOM_triple,Coverage,,,,,,HBA_HBB_ratio,1.1256,,
+HOM_triple,Coverage,,,,,,HBB_median_depth,1059.000,,
+HOM_triple2,Coverage,,,,,,HBA_mean_depth,1373.597,,
+HOM_triple2,Coverage,,,,,,HBB_mean_depth,1023.012,,
+HOM_triple2,Coverage,,,,,,HBA_HBB_ratio,0.9446,,
+HOM_triple2,Coverage,,,,,,HBB_median_depth,1028.000,,
+NA21106,Coverage,,,,,,HBA_mean_depth,20.774,,
+NA21106,Coverage,,,,,,HBB_mean_depth,24.631,,
+NA21106,Coverage,,,,,,HBA_HBB_ratio,1.0000,,
+NA21106,Coverage,,,,,,HBB_median_depth,25.000,,
+SRR37686269,Coverage,,,,,,HBA_mean_depth,823.555,,
+SRR37686269,Coverage,,,,,,HBB_mean_depth,538.658,,
+SRR37686269,Coverage,,,,,,HBA_HBB_ratio,0.0000,,
+SRR37686269,Coverage,,,,,,HBB_median_depth,642.000,,
+SRR37686273,Coverage,,,,,,HBA_mean_depth,16055.299,,
+SRR37686273,Coverage,,,,,,HBB_mean_depth,6183.867,,
+SRR37686273,Coverage,,,,,,HBA_HBB_ratio,0.0009,,
+SRR37686273,Coverage,,,,,,HBB_median_depth,7410.000,,
+WT_control,Coverage,,,,,,HBA_mean_depth,969.369,,
+WT_control,Coverage,,,,,,HBB_mean_depth,963.662,,
+WT_control,Coverage,,,,,,HBA_HBB_ratio,1.0083,,
+WT_control,Coverage,,,,,,HBB_median_depth,968.000,,

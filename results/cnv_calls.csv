@@ -1,0 +1,8 @@
+﻿Sample,Type,Region,Fold,Name,Confidence
+HET_a37,loss,chr16:174800-175600,0.49,,high
+HET_a42,loss,chr16:170600-173000,0.49,,high
+HET_fullalpha,loss,chr16:170000-170400,0.49,,high
+HET_fullalpha,loss,chr16:170800-171800,0.50,,high
+HET_fullalpha,loss,chr16:176000-178000,0.49,,high
+HOM_a37,loss,chr16:173600-177400,0.02,,high
+HOM_triple2,gain,chr16:173400-177000,1.80,ααα(anti-3.7) (95% reciprocal; ithaID=2561),moderate

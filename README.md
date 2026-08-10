@@ -186,7 +186,7 @@ variants) that uses expert thalassaemia curation as the classification spine:
 - **IthaGenes (ITHANET)** — 2,423 globin variants (2,367 Causative + 56 Neutral),
   the curation spine. Loci: β 1,168; α2 421; α1 283; α-ambiguous 205; δ 193;
   Gγ 88; Aγ 58; plus multi-gene and hybrid entries.
-  `scripts/build_naming_layer.py`.
+  `databases/build_naming_layer.py`.
 - **ClinVar** — 1,604 additional variants not in IthaGenes, plus classification
   cross-reference where both hold a variant.
 - Source per variant: 1,411 IthaGenes-only, 1,012 IthaGenes+ClinVar,
