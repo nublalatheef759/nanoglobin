@@ -84,10 +84,9 @@ rule cigar_deletions:
     conda:
         "envs/python.yaml"
     shell:
-        "SAMTOOLS=$(find .snakemake/conda -name samtools -type f 2>/dev/null | head -1); "
         "python scripts/detect_deletions_cigar.py "
         "--bam {input.bam} --name {wildcards.sample} "
-        "--cnvs {input.cnvs} --samtools $SAMTOOLS "
+        "--cnvs {input.cnvs} --samtools $(which samtools) "
         "--out {output} 2> {log}"
         
 rule sniffles_sv:

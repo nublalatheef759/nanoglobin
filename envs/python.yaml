@@ -13,3 +13,4 @@ dependencies:
   - requests=2.31
   - lxml=5.1
   - pysam=0.22
+  - samtools=1.16.1
