@@ -283,9 +283,12 @@ directly off single molecules.
 - Promoter/5′UTR HGVS is transcript-dependent; catalogue-guided selection is
   required. Variants not in the catalogue and >~340 bp upstream stay
   `upstream_gene_variant` (correct — intergenic, not named promoter variants).
-- `vep_annotate.py` annotates insertions via the Ensembl VEP region endpoint,
-  which can return an API error for some indel formats. Not triggered by any
-  variant in the current test set.
+- `vep_annotate.py` queries the Ensembl VEP REST endpoint, which intermittently
+  returns errors when the service is unavailable or under load. Affected variants
+  are recorded as `api_error` rather than silently dropped, and re-running
+  `annotate_variants` resolves them once the service recovers. Annotation
+  therefore depends on a live external service and is not pinned by the conda
+  environments.
 
 **Clinical logic**
 - `annotate_structural` handles HBA only; HBB structural variants are not
