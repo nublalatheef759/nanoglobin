@@ -239,12 +239,11 @@ single allele rather than per-variant.
 
 ## Co-inheritance flagging
 
-Patients co-inheriting **causative** HBA and HBB variants are flagged: co-inherited
-α-thalassaemia suppresses HbA2, the diagnostic marker for β-thal trait, so an HBB
-carrier can screen normal on HPLC. In this cohort, HBB heterozygotes below the
-3.5% HbA2 cutoff rose with α-globin dose — 25.5% (no HBA variant) → 36.5% (HBA het)
-→ 43.3% (HBA hom/comp het). The flag fires only when both loci carry causative
-variants; benign background variants do not trigger it.
+Patients co-inheriting **causative** HBA and HBB variants are flagged. Co-inheritance
+alters red-cell indices and complicates interpretation of screening results, so the
+combined genotype is surfaced rather than reported as two independent findings. The
+flag fires only when both loci carry causative variants; benign background variants
+do not trigger it.
 
 ## Per-sample clinical report
 
