@@ -231,7 +231,8 @@ rule comprehensive_summary:
         annotated=expand("results/{s}.annotated.csv", s=SAMPLES),
         sniffles=expand("variants/{s}/{s}.sniffles.vcf", s=SAMPLES),
         cutesv=expand("variants/{s}/{s}.cutesv.vcf", s=SAMPLES),
-        coverage=expand("variants/{s}/{s}.coverage.tsv", s=SAMPLES)
+        coverage=expand("variants/{s}/{s}.coverage.tsv", s=SAMPLES),
+        cigar=expand("variants/{s}/{s}.cigar_deletions.tsv", s=SAMPLES)
     output:
         "results/comprehensive_report.csv"
     params:

@@ -94,6 +94,26 @@ with open(output_file, 'w') as out:
                 ref_display = parts[3][:20] + "..." if len(parts[3]) > 20 else parts[3]
                 writer.writerow([sample, "CuteSV", chrom, pos, ref_display, svtype, sv_name, gene, "SV_" + svtype + "_" + svlen + "bp", gt, parts[5]])
 
+    # CIGAR-based alpha-globin deletions. Only confident calls are emitted:
+    # detect_deletions_cigar.py writes deletion_detected=no when fewer than
+    # three spanning reads carry the event, and those rows are skipped here
+    # rather than reported as a negative finding.
+    for f in _declared("variants/*/*.cigar_deletions.tsv", _by_dirname):
+        sample = f.split("/")[1]
+        with open(f) as fh:
+            rdr = csv.DictReader(fh, delimiter="\t")
+            for row in rdr:
+                if (row.get("deletion_detected") or "").strip().lower() != "yes":
+                    continue
+                size = (row.get("size_bp") or "").strip()
+                name = (row.get("matched_type") or "").strip()
+                zyg = (row.get("zygosity") or "").strip()
+                frac = (row.get("fraction") or "").strip()
+                writer.writerow([sample, "CIGAR", "chr16", "", "", "DEL",
+                                 name, "HBA",
+                                 "DEL_%sbp_frac_%s" % (size, frac),
+                                 zyg, ""])
+
     for f in _declared("variants/*/*.coverage.tsv", _by_dirname):
         sample = f.split("/")[1]
         with open(f) as cov:
