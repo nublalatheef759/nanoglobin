@@ -7,13 +7,15 @@ developed for thalassaemia (nanothal) and generalised to the globin loci
 (nanoglobin).
 
 ```
-FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filter → region filter → VEP → annotate
-                               ├→ bcftools csq (haplotype-aware consequence)
-                               ├→ CIGAR deletion scan (α-globin deletions from spanning reads)
-                               ├→ Sniffles ┐
-                               ├→ CuteSV   ┤→ identify_sv (IthaCNVs catalogue)
-                               └→ coverage_profile (binned depth, flanking-normalised)
-                                            └→ comprehensive report → patient summary → clinical report
+FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filter → region filter → VEP ─┐
+                               ├→ CIGAR deletion scan (spanning reads, class + zygosity) ────┤
+                               ├→ Sniffles ┐                                                 │
+                               ├→ CuteSV   ┤→ identify_sv (IthaCNVs catalogue) ──────────────┤
+                               ├→ coverage_profile (binned depth) → detect_cnv ──────────────┤
+                               │                                                             ↓
+                               │                              comprehensive report → sample report
+                               │                                                    → clinical annotation
+                               └→ bcftools csq (haplotype-aware consequence; terminal, not merged)
 ```
 
 ## Status
@@ -290,13 +292,15 @@ directly off single molecules.
 - `annotate_structural` handles HBA only; HBB structural variants are not
   annotated by it. Its hardcoded `sv_lookup` is superseded by
   `identify_sv.py`/`cnvs.csv`.
+- CIGAR deletion calls are matched to `cnvs.csv` by size **and** position: the
+  catalogue entry must be on the same chromosome and the observed breakpoint
+  must fall within its interval (±5 kb). Size tolerance is ±2%. Events matching
+  no entry are reported as `uncatalogued` rather than forced to a named class.
 - β⁰/β⁺ classification lists are a data file (`beta_classification.csv`).
 
 **Pipeline**
 - WGS mode is wired (`mode: wgs` switches the reference) but carriers are run
   manually in WGS coordinates; no full WGS dataset run end-to-end.
-- `comprehensive_report.py` and `patient_summary.py` take no arguments and glob
-  the filesystem, so simulated samples can appear in clinical reports.
 
 ## Data sources
 
