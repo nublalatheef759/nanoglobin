@@ -109,7 +109,10 @@ with open(output_file, 'w') as out:
                 name = (row.get("matched_type") or "").strip()
                 zyg = (row.get("zygosity") or "").strip()
                 frac = (row.get("fraction") or "").strip()
-                writer.writerow([sample, "CIGAR", "chr16", "", "", "DEL",
+                writer.writerow([sample, "CIGAR",
+                                 (row.get("chrom") or "").strip(),
+                                 (row.get("breakpoint") or "").strip(),
+                                 "", "DEL",
                                  name, "HBA",
                                  "DEL_%sbp_frac_%s" % (size, frac),
                                  zyg, ""])

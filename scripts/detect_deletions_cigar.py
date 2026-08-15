@@ -37,6 +37,7 @@ CIGAR-deletion gives precise size/type + zygosity for deletions within read
 length; coverage catches the large ones.
 """
 import argparse
+import collections
 import csv
 import os
 import re
@@ -107,32 +108,50 @@ def load_cnv_types(cnvs_csv):
                 continue
             if smin > 0:
                 types.append((r.get("name", "?"), smin, smax or smin,
-                              r.get("genes", "")))
+                              r.get("genes", ""), r.get("chrom", ""),
+                              r.get("start_min", ""), r.get("end_max", "")))
     return types
 
 
-def type_by_size(size, types, tol=0.10):
-    """Return CNV records whose size matches, sorted by closeness (best first)."""
+def type_by_size(size, types, chrom=None, pos=None, tol=0.02, margin=5000):
+    """Return CNV records matching by size AND position, best first.
+
+    Size compatibility alone is not identity: a catalogued beta-locus deletion
+    on chr11 can be the same length as an observed alpha-locus deletion on
+    chr16. A candidate is returned only when the chromosome matches and the
+    observed breakpoint falls inside the catalogued interval (plus a margin,
+    as the breakpoint is a median across reads).
+    """
     hits = []
-    for name, smin, smax, genes in types:
+    for name, smin, smax, genes, c_chrom, c_start, c_end in types:
         lo = min(smin, smax) * (1 - tol)
         hi = max(smin, smax) * (1 + tol)
-        if lo <= size <= hi:
-            # distance from the nearest catalogued size bound
-            centre = (smin + smax) / 2
-            dist = abs(size - centre)
-            hits.append((dist, name, smin, smax, genes))
+        if not (lo <= size <= hi):
+            continue
+        if chrom and c_chrom and c_chrom != chrom:
+            continue
+        if pos is not None and c_start and c_end:
+            try:
+                if not (int(float(c_start)) - margin <= pos
+                        <= int(float(c_end)) + margin):
+                    continue
+            except ValueError:
+                pass
+        centre = (smin + smax) / 2
+        hits.append((abs(size - centre), name, smin, smax, genes))
     hits.sort(key=lambda x: x[0])
     return [(n, a, b, g) for (_, n, a, b, g) in hits]
 
 
-def write_tsv(path, name, detected, size, mtype, zyg, frac, genotype):
+def write_tsv(path, name, detected, size, mtype, zyg, frac, genotype,
+              chrom="NA", pos="NA"):
     """Write a single clean result row (with header) for pipeline consumption."""
     if not path:
         return
-    header = ("sample\tdeletion_detected\tsize_bp\tmatched_type\t"
-              "zygosity\tfraction\tdragen_genotype\n")
-    row = (f"{name}\t{detected}\t{size}\t{mtype}\t{zyg}\t{frac}\t{genotype}\n")
+    header = ("sample\tdeletion_detected\tchrom\tbreakpoint\tsize_bp\t"
+              "matched_type\tzygosity\tfraction\tdragen_genotype\n")
+    row = (f"{name}\t{detected}\t{chrom}\t{pos}\t{size}\t{mtype}\t"
+           f"{zyg}\t{frac}\t{genotype}\n")
     with open(path, "w") as fh:
         fh.write(header)
         fh.write(row)
@@ -168,7 +187,8 @@ def main():
     for region in args.regions.split(","):
         dels, reads = scan_region(args.samtools, args.bam, region,
                                   args.min_del, args.mapq)
-        all_dels.extend(dels)
+        _rc = region.split(":")[0]
+        all_dels.extend([(d[0], d[1], _rc) for d in dels])
         all_reads.extend(reads)
 
     # require a minimum number of supporting reads (noise filter)
@@ -193,6 +213,7 @@ def main():
 
     # spanning reads counted at the actual breakpoint (median deletion start)
     breakpoint_pos = int(stats.median(d[0] for d in all_dels))
+    del_chrom = collections.Counter(d[2] for d in all_dels).most_common(1)[0][0]
     spanning = count_spanning(all_reads, breakpoint_pos)
     frac = n_del / spanning if spanning else float("nan")
 
@@ -204,11 +225,11 @@ def main():
         zyg = ("UNCERTAIN (low fraction -- large deletion exceeding typical read "
                "length; confirm zygosity by coverage)")
 
-    hits = type_by_size(consensus, types)
+    hits = type_by_size(consensus, types, chrom=del_chrom, pos=breakpoint_pos)
 
     print(f"#   consensus deletion size: {consensus} bp "
           f"(range {sizes[0]}-{sizes[-1]}, n={n_del} reads)")
-    print(f"#   breakpoint ~chr16:{breakpoint_pos}   spanning reads: {spanning}   "
+    print(f"#   breakpoint ~{del_chrom}:{breakpoint_pos}   spanning reads: {spanning}   "
           f"deletion-read fraction: {frac:.2f}")
     if hits:
         print(f"#   best size match: {hits[0][0]} ({hits[0][1]}-{hits[0][2]} bp; {hits[0][3]})")
@@ -225,7 +246,8 @@ def main():
                  "HET" if frac >= 0.30 else "UNCERTAIN")
     write_tsv(args.out, args.name, "yes", consensus,
               hits[0][0] if hits else "uncatalogued",
-              zyg_short, f"{frac:.2f}", args.genotype)
+              zyg_short, f"{frac:.2f}", args.genotype,
+              chrom=del_chrom, pos=breakpoint_pos)
 
 
 if __name__ == "__main__":
