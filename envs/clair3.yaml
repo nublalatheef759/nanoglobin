@@ -2,8 +2,8 @@
 # which is what removes the module-vs-conda pysam conflict and the two-shell split.
 name: nanoglobin-clair3
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
   - defaults
 dependencies:
   - clair3=1.0.4
