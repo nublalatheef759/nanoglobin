@@ -1,0 +1,21 @@
+Clean-clone reproducibility test, 16 August 2026
+
+Repository cloned fresh from GitHub into a separate directory. Reference data,
+Clair3 model and FASTQ symlinked (not tracked in the repository). One sample
+(SRR37686273) run end to end as a batch job, 8 cores, 32 GB.
+
+Result: 20 of 20 rules completed. Wall time 7 min 46 s including conda
+environment creation; peak memory 2.0 GB. Pipeline compute approximately
+3.5 min, dominated by Clair3 (1 min 33 s) and minimap2 (52 s).
+
+Variant calls (sample, chrom, pos, ref, alt) were byte-identical to the working
+copy. The only difference was the annotation column: the Ensembl VEP REST API
+returned errors for 12 variants in the clone and 11 in the working copy, on
+different variants each time.
+
+Three defects were found and fixed:
+  - conda channel order (bioconda before conda-forge) in align.yaml,
+    bcftools.yaml and clair3.yaml, which made a fresh solve fail
+  - unused absolute tool paths in config.yml pointing at a personal
+    conda environment
+  - no reference-data acquisition instructions in the README
