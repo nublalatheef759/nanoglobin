@@ -79,8 +79,18 @@ def query_vep(chrom, pos, ref, alt):
         url = f"{server}/vep/human/region/{chrom_num}:{pos}:{pos}/{alt}"
     
     try:
-        r = requests.get(url, headers={"Content-Type": "application/json"}, params={"hgvs": 1, "regulatory": 1, "canonical": 1})
-        time.sleep(0.1)  # rate limit
+        # Retry transient failures. A single 429 (rate limited) or 5xx would
+        # otherwise mark the variant api_error for the whole run, which is why
+        # a different set of variants failed on each execution.
+        for attempt in range(4):
+            r = requests.get(url, headers={"Content-Type": "application/json"},
+                             params={"hgvs": 1, "regulatory": 1, "canonical": 1},
+                             timeout=30)
+            if r.ok:
+                break
+            wait = float(r.headers.get("Retry-After", 0)) or (2 ** attempt)
+            time.sleep(wait)
+        time.sleep(0.15)  # stay inside the 15 req/s limit
         if r.ok:
             data = r.json()
             if data and "transcript_consequences" in data[0]:
