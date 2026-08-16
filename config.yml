@@ -5,10 +5,7 @@ samples: ["SRR37686269", "SRR37686273"]
 ref_amplicon: "reference/hg38_globin.fa"      
 ref_wgs: "reference/hg38.fa"
 csq_gff: "reference/ensembl_globin.gff3.gz"
-clair3_path: "/rds/bear-apps/2022a/EL8-ice/software/Clair3/1.0.4-foss-2022a/bin/run_clair3.sh"
 clair3_models: "models/r1041_e82_400bps_sup_v430"
-sniffles_path: "/rds/homes/f/fnl759/.conda/envs/snakemake/bin/sniffles"
-cutesv_path: "/rds/homes/f/fnl759/.conda/envs/snakemake/bin/cuteSV"
 cutesv_min_support: 25
 targets:
   HBA: "chr16:170000-178000"
