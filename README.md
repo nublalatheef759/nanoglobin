@@ -45,6 +45,23 @@ the whole pipeline runs from a single command.
 # rerio (https://github.com/nanoporetech/rerio), place it under models/, and set
 # config.yml `clair3_models:` to that path (e.g. models/r1041_e82_400bps_sup_v430).
 
+# one-time: reference data (not bundled -- ~3.5 GB)
+# GRCh38 primary assembly, e.g. from UCSC:
+#   wget https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
+#   gunzip hg38.fa.gz && samtools faidx hg38.fa
+# amplicon-mode reference (chr11 + chr16 only):
+#   samtools faidx hg38.fa chr11 chr16 > reference/hg38_globin.fa
+#   samtools faidx reference/hg38_globin.fa
+# annotation for bcftools csq (Ensembl 110 GFF3, chr11 + chr16, UCSC contig names):
+#   wget https://ftp.ensembl.org/pub/release-110/gff3/homo_sapiens/\
+#        Homo_sapiens.GRCh38.110.gff3.gz -O reference/ensembl.110.gff3.gz
+#   zcat reference/ensembl.110.gff3.gz \
+#     | awk 'BEGIN{OFS="\t"} /^#/{print; next} $1=="11"{$1="chr11"; print} $1=="16"{$1="chr16"; print}' \
+#     | bgzip > reference/ensembl_globin.gff3.gz
+#   tabix -p gff reference/ensembl_globin.gff3.gz
+
+# place reads as fastq/<sample>.fastq and list them in config.yml `samples:`
+
 # run everything
 snakemake --use-conda --cores 8 --rerun-triggers mtime
 ```
@@ -283,12 +300,16 @@ directly off single molecules.
 - Promoter/5′UTR HGVS is transcript-dependent; catalogue-guided selection is
   required. Variants not in the catalogue and >~340 bp upstream stay
   `upstream_gene_variant` (correct — intergenic, not named promoter variants).
-- `vep_annotate.py` queries the Ensembl VEP REST endpoint, which intermittently
-  returns errors when the service is unavailable or under load. Affected variants
-  are recorded as `api_error` rather than silently dropped, and re-running
-  `annotate_variants` resolves them once the service recovers. Annotation
-  therefore depends on a live external service and is not pinned by the conda
-  environments.
+- `vep_annotate.py` queries the Ensembl VEP REST endpoint. Requests are retried
+  up to four times with exponential backoff, honouring `Retry-After`; before
+  this was added a single transient failure marked a variant `api_error` for the
+  whole run, which is why a different set of variants failed on each execution.
+  A residual failure mode remains: Ensembl sometimes returns an HTML error page
+  with a 200 status, which the retry logic cannot detect, so one to three
+  variants per run may still record `api_error`. Affected variants are recorded
+  rather than silently dropped. Annotation depends on a live external service
+  and is not pinned by the conda environments; caching successful annotations,
+  batching requests, or using a local VEP install would remove this dependency.
 
 **Clinical logic**
 - `annotate_structural` handles HBA only; HBB structural variants are not
