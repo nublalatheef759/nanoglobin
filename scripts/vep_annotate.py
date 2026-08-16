@@ -85,7 +85,7 @@ def query_vep(chrom, pos, ref, alt):
         for attempt in range(4):
             r = requests.get(url, headers={"Content-Type": "application/json"},
                              params={"hgvs": 1, "regulatory": 1, "canonical": 1},
-                             timeout=30)
+                             timeout=90)
             if r.ok:
                 break
             wait = float(r.headers.get("Retry-After", 0)) or (2 ** attempt)
