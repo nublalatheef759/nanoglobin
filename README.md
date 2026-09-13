@@ -360,6 +360,17 @@ records are unsubtyped.
 
 ---
 
+## Licence and data
+
+Code in this repository is released under the MIT Licence (`LICENSE`).
+
+The variant catalogues in `databases/` are derived from IthaGenes, IthaCNVs,
+ClinVar and HbVar and remain subject to those resources' terms of use. No
+patient data are included here; the clinical cohort described in the
+accompanying study is held by Dubai Health and is not distributed.
+
+---
+
 ## Layout
 
 ```
