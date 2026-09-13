@@ -140,10 +140,19 @@ def main():
                 clinvar, common, func = cat.get(hgvs, ("", "", ""))
                 t = tier(clinvar, func)
                 cv = (clinvar or "").strip()
+                is_causative = func.strip().lower() == "causative"
                 if cv and cv not in ("?", "other", "not provided",
                                      "no classification for the single variant"):
-                    klass = cv
-                elif func.strip().lower() == "causative":
+                    # IthaGenes-primary tiering can disagree with ClinVar: a
+                    # variant catalogued as causative may have since been
+                    # classified benign on population-frequency evidence. Show
+                    # both rather than the ClinVar label alone, so the tier and
+                    # the displayed class cannot appear to contradict.
+                    if is_causative and "enign" in cv:
+                        klass = "Causative (IthaGenes) / %s (ClinVar)" % cv
+                    else:
+                        klass = cv
+                elif is_causative:
                     klass = "Causative"
                 else:
                     klass = "unclassified"

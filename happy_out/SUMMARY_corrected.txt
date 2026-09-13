@@ -1,0 +1,13 @@
+hap.py validation (GA4GH standard), CORRECTED FP column
+
+CORE (HBA/HBB):
+  SNV:   96.6% recall, 99.3% precision (140 TP, 5 FN, 1 FP)
+  INDEL: 63.6% recall, 73.7% precision (14 TP, 8 FN, 5 FP)
+
+EXTENDED (full beta-cluster: HBB,HBD,HBG1/2,HBE1,LCR):
+  SNV:      90.4% recall, 94.1% precision (788 TP, 84 FN, 49 FP)
+  INDEL:    69.6% recall, 83.8% precision (119 TP, 52 FN, 23 FP)
+  COMBINED: 87.0% recall, 92.6% precision (907 TP, 136 FN, 72 FP)
+
+Extended-region FPs concentrate in HBG1/HBG2 paralogs (segmental duplication,
+mirroring HBA1/HBA2). Indels harder on both recall and precision (ONT error mode).

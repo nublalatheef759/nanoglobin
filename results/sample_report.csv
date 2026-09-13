@@ -1,26 +1,8 @@
 ﻿Sample,Result,Common_name,Primary_HGVS,Primary_zygosity,N_pathogenic,N_conflicting,N_vus,N_benign,All_variants_ranked
-HET_100x,Causative variant detected,'-α3.7,,het,1,0,0,0,"-α3.7 [Causative, het]"
-HET_30x,Causative variant detected,'-α3.7,,het,1,0,0,0,"-α3.7 [Causative, het]"
-HET_500x,Causative variant detected,'-α3.7,,het,1,0,0,0,"-α3.7 [Causative, het]"
-HET_50x,Causative variant detected,'-α3.7,,het,1,0,0,0,"-α3.7 [Causative, het]"
-HET_a37,Causative variant detected,'-α3.7,,het,1,0,0,0,"-α3.7 [Causative, het]"
-HET_a42,Causative variant detected,'-α4.2,,het,1,0,0,0,"-α4.2 [Causative, het]"
-HET_fullalpha,Causative variant detected,'--SPAN,,het,1,0,0,0,"--SPAN [Causative, het]"
-HET_hbs,Causative variant detected,CD 6 GAG>GTG [Glu>Val] (Sickle-cell),HBB:c.20A>T,het,1,0,0,0,"CD 6 GAG>GTG [Glu>Val] (Sickle-cell) (HBB:c.20A>T) [Causative, het]"
-HET_prom,Causative variant detected,'-88 (C>A),HBB:c.-138C>A,het,1,0,0,0,"'-88 (C>A) (HBB:c.-138C>A) [Pathogenic/Likely pathogenic, het]"
-HET_triple,No variant detected,none,,,0,0,0,0,none
-HG00642,No variant detected,none,,,0,0,0,0,none
-HG00735,No variant detected,none,,,0,0,0,0,none
-HG02071,No variant detected,none,,,0,0,0,0,none
-HG02074,No variant detected,none,,,0,0,0,0,none
-HG02083,No variant detected,none,,,0,0,0,0,none
-HG02514,No variant detected,none,,,0,0,0,0,none
-HG03136,No variant detected,none,,,0,0,0,0,none
-HG03862,No variant detected,none,,,0,0,0,0,none
-HOM_a37,Causative variant detected,'-α3.7,,hom,1,0,0,0,"-α3.7 [Causative, hom]"
-HOM_triple,No variant detected,none,,,0,0,0,0,none
+HET_a37,No variant detected,none,,,0,0,0,0,none
+HET_a42,No variant detected,none,,,0,0,0,0,none
+HET_fullalpha,No variant detected,none,,,0,0,0,0,none
+HOM_a37,No variant detected,none,,,0,0,0,0,none
 HOM_triple2,Unresolved structural-gain candidate — review,none,,,0,0,0,0,"unresolved structural-gain candidate (best catalogue match: ααα(anti-3.7) (95% reciprocal; ithaID=2561)) (chr16:173400-177000, ~1.80× depth) [gain, unresolved (coverage only)]"
-NA21106,No variant detected,none,,,0,0,0,0,none
-SRR37686269,Causative variant detected,3'UTR +129 T>A; CD 6 GAG>AAG [Glu>Lys],HBB:c.*129T>A; HBB:c.19G>A,het; het,2,0,4,1,"3'UTR +129 T>A (HBB:c.*129T>A) [Uncertain significance, het]; CD 6 GAG>AAG [Glu>Lys] (HBB:c.19G>A) [Pathogenic/Likely pathogenic, het]; HBB:c.-86-20A>T [unclassified, het]; HBB:c.-86-33C>T [unclassified, hom]; HBB:c.-86-43T>C [unclassified, het]; HBB:c.-86-195T>C [unclassified, het]; '-6 G>C (HBA2:c.-43G>C) [Benign, hom]"
-SRR37686273,Causative variant detected,3'UTR +107 A>G (3' UTR +832 G>A),HBA2:c.*107A>G,hom,1,0,13,3,"3'UTR +107 A>G (3' UTR +832 G>A) (HBA2:c.*107A>G) [Benign, hom]; HBB:c.-19+101C>T [unclassified, het]; HBB:c.-47C>T [unclassified, hom]; HBB:c.-86-20A>T [unclassified, het]; HBB:c.-86-33C>T [unclassified, hom]; HBB:c.-86-43T>C [unclassified, het]; HBB:c.-86-195T>C [unclassified, het]; HBA1:c.*200C>G [unclassified, hom]; HBD:c.84G>T [unclassified, het]; unknown_DEL_2910bp [Unclassified SV, het]; unknown_DEL_2241bp [Unclassified SV, het]; unknown_DEL_441bp [Unclassified SV, het]; unknown_DEL_2165bp [Unclassified SV]; unknown_DEL_99bp [Unclassified SV, ref]; IVS II-81 (C>T) (HBB:c.315+81C>T) [Benign, het]; HBB:c.9T>C [Benign, het]; '-6 G>C (HBA2:c.-43G>C) [Benign, hom]"
-WT_control,No variant detected,none,,,0,0,0,0,none
+SRR37686269,Causative variant detected,3'UTR +129 T>A; CD 6 GAG>AAG [Glu>Lys],HBB:c.*129T>A; HBB:c.19G>A,het; het,2,0,4,1,"3'UTR +129 T>A (HBB:c.*129T>A) [Uncertain significance, het]; CD 6 GAG>AAG [Glu>Lys] (HBB:c.19G>A) [Pathogenic/Likely pathogenic, het]; api_error [unclassified, het]; api_error [unclassified, hom]; api_error [unclassified, het]; api_error [unclassified, het]; '-6 G>C (HBA2:c.-43G>C) [Benign, hom]"
+SRR37686273,VUS only — review,none,,,0,0,17,1,"api_error [unclassified, het]; api_error [unclassified, het]; api_error [unclassified, het]; api_error [unclassified, hom]; HBB:c.-86-20A>T [unclassified, het]; HBB:c.-86-33C>T [unclassified, hom]; api_error [unclassified, het]; api_error [unclassified, het]; api_error [unclassified, hom]; api_error [unclassified, hom]; api_error [unclassified, het]; unknown_DEL_2910bp [Unclassified SV, het]; unknown_DEL_2241bp [Unclassified SV, het]; unknown_DEL_441bp [Unclassified SV, het]; unknown_DEL_2165bp [Unclassified SV]; unknown_DEL_99bp [Unclassified SV, ref]; uncatalogued [unclassified]; '-6 G>C (HBA2:c.-43G>C) [Benign, hom]"

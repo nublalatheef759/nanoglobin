@@ -1,5 +1,9 @@
 # NanoGlobin
 
+![Snakemake](https://img.shields.io/badge/snakemake-%E2%89%A58.0-brightgreen)
+![Python](https://img.shields.io/badge/python-3.10-blue)
+![License](https://img.shields.io/badge/license-MIT-yellow)
+
 Variant calling for haemoglobinopathies from Oxford Nanopore long-read data —
 α/β-thalassaemias, structural haemoglobin variants (Hb S, Hb C, Hb E), and
 copy-number rearrangements. Targets HBA1/HBA2 (chr16) and HBB (chr11);
@@ -20,15 +24,16 @@ FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filte
 
 ## Status
 
-Core methods validated against real long-read data with three independent truth
-sources (below). The pipeline runs anywhere via `--use-conda` (see
-Reproducibility). The legacy BlueBEAR module path still works but is not required.
+Core methods are benchmarked against real long-read data using two independent
+truth sources (see Benchmarking). The pipeline runs anywhere via `--use-conda`.
 
 > **Running the pipeline after adding/editing a rule:** Snakemake treats a changed
 > rule as a reason to rebuild everything upstream. Always pass
 > `--rerun-triggers mtime` so only genuinely stale targets rebuild, and put the
 > target *after* a `--` separator (the flag otherwise swallows it):
 > `snakemake --use-conda --cores 8 --rerun-triggers mtime -- <target>`.
+
+---
 
 ## Reproducibility
 
@@ -78,9 +83,11 @@ conda-forge before bioconda so pysam/libdeflate resolve under strict channel
 priority; the cuteSV rule sets `PYTHONNOUSERSITE=1` so a stray user-site cuteSV
 install cannot shadow the pinned one.
 
-## Validation
+---
 
-Validated on real Oxford Nanopore data against two independent truth sources —
+## Benchmarking
+
+Benchmarked on real Oxford Nanopore data against two independent truth sources —
 HPRC diploid assemblies and the GIAB HG002 benchmark. DRAGEN calls are used as a
 **comparator** for deletion carriers, not as independent truth. No single truth
 set carries the whole claim.
@@ -133,7 +140,9 @@ their individual sample identifiers were not retained in the result snapshot:
 
 Synthetic positives (`scripts/simulate/`) were used during development to build
 and unit-test the callers against known-answer cases before real data; they are
-development scaffolding, not a validation pillar.
+development scaffolding, not a benchmarking pillar.
+
+---
 
 ## α-globin deletion detection (CIGAR method)
 
@@ -193,6 +202,8 @@ triplications: an extra near-identical α copy adds no unique depth (HG00735,
 23.1× vs 24.1× in a normal control). The CIGAR and coverage methods are
 complementary — CIGAR for precise typing within read length, coverage for
 deletions beyond it.
+
+---
 
 ## Naming and classification layer
 
@@ -254,6 +265,8 @@ Haplotype-aware consequences are additionally produced by **bcftools csq**
 (`rule csq_annotate`, Ensembl GFF3), which reports multi-variant haplotypes on a
 single allele rather than per-variant.
 
+---
+
 ## Co-inheritance flagging
 
 Patients co-inheriting **causative** HBA and HBB variants are flagged. Co-inheritance
@@ -261,6 +274,8 @@ alters red-cell indices and complicates interpretation of screening results, so 
 combined genotype is surfaced rather than reported as two independent findings. The
 flag fires only when both loci carry causative variants; benign background variants
 do not trigger it.
+
+---
 
 ## Per-sample clinical report
 
@@ -272,6 +287,8 @@ variant list. SNVs and structural variants (deletions and catalogue-matched
 gains) are unified into one view. Nothing is hidden: benign and VUS variants sort
 below causative ones but remain visible — ClinVar "Conflicting" variants are
 surfaced explicitly.
+
+---
 
 ## Variant filtering and phasing
 
@@ -288,6 +305,8 @@ across five samples, **zero switch errors** and zero Hamming distance. chr11
 only — too few heterozygous variants in the α-globin truth regions to assess.
 SRR37686273 carries six het variants across 1.3 kb of HBB, all in cis, read
 directly off single molecules.
+
+---
 
 ## Known issues
 
@@ -325,6 +344,8 @@ directly off single molecules.
 - WGS mode is wired (`mode: wgs` switches the reference) but carriers are run
   manually in WGS coordinates; no full WGS dataset run end-to-end.
 
+---
+
 ## Data sources
 
 - **IthaGenes / IthaCNVs** (https://www.ithanet.eu) — variant curation, common
@@ -336,9 +357,12 @@ directly off single molecules.
 - **VariantValidator** (https://rest.variantvalidator.org) — GRCh38 coordinate
   derivation (MANE transcripts NM_000518.5 HBB, NM_000558.5 HBA1, NM_000517.6 HBA2).
 
+---
+
 ## Layout
 
 ```
+LICENSE                          MIT
 Snakefile                        pipeline definition (incl. csq_annotate, cigar_deletions)
 config.yml                       paths, thresholds, target regions
 envs/                            per-rule conda environments (pinned)
@@ -370,8 +394,8 @@ scripts/
   build_clinvar.py               ClinVar merge
   merge_hbvar.py                 fill common names from HbVar
   simulate/                      development test-case generators (haplotype/SNV/triplication)
-giab_HG002.sh                    GIAB HG002 gold-standard validation
-run_pipeline_hprc.sh             HPRC multi-sample validation driver
+giab_HG002.sh                    GIAB HG002 benchmark
+run_pipeline_hprc.sh             HPRC multi-sample benchmarking driver
 simulation/                      development truth VCFs
 ```
 
