@@ -16,3 +16,12 @@ slurm-*
 __pycache__/
 scratch_tmp/
 happy.sif
+*.bak*
+*.log
+*.stats
+slurm-*
+*.checkpoint*
+__pycache__/
+scratch_tmp/
+happy.sif
+*.sif
