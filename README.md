@@ -10,6 +10,10 @@ copy-number rearrangements. Targets HBA1/HBA2 (chr16) and HBB (chr11);
 developed for thalassaemia (nanothal) and generalised to the globin loci
 (nanoglobin).
 
+Developed alongside a cohort study of α- and β-globin variants in a multinational
+thalassaemia cohort in Dubai:
+[nublalatheef759/uae-thalassaemia-cohort](https://github.com/nublalatheef759/uae-thalassaemia-cohort)
+
 ```
 FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filter → region filter → VEP ─┐
                                ├→ CIGAR deletion scan (spanning reads, class + zygosity) ────┤
@@ -356,6 +360,12 @@ directly off single molecules.
   `scripts/merge_hbvar.py`.
 - **VariantValidator** (https://rest.variantvalidator.org) — GRCh38 coordinate
   derivation (MANE transcripts NM_000518.5 HBB, NM_000558.5 HBA1, NM_000517.6 HBA2).
+- **UAE thalassaemia cohort** ((https://github.com/nublalatheef759/uae-thalassaemia-cohort) —
+the cohort analysis this pipeline was developed alongside. The naming layer
+covers 76 of the 77 distinct variants recorded across that cohort: all 70
+small variants, and 6 of 7 structural classes via IthaCNVs. The single miss is
+--MED, which IthaCNVs holds as subtypes MED-I and MED-II while the clinical
+records are unsubtyped.
 
 ---
 
