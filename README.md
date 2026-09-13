@@ -14,17 +14,8 @@ Developed alongside a cohort study of α- and β-globin variants in a multinatio
 thalassaemia cohort in Dubai:
 [nublalatheef759/uae-thalassaemia-cohort](https://github.com/nublalatheef759/uae-thalassaemia-cohort)
 
-```
-FASTQ → minimap2 → sort/index ─┬→ Clair3 (SNV/indel, phased) → filter → region filter → VEP ─┐
-                               ├→ CIGAR deletion scan (spanning reads, class + zygosity) ────┤
-                               ├→ Sniffles ┐                                                 │
-                               ├→ CuteSV   ┤→ identify_sv (IthaCNVs catalogue) ──────────────┤
-                               ├→ coverage_profile (binned depth) → detect_cnv ──────────────┤
-                               │                                                             ↓
-                               │                              comprehensive report → sample report
-                               │                                                    → clinical annotation
-                               └→ bcftools csq (haplotype-aware consequence; terminal, not merged)
-```
+![NanoGlobin workflow](docs/workflow.svg)
+
 
 ## Status
 
